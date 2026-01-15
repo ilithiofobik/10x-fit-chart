@@ -3,9 +3,9 @@ description:
 globs: 
 alwaysApply: true
 ---
-# AI Rules for {app-name}
+# AI Rules for 10xFitChart
 
-{project-description}
+10xFitChart is a desktop-first workout tracking application designed for efficient data entry and deep historical analysis. Built with Astro, React, and Supabase, it enables users to log strength and cardio sessions quickly using keyboard navigation and visualizes progressive overload trends through detailed charts. The MVP focuses on speed and separating metrics for different activity types.
 
 ## Tech Stack
 

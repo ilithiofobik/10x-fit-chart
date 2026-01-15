@@ -1,7 +1,7 @@
-# Dokument wymagań produktu (PRD) - FitChart
+# Dokument wymagań produktu (PRD) - 10xFitChart
 
 ## 1. Przegląd produktu
-FitChart to aplikacja internetowa typu desktop-first, służąca do śledzenia postępów treningowych z naciskiem na analizę danych historycznych i wizualizację trendów. Produkt adresowany jest do osób trenujących siłowo i wytrzymałościowo, które preferują wygodne wprowadzanie danych na komputerze "po fakcie" (np. wieczorem w domu) zamiast uciążliwego klikania w telefonie podczas treningu. System umożliwia głęboką analizę progresu (Progressive Overload) poprzez wykresy i statystyki.
+10xFitChart to aplikacja internetowa typu desktop-first, służąca do śledzenia postępów treningowych z naciskiem na analizę danych historycznych i wizualizację trendów. Produkt adresowany jest do osób trenujących siłowo i wytrzymałościowo, które preferują wygodne wprowadzanie danych na komputerze "po fakcie" (np. wieczorem w domu) zamiast uciążliwego klikania w telefonie podczas treningu. System umożliwia głęboką analizę progresu (Progressive Overload) poprzez wykresy i statystyki.
 
 Aplikacja w wersji MVP (Minimum Viable Product) skupia się na szybkości wprowadzania danych (nawigacja klawiaturą, kopiowanie treningów) oraz czytelnej prezentacji dwóch głównych typów aktywności: treningu siłowego (metryki: objętość, 1RM) oraz cardio (metryka: prędkość).
 
@@ -14,7 +14,7 @@ Osoby trenujące regularnie napotykają następujące problemy:
 - Brak narzędzi desktopowych, które pozwalałyby na szybkie uzupełnienie całego treningu (batch entry) w kilka minut.
 - Większość prostych aplikacji nie obsługuje poprawnie dwóch różnych modeli danych (siłowe vs cardio) na jednym wykresie lub w jednym widoku.
 
-FitChart rozwiązuje te problemy, dostarczając interfejs zoptymalizowany pod klawiaturę i duże ekrany, z automatycznym przeliczaniem zaawansowanych metryk (Epley 1RM, Volume) i wizualizacją postępów.
+10xFitChart rozwiązuje te problemy, dostarczając interfejs zoptymalizowany pod klawiaturę i duże ekrany, z automatycznym przeliczaniem zaawansowanych metryk (Epley 1RM, Volume) i wizualizacją postępów.
 
 ## 3. Wymagania funkcjonalne
 
