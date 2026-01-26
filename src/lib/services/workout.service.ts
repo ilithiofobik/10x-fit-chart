@@ -4,7 +4,36 @@
  */
 
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { WorkoutListItemDTO, ListWorkoutsResponse, PaginationDTO } from "../../types";
+import type {
+  WorkoutListItemDTO,
+  ListWorkoutsResponse,
+  PaginationDTO,
+  CreateWorkoutCommand,
+  WorkoutDetailsDTO,
+  WorkoutSetDTO,
+  Exercise,
+  ExerciseType,
+} from "../../types";
+
+/**
+ * Custom error for exercise not found
+ */
+export class ExerciseNotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ExerciseNotFoundError";
+  }
+}
+
+/**
+ * Custom error for exercise type mismatch
+ */
+export class ExerciseTypeMismatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ExerciseTypeMismatchError";
+  }
+}
 
 export interface ListWorkoutsFilters {
   limit: number;
@@ -126,4 +155,171 @@ export async function listWorkouts(
     workouts: workoutListItems,
     pagination,
   };
+}
+
+/**
+ * Calculate 1RM (One Rep Max) using Brzycki formula
+ * @param weight - Weight lifted in kg
+ * @param reps - Number of repetitions
+ * @returns Calculated 1RM value
+ */
+function calculate1RM(weight: number, reps: number): number {
+  if (reps === 1) return weight;
+  // Brzycki formula: 1RM = weight / (1.0278 - 0.0278 * reps)
+  return weight / (1.0278 - 0.0278 * reps);
+}
+
+/**
+ * Calculate volume (total work done)
+ * @param weight - Weight lifted in kg
+ * @param reps - Number of repetitions
+ * @returns Volume (weight * reps)
+ */
+function calculateVolume(weight: number, reps: number): number {
+  return weight * reps;
+}
+
+/**
+ * Create a new workout with sets
+ * @param supabase - Supabase client instance
+ * @param userId - Current user ID from auth
+ * @param command - Workout creation data with sets
+ * @returns Created WorkoutDetailsDTO with all sets and exercise info
+ */
+export async function createWorkout(
+  supabase: SupabaseClient,
+  userId: string,
+  command: CreateWorkoutCommand
+): Promise<WorkoutDetailsDTO> {
+  const { date, notes, sets } = command;
+
+  // Extract unique exercise IDs for validation
+  const exerciseIds = [...new Set(sets.map((set) => set.exercise_id))];
+
+  // Validate exercises exist and are accessible (system or user's)
+  const { data: exercises, error: exerciseError } = await supabase
+    .from("exercises")
+    .select("*")
+    .in("id", exerciseIds);
+
+  if (exerciseError) {
+    console.error("Error fetching exercises:", exerciseError);
+    throw new Error("Failed to validate exercises");
+  }
+
+  if (!exercises || exercises.length !== exerciseIds.length) {
+    throw new ExerciseNotFoundError("One or more exercises not found or not accessible");
+  }
+
+  // Create exercise map for quick lookup
+  const exerciseMap = new Map<string, Exercise>(exercises.map((ex) => [ex.id, ex]));
+
+  // Validate exercise types match the provided fields
+  for (const set of sets) {
+    const exercise = exerciseMap.get(set.exercise_id);
+    if (!exercise) {
+      throw new ExerciseNotFoundError(`Exercise ${set.exercise_id} not found`);
+    }
+
+    if (exercise.type === "strength") {
+      // Strength exercises should have weight/reps, not distance/time
+      if (set.distance !== null && set.distance !== undefined) {
+        throw new ExerciseTypeMismatchError(
+          `Strength exercise "${exercise.name}" cannot have distance field`
+        );
+      }
+      if (set.time !== null && set.time !== undefined) {
+        throw new ExerciseTypeMismatchError(`Strength exercise "${exercise.name}" cannot have time field`);
+      }
+    } else {
+      // Cardio exercises should have distance/time, not weight/reps
+      if (set.weight !== null && set.weight !== undefined) {
+        throw new ExerciseTypeMismatchError(`Cardio exercise "${exercise.name}" cannot have weight field`);
+      }
+      if (set.reps !== null && set.reps !== undefined) {
+        throw new ExerciseTypeMismatchError(`Cardio exercise "${exercise.name}" cannot have reps field`);
+      }
+    }
+  }
+
+  // Create workout
+  const { data: workout, error: workoutError } = await supabase
+    .from("workouts")
+    .insert({
+      user_id: userId,
+      date,
+      notes: notes || null,
+    })
+    .select()
+    .single();
+
+  if (workoutError) {
+    console.error("Error creating workout:", workoutError);
+    throw new Error("Failed to create workout");
+  }
+
+  if (!workout) {
+    throw new Error("Failed to retrieve created workout");
+  }
+
+  // Prepare workout sets with calculated fields
+  const workoutSets = sets.map((set) => {
+    const exercise = exerciseMap.get(set.exercise_id)!;
+    const setData: any = {
+      workout_id: workout.id,
+      exercise_id: set.exercise_id,
+      sort_order: set.sort_order,
+      weight: set.weight ?? null,
+      reps: set.reps ?? null,
+      distance: set.distance ?? null,
+      time: set.time ?? null,
+      calculated_1rm: null,
+      calculated_volume: null,
+    };
+
+    // Calculate 1RM and volume for strength exercises
+    if (exercise.type === "strength" && set.weight && set.reps) {
+      setData.calculated_1rm = calculate1RM(set.weight, set.reps);
+      setData.calculated_volume = calculateVolume(set.weight, set.reps);
+    }
+
+    return setData;
+  });
+
+  // Insert all workout sets
+  const { data: createdSets, error: setsError } = await supabase
+    .from("workout_sets")
+    .insert(workoutSets)
+    .select();
+
+  if (setsError) {
+    console.error("Error creating workout sets:", setsError);
+    // Try to rollback by deleting the workout
+    await supabase.from("workouts").delete().eq("id", workout.id);
+    throw new Error("Failed to create workout sets");
+  }
+
+  if (!createdSets) {
+    // Rollback workout
+    await supabase.from("workouts").delete().eq("id", workout.id);
+    throw new Error("Failed to retrieve created workout sets");
+  }
+
+  // Map sets to WorkoutSetDTO with exercise information
+  const setsDTO: WorkoutSetDTO[] = createdSets.map((set) => {
+    const exercise = exerciseMap.get(set.exercise_id)!;
+    return {
+      ...set,
+      exercise_name: exercise.name,
+      exercise_type: exercise.type,
+    };
+  });
+
+  // Return WorkoutDetailsDTO
+  const workoutDetails: WorkoutDetailsDTO = {
+    ...workout,
+    sets: setsDTO,
+  };
+
+  return workoutDetails;
 }
