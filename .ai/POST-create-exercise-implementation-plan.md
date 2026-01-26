@@ -5,6 +5,7 @@
 **Cel:** Umożliwienie zalogowanemu użytkownikowi dodania własnego (prywatnego) ćwiczenia.
 
 **Kluczowe cechy:**
+
 - Metoda: `POST /api/exercises`
 - Wymaga autoryzacji (Supabase Auth)
 - Tworzy ćwiczenie użytkownika (user_id = authenticated user)
@@ -16,10 +17,12 @@
 **Struktura URL:** `/api/exercises`
 
 **Headers:**
+
 - `Content-Type: application/json`
 - `Authorization: Bearer {token}` (zarządzane przez Supabase)
 
 **Request Body (wszystkie pola wymagane):**
+
 ```json
 {
   "name": "Cable Flyes",
@@ -28,17 +31,20 @@
 ```
 
 **Walidacja:**
+
 - `name`: string, min 1 znak, max 100 znaków, trimmed
 - `type`: enum ("strength" | "cardio")
 
 ## 3. Wykorzystywane typy
 
 Z `src/types.ts`:
+
 - `CreateExerciseCommand` - request body: `{ name: string, type: ExerciseType }`
 - `ExerciseDTO` - response: Exercise + `is_system: boolean`
 - `ExerciseType` - enum: `"strength" | "cardio"`
 
 **Walidacja Zod (request body):**
+
 ```typescript
 z.object({
   name: z.string().min(1).max(100).trim(),
@@ -49,6 +55,7 @@ z.object({
 ## 4. Szczegóły odpowiedzi
 
 **Sukces (201 Created):**
+
 ```json
 {
   "id": "uuid",
@@ -63,6 +70,7 @@ z.object({
 ```
 
 **Kody błędów:**
+
 - `401` - Brak autoryzacji
 - `400` - Nieprawidłowy request body
 - `409` - Nazwa ćwiczenia już istnieje dla użytkownika
@@ -91,11 +99,13 @@ z.object({
 3. **Walidacja długości:** Max 100 znaków (zgodnie z DB constraint) - zapobiega DoS
 4. **Walidacja typu:** Tylko dozwolone wartości enum
 5. **RLS Policy:** INSERT policy dla tabeli `exercises`:
+
    ```sql
    CREATE POLICY "Users can insert own exercises"
    ON exercises FOR INSERT
    WITH CHECK (user_id = auth.uid());
    ```
+
 6. **Trimming:** Usunięcie białych znaków z nazwy przed zapisem
 7. **Case sensitivity:** Rozważyć case-insensitive sprawdzanie duplikatów (future enhancement)
 
@@ -111,6 +121,7 @@ z.object({
 | Błąd DB (insert) | 500 | `{ message: "Internal server error" }` | Tak |
 
 **Strategia:**
+
 - Guard clause: 401 na początku (early return)
 - Walidacja body: 400 z detalami błędów Zod
 - Check duplikat: 409 (logika biznesowa, nie logujemy)
@@ -119,14 +130,17 @@ z.object({
 ## 8. Rozważania dotyczące wydajności
 
 **Potencjalne wąskie gardła:**
+
 - Sprawdzanie duplikatów wymaga dodatkowego query
 
 **Optymalizacje:**
+
 1. **Index na (user_id, name):** Przyspiesza sprawdzanie unikalności
 2. **DB Constraint:** Dodanie UNIQUE constraint na (user_id, name) - zapobiega race conditions
 3. **Transakcje:** Nie wymagane dla single insert
 
-**Uwaga:** 
+**Uwaga:**
+
 - Operacja jest lekka (single row insert)
 - Brak potrzeby cachowania (user-specific data)
 - Rate limiting można rozważyć w przyszłości
@@ -148,6 +162,7 @@ export async function createExercise(
 ```
 
 **Logika:**
+
 1. Sprawdź czy nazwa istnieje dla użytkownika (query)
 2. Jeśli tak → throw Error z odpowiednim komunikatem
 3. Insert do `exercises` z user_id = userId
@@ -186,6 +201,7 @@ const CreateExerciseBodySchema = z.object({
 ### Krok 4: Obsługa błędów w serwisie
 
 W `createExercise`:
+
 - Custom error dla duplikatu: może być prosty Error z komunikatem
 - Endpoint sprawdza message error i mapuje na odpowiedni kod (409 vs 500)
 - Lub: użyć custom error class (np. `ConflictError`)
@@ -193,6 +209,7 @@ W `createExercise`:
 ### Krok 5: Konfiguracja RLS w Supabase
 
 **Policy INSERT:**
+
 ```sql
 CREATE POLICY "Users can insert own exercises"
 ON exercises FOR INSERT
@@ -200,6 +217,7 @@ WITH CHECK (user_id = auth.uid());
 ```
 
 **Policy SELECT (już istnieje z GET):**
+
 ```sql
 CREATE POLICY "Users can view system and own exercises"
 ON exercises FOR SELECT
@@ -229,6 +247,7 @@ UNIQUE (user_id, name);
 ## 10. Uwagi implementacyjne
 
 **Best practices:**
+
 - Guard clause dla autoryzacji na początku
 - Walidacja przed wywołaniem serwisu
 - Service rzuca errors, endpoint je obsługuje i mapuje na HTTP status
@@ -236,6 +255,7 @@ UNIQUE (user_id, name);
 - TypeScript strict mode
 
 **Zależności:**
+
 - Wymaga istniejącego `exercise.service.ts`
 - Wymaga middleware Astro z supabase w locals
 - Wymaga aktywnej sesji Supabase
