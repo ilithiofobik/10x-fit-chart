@@ -1,8 +1,32 @@
 ---
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
+import { HeroSection } from "@/components/landing/HeroSection";
+import FeatureGrid from "@/components/landing/FeatureGrid.astro";
+import Footer from "@/components/landing/Footer.astro";
+import { landingFeatures } from "@/data/landing-features";
+import { supabaseServer } from "@/db/supabase-server";
+
+// Check user session for conditional rendering
+const supabase = supabaseServer(Astro);
+
+let isAuthenticated = false;
+try {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error) {
+    console.error("Session check failed:", error);
+  }
+  isAuthenticated = !!session && !error;
+} catch (err) {
+  console.error("Unexpected error during session check:", err);
+  isAuthenticated = false;
+}
 ---
 
-<Layout>
-  <Welcome />
+<Layout
+  title="10xFitChart - Śledź postępy treningowe"
+  description="Desktop-first aplikacja do śledzenia treningów siłowych i cardio. Szybkie wprowadzanie danych, głęboka analiza postępów i wykresy progresji."
+>
+  <HeroSection isAuthenticated={isAuthenticated} client:load />
+  <FeatureGrid features={landingFeatures} />
+  <Footer />
 </Layout>
