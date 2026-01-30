@@ -1,0 +1,32 @@
+---
+import Layout from "./Layout.astro";
+import { AppHeader } from "@/components/layout/AppHeader";
+import { Toaster } from "@/components/ui/sonner";
+import { supabaseServer } from "@/db/supabase-server";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+
+// Pobierz dane użytkownika dla user menu
+const supabase = supabaseServer(Astro);
+const { data: { user } } = await supabase.auth.getUser();
+
+// Jeśli nie ma użytkownika, przekieruj na login (safety check)
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<Layout title={title} description={description}>
+  <AppHeader user={user} client:load />
+  
+  <main class="container mx-auto px-4 py-6">
+    <slot />
+  </main>
+  
+  <Toaster client:load position="top-right" />
+</Layout>

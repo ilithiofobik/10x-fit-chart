@@ -1,0 +1,75 @@
+---
+import LayoutApp from "@/layouts/LayoutApp.astro";
+import { SignOutButton } from "@/components/auth/SignOutButton";
+import { DeleteAccountButton } from "@/components/auth/DeleteAccountButton";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabaseServer } from "@/db/supabase-server";
+
+const supabase = supabaseServer(Astro);
+const { data: { user } } = await supabase.auth.getUser();
+
+// Safety check (middleware już to robi, ale dla pewności)
+if (!user) {
+  return Astro.redirect('/login');
+}
+---
+
+<LayoutApp title="Profil - 10xFitChart">
+  <div class="max-w-2xl mx-auto space-y-6">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">Profil użytkownika</h1>
+      <p class="text-muted-foreground">
+        Zarządzaj swoim kontem i ustawieniami
+      </p>
+    </div>
+
+    {/* Informacje o koncie */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Informacje o koncie</CardTitle>
+        <CardDescription>Twoje dane konta</CardDescription>
+      </CardHeader>
+      <CardContent class="space-y-4">
+        <div>
+          <label class="text-sm font-medium text-muted-foreground">Email</label>
+          <p class="text-lg">{user.email}</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-muted-foreground">ID użytkownika</label>
+          <p class="text-sm font-mono text-muted-foreground">{user.id}</p>
+        </div>
+      </CardContent>
+    </Card>
+
+    {/* Akcje konta */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Akcje</CardTitle>
+        <CardDescription>Zarządzanie kontem</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <SignOutButton client:load />
+      </CardContent>
+    </Card>
+
+    {/* Strefa niebezpieczna */}
+    <Card class="border-destructive">
+      <CardHeader>
+        <CardTitle class="text-destructive">Strefa niebezpieczna</CardTitle>
+        <CardDescription>
+          Nieodwracalne akcje - zachowaj ostrożność
+        </CardDescription>
+      </CardHeader>
+      <CardContent class="space-y-4">
+        <div>
+          <p class="text-sm text-muted-foreground mb-4">
+            Usunięcie konta jest nieodwracalne i spowoduje trwałe usunięcie wszystkich Twoich danych, 
+            w tym treningów, ćwiczeń i statystyk.
+          </p>
+          <DeleteAccountButton client:load />
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+</LayoutApp>

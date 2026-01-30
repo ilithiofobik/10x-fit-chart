@@ -1,20 +1,24 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { Button } from "@/components/ui/button";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { supabaseServer } from "@/db/supabase-server";
+import { Toaster } from "@/components/ui/sonner";
+
+// Sprawdź czy użytkownik jest już zalogowany
+const supabase = supabaseServer(Astro);
+const { data: { session } } = await supabase.auth.getSession();
+
+// Przekieruj na dashboard jeśli zalogowany
+if (session) {
+  return Astro.redirect("/app/dashboard");
+}
 ---
 
 <Layout title="Logowanie - 10xFitChart" description="Zaloguj się do 10xFitChart">
   <div class="flex min-h-screen items-center justify-center px-4">
-    <div class="w-full max-w-md text-center">
-      <h1 class="text-4xl font-bold text-foreground">Logowanie</h1>
-      <p class="mt-4 text-lg text-muted-foreground">
-        Strona logowania - wkrótce dostępna
-      </p>
-      <div class="mt-8">
-        <Button asChild variant="outline">
-          <a href="/">Wróć na stronę główną</a>
-        </Button>
-      </div>
+    <div class="w-full max-w-md">
+      <LoginForm client:load />
     </div>
   </div>
+  <Toaster client:load position="top-right" />
 </Layout>

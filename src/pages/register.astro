@@ -1,6 +1,17 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import { Button } from "@/components/ui/button";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+import { supabaseServer } from "@/db/supabase-server";
+import { Toaster } from "@/components/ui/sonner";
+
+// Sprawdź czy użytkownik jest już zalogowany
+const supabase = supabaseServer(Astro);
+const { data: { session } } = await supabase.auth.getSession();
+
+// Przekieruj na dashboard jeśli zalogowany
+if (session) {
+  return Astro.redirect("/app/dashboard");
+}
 ---
 
 <Layout
@@ -8,16 +19,9 @@ import { Button } from "@/components/ui/button";
   description="Zarejestruj się w 10xFitChart"
 >
   <div class="flex min-h-screen items-center justify-center px-4">
-    <div class="w-full max-w-md text-center">
-      <h1 class="text-4xl font-bold text-foreground">Rejestracja</h1>
-      <p class="mt-4 text-lg text-muted-foreground">
-        Strona rejestracji - wkrótce dostępna
-      </p>
-      <div class="mt-8">
-        <Button asChild variant="outline">
-          <a href="/">Wróć na stronę główną</a>
-        </Button>
-      </div>
+    <div class="w-full max-w-md">
+      <RegisterForm client:load />
     </div>
   </div>
+  <Toaster client:load position="top-right" />
 </Layout>

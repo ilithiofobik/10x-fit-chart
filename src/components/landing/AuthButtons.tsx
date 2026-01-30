@@ -12,7 +12,7 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
     return (
       <div className="flex justify-center">
         <Button asChild size="lg">
-          <a href="/dashboard">Przejdź do aplikacji</a>
+          <a href="/app/dashboard">Przejdź do aplikacji</a>
         </Button>
       </div>
     );
@@ -21,7 +21,7 @@ export function AuthButtons({ isAuthenticated }: AuthButtonsProps) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-4">
       <Button asChild size="lg">
-        <a href="/register">Zarejestruj się</a>
+        <a href="/register">Rozpocznij za darmo</a>
       </Button>
       <Button asChild variant="outline" size="lg">
         <a href="/login">Zaloguj się</a>
