@@ -1,23 +1,46 @@
 import { defineMiddleware } from "astro:middleware";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseServer } from "@/db/supabase-server";
 
-import type { Database } from "../db/database.types";
+/**
+ * Middleware for authentication and route protection
+ *
+ * Responsibilities:
+ * 1. Create Supabase client with cookie-based auth
+ * 2. Fetch user session and add to locals
+ * 3. Protect /app/* routes (redirect to /login if not authenticated)
+ * 4. Redirect authenticated users from /login and /register to /app/dashboard
+ */
+export const onRequest = defineMiddleware(async (context, next) => {
+  const { url, redirect } = context;
 
-const supabaseUrl = import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.SUPABASE_KEY;
-
-export const onRequest = defineMiddleware((context, next) => {
-  // Extract auth token from Authorization header
-  const authHeader = context.request.headers.get("Authorization");
-  const token = authHeader?.replace("Bearer ", "");
-
-  // Create Supabase client with the auth token
-  const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    global: {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    },
-  });
-
+  // 1. Create Supabase client with cookie storage
+  const supabase = supabaseServer(context);
   context.locals.supabase = supabase;
+
+  // 2. Fetch user session
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  // Add user to locals (null if not authenticated)
+  context.locals.user = error ? null : user;
+
+  // 3. Define protected and auth-only routes
+  const isProtectedRoute = url.pathname.startsWith("/app");
+  const isAuthRoute = ["/login", "/register"].includes(url.pathname);
+
+  // 4. Route protection logic
+  if (isProtectedRoute && !user) {
+    // Redirect unauthenticated users to login
+    return redirect("/login");
+  }
+
+  if (isAuthRoute && user) {
+    // Redirect authenticated users to dashboard
+    return redirect("/app/dashboard");
+  }
+
+  // 5. Continue to page rendering
   return next();
 });
