@@ -1,0 +1,8 @@
+---
+import LayoutApp from "../../../layouts/LayoutApp.astro";
+import { WorkoutLoggerProvider } from "../../../components/workout-logger";
+---
+
+<LayoutApp title="Nowy Trening - 10xFitChart">
+  <WorkoutLoggerProvider client:load />
+</LayoutApp>
