@@ -598,3 +598,125 @@ export interface ConfirmArchiveDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => Promise<void>;
 }
+
+// ============================================================================
+// DASHBOARD VIEW TYPES
+// ============================================================================
+
+/**
+ * Stan głównego komponentu Dashboard
+ */
+export interface DashboardState {
+  // Dane z API
+  data: DashboardSummaryDTO | null;
+
+  // Filtry
+  selectedMonths: number; // 1, 3, 6, lub 12
+
+  // Stany UI
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * Pojedynczy punkt danych wykresu
+ */
+export interface ChartDataPoint {
+  date: string; // Sformatowana data do wyświetlenia
+  dateValue: string; // ISO date dla sortowania
+  value: number; // Wartość metryki
+  label: string; // Etykieta dla tooltip
+  workoutId?: string; // Opcjonalne ID treningu dla nawigacji
+}
+
+/**
+ * Typ metryki dla wykresu (przyszłe rozszerzenie)
+ */
+export type DashboardMetric =
+  | "total_volume" // Łączna objętość
+  | "total_workouts" // Liczba treningów
+  | "avg_sets" // Średnia liczba serii
+  | "unique_exercises"; // Unikalne ćwiczenia
+
+/**
+ * Konfiguracja metryki wykresu
+ */
+export interface DashboardMetricConfig {
+  key: DashboardMetric;
+  label: string;
+  unit: string;
+  color: string;
+  formatter: (value: number) => string;
+}
+
+// Props Types dla komponentów Dashboard
+
+/**
+ * Props dla DashboardHeader
+ */
+export interface DashboardHeaderProps {
+  selectedMonths: number;
+  onMonthsChange: (months: number) => void;
+}
+
+/**
+ * Props dla StatsGrid
+ */
+export interface StatsGridProps {
+  stats: SummaryStatsDTO;
+  isLoading: boolean;
+}
+
+/**
+ * Props dla StatCard
+ */
+export interface StatCardProps {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: number | undefined;
+  formatter?: (value: number) => string;
+  isLoading: boolean;
+}
+
+/**
+ * Props dla RecentWorkoutsList
+ */
+export interface RecentWorkoutsListProps {
+  workouts: RecentWorkoutDTO[];
+  isLoading: boolean;
+}
+
+/**
+ * Props dla WorkoutSummaryCard
+ */
+export interface WorkoutSummaryCardProps {
+  workout: RecentWorkoutDTO;
+  onClick: (workoutId: string) => void;
+}
+
+/**
+ * Props dla ProgressChartWidget
+ */
+export interface ProgressChartWidgetProps {
+  data: ChartDataPoint[];
+  isLoading: boolean;
+}
+
+/**
+ * Props dla ChartHeader
+ */
+export interface ChartHeaderProps {
+  title: string;
+  selectedMetric?: string;
+  onMetricChange?: (metric: string) => void;
+}
+
+/**
+ * Props dla ProgressChart
+ */
+export interface ProgressChartProps {
+  data: ChartDataPoint[];
+  xAxisKey: string;
+  yAxisKey: string;
+  lineColor?: string;
+}

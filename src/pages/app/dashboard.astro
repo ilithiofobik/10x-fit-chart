@@ -1,61 +1,10 @@
 ---
 import LayoutApp from "@/layouts/LayoutApp.astro";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dashboard as DashboardView } from "@/components/dashboard";
+
+export const prerender = false;
 ---
 
-<LayoutApp title="Dashboard - 10xFitChart">
-  <div class="space-y-6">
-    <div>
-      <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-      <p class="text-muted-foreground">
-        Witaj w 10xFitChart! Tu zobaczysz podsumowanie swoich treningów.
-      </p>
-    </div>
-
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <Card>
-        <CardHeader>
-          <CardTitle>Treningi</CardTitle>
-          <CardDescription>Ostatnie 30 dni</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p class="text-3xl font-bold">0</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Ćwiczenia</CardTitle>
-          <CardDescription>W Twoim słowniku</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p class="text-3xl font-bold">0</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Postęp</CardTitle>
-          <CardDescription>Ten tydzień</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p class="text-3xl font-bold">0%</p>
-        </CardContent>
-      </Card>
-    </div>
-
-    <Card>
-      <CardHeader>
-        <CardTitle>Rozpocznij</CardTitle>
-        <CardDescription>
-          Zacznij od zalogowania swojego pierwszego treningu
-        </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-2">
-        <p class="text-muted-foreground">
-          Dashboard będzie wyświetlał szczegółowe statystyki po zalogowaniu pierwszych treningów.
-        </p>
-      </CardContent>
-    </Card>
-  </div>
+<LayoutApp title="Dashboard - 10xFitChart" description="Podgląd postępów treningowych">
+  <DashboardView client:load />
 </LayoutApp>
