@@ -1,0 +1,17 @@
+---
+import LayoutApp from "@/layouts/LayoutApp.astro";
+import ExerciseManager from "@/components/exercises/ExerciseManager";
+
+// Sprawdzenie autoryzacji
+const {
+  data: { user },
+} = await Astro.locals.supabase.auth.getUser();
+
+if (!user) {
+  return Astro.redirect("/login?redirect=/app/exercises");
+}
+---
+
+<LayoutApp title="Baza Ćwiczeń - 10xFitChart">
+  <ExerciseManager client:load />
+</LayoutApp>

@@ -479,3 +479,122 @@ export interface WorkoutEditorState {
   isDeleting: boolean;
   isLoading: boolean;
 }
+
+// ============================================================================
+// EXERCISES VIEW TYPES
+// ============================================================================
+
+/**
+ * Stan widoku Bazy Ćwiczeń
+ */
+export interface ExercisesViewState {
+  // Lista ćwiczeń
+  exercises: ExerciseDTO[];
+
+  // Filtry
+  searchQuery: string;
+  typeFilter: ExerciseTypeFilter;
+
+  // Stany UI
+  isLoading: boolean;
+  error: string | null;
+
+  // Dialogi
+  formDialog: {
+    open: boolean;
+    mode: "create" | "edit";
+    exercise: ExerciseDTO | null;
+    isSubmitting: boolean;
+  };
+
+  archiveDialog: {
+    open: boolean;
+    exercise: ExerciseDTO | null;
+    isDeleting: boolean;
+  };
+}
+
+/**
+ * Typ filtra ćwiczeń
+ */
+export type ExerciseTypeFilter = "all" | "strength" | "cardio";
+
+/**
+ * Dane formularza ćwiczenia
+ */
+export interface ExerciseFormData {
+  name: string;
+  type?: ExerciseType;
+}
+
+/**
+ * Lista przefiltrowanych ćwiczeń (computed)
+ */
+export interface FilteredExercises {
+  all: ExerciseDTO[];
+  system: ExerciseDTO[];
+  user: ExerciseDTO[];
+  active: ExerciseDTO[];
+  archived: ExerciseDTO[];
+}
+
+// Props Types dla komponentów Exercises
+
+/**
+ * Props dla ExerciseHeader
+ */
+export interface ExerciseHeaderProps {
+  onAddClick: () => void;
+}
+
+/**
+ * Props dla ExerciseFilters
+ */
+export interface ExerciseFiltersProps {
+  searchQuery: string;
+  typeFilter: ExerciseTypeFilter;
+  onSearchChange: (query: string) => void;
+  onTypeFilterChange: (type: ExerciseTypeFilter) => void;
+}
+
+/**
+ * Props dla ExerciseList
+ */
+export interface ExerciseListProps {
+  exercises: ExerciseDTO[];
+  isLoading: boolean;
+  onEdit: (exercise: ExerciseDTO) => void;
+  onArchive: (exercise: ExerciseDTO) => void;
+}
+
+/**
+ * Props dla ExerciseCard
+ */
+export interface ExerciseCardProps {
+  exercise: ExerciseDTO;
+  onEdit: (exercise: ExerciseDTO) => void;
+  onArchive: (exercise: ExerciseDTO) => void;
+}
+
+/**
+ * Props dla ExerciseFormDialog
+ */
+export interface ExerciseFormDialogProps {
+  open: boolean;
+  mode: "create" | "edit";
+  exercise?: ExerciseDTO;
+  isSubmitting: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: CreateExerciseCommand | UpdateExerciseCommand) => Promise<void>;
+}
+
+/**
+ * Props dla ConfirmArchiveDialog
+ */
+export interface ConfirmArchiveDialogProps {
+  open: boolean;
+  exercise: ExerciseDTO | null;
+  isDeleting: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => Promise<void>;
+}
