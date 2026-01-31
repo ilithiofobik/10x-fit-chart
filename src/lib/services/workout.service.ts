@@ -197,10 +197,7 @@ export async function createWorkout(
   const exerciseIds = [...new Set(sets.map((set) => set.exercise_id))];
 
   // Validate exercises exist and are accessible (system or user's)
-  const { data: exercises, error: exerciseError } = await supabase
-    .from("exercises")
-    .select("*")
-    .in("id", exerciseIds);
+  const { data: exercises, error: exerciseError } = await supabase.from("exercises").select("*").in("id", exerciseIds);
 
   if (exerciseError) {
     console.error("Error fetching exercises:", exerciseError);
@@ -224,9 +221,7 @@ export async function createWorkout(
     if (exercise.type === "strength") {
       // Strength exercises should have weight/reps, not distance/time
       if (set.distance !== null && set.distance !== undefined) {
-        throw new ExerciseTypeMismatchError(
-          `Strength exercise "${exercise.name}" cannot have distance field`
-        );
+        throw new ExerciseTypeMismatchError(`Strength exercise "${exercise.name}" cannot have distance field`);
       }
       if (set.time !== null && set.time !== undefined) {
         throw new ExerciseTypeMismatchError(`Strength exercise "${exercise.name}" cannot have time field`);
@@ -287,10 +282,7 @@ export async function createWorkout(
   });
 
   // Insert all workout sets
-  const { data: createdSets, error: setsError } = await supabase
-    .from("workout_sets")
-    .insert(workoutSets)
-    .select();
+  const { data: createdSets, error: setsError } = await supabase.from("workout_sets").insert(workoutSets).select();
 
   if (setsError) {
     console.error("Error creating workout sets:", setsError);
@@ -322,4 +314,70 @@ export async function createWorkout(
   };
 
   return workoutDetails;
+}
+
+/**
+ * Get user's latest workout with all sets and exercise info
+ * Returns the most recent workout by date (and created_at for same-day tie-breaking)
+ * @param supabase - Supabase client instance
+ * @param userId - Current user ID from auth
+ * @returns WorkoutDetailsDTO or null if no workouts exist
+ */
+export async function getLatestWorkout(supabase: SupabaseClient, userId: string): Promise<WorkoutDetailsDTO | null> {
+  // Query latest workout with sets and exercises using nested select
+  const { data: workout, error } = await supabase
+    .from("workouts")
+    .select(
+      `
+      *,
+      workout_sets (
+        *,
+        exercises (
+          name,
+          type
+        )
+      )
+    `
+    )
+    .eq("user_id", userId)
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle(); // Use maybeSingle() to allow null result without error
+
+  if (error) {
+    console.error("Error fetching latest workout:", error);
+    throw new Error("Failed to fetch latest workout");
+  }
+
+  // If no workout exists (new user or no workouts yet)
+  if (!workout) {
+    return null;
+  }
+
+  // Map workout_sets to WorkoutSetDTO with exercise info
+  const sets: WorkoutSetDTO[] = (workout.workout_sets || []).map((set: any) => {
+    const exercise = set.exercises;
+
+    // Create WorkoutSetDTO without the nested exercises object
+    const { exercises: _, ...setData } = set;
+
+    return {
+      ...setData,
+      exercise_name: exercise.name,
+      exercise_type: exercise.type as ExerciseType,
+    };
+  });
+
+  // Sort sets by sort_order to ensure correct display order
+  sets.sort((a, b) => a.sort_order - b.sort_order);
+
+  // Remove workout_sets from workout object to avoid duplication
+  const { workout_sets, ...workoutData } = workout;
+
+  // Return WorkoutDetailsDTO
+  return {
+    ...workoutData,
+    sets,
+  };
 }
