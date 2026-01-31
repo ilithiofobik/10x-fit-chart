@@ -22,6 +22,7 @@ Regular trainees often struggle to see long-term trends using paper logs or mobi
 * **Charts:** [Recharts](https://recharts.org/)
 * **Backend & Auth:** [Supabase](https://supabase.com/) (PostgreSQL, Auth, RLS)
 * **Language:** [TypeScript 5](https://www.typescriptlang.org/)
+* **Testing:** [Vitest](https://vitest.dev/) + [Testing Library](https://testing-library.com/)
 * **Hosting:** Cloudflare Pages
 
 ## Getting Started Locally
@@ -58,6 +59,34 @@ Regular trainees often struggle to see long-term trends using paper logs or mobi
 
 The application should now be running at `http://localhost:4321`.
 
+## Testing
+
+The project uses **Vitest** for unit and component testing.
+
+### Running Tests
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests once (for CI)
+npm run test:unit
+
+# Open Vitest UI
+npm run test:ui
+
+# Generate coverage report
+npm run test:coverage
+```
+
+For detailed testing guidelines, see [Testing Guide](./src/test-utils/README.md).
+
+### Test Coverage Goals
+
+- **Services & Utils**: ≥ 80% coverage
+- **Hooks & Reducers**: ≥ 80% coverage
+- **Components (logic)**: ≥ 70% coverage
+
 ## Available Scripts
 
 | Script | Description |
@@ -68,6 +97,10 @@ The application should now be running at `http://localhost:4321`.
 | `npm run lint` | Runs ESLint to check for code quality issues. |
 | `npm run lint:fix` | Runs ESLint and automatically fixes fixable issues. |
 | `npm run format` | Formats code using Prettier. |
+| `npm test` | Runs unit tests in watch mode. |
+| `npm run test:unit` | Runs unit tests once (CI mode). |
+| `npm run test:ui` | Opens Vitest UI for interactive test debugging. |
+| `npm run test:coverage` | Generates test coverage report. |
 
 ## Project Scope
 

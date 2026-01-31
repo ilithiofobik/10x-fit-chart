@@ -24,3 +24,7 @@ pnpm-debug.log*
 .idea/
 .env.example
 .ai/endpoints-order.md
+
+# test coverage
+coverage/
+*.lcov
