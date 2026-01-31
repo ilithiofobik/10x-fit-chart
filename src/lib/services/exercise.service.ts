@@ -4,7 +4,7 @@
  */
 
 import type { SupabaseClient } from "../../db/supabase.client";
-import type { ExerciseDTO, ExerciseType, CreateExerciseCommand } from "../../types";
+import type { ExerciseDTO, ExerciseType, CreateExerciseCommand, UpdateExerciseCommand } from "../../types";
 
 /**
  * Custom error for duplicate exercise name
@@ -13,6 +13,26 @@ export class ExerciseConflictError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ExerciseConflictError";
+  }
+}
+
+/**
+ * Custom error for resource not found
+ */
+export class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NotFoundError";
+  }
+}
+
+/**
+ * Custom error for forbidden operations
+ */
+export class ForbiddenError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ForbiddenError";
   }
 }
 
@@ -36,10 +56,7 @@ export async function listExercises(
   const { type, includeArchived = false } = filters;
 
   // Build query with filters
-  let query = supabase
-    .from("exercises")
-    .select("*")
-    .or(`user_id.is.null,user_id.eq.${userId}`);
+  let query = supabase.from("exercises").select("*").or(`user_id.is.null,user_id.eq.${userId}`);
 
   // Apply type filter if provided
   if (type) {
@@ -133,4 +150,79 @@ export async function createExercise(
   };
 
   return exerciseDTO;
+}
+
+/**
+ * Update an existing exercise name
+ * @param supabase - Supabase client instance
+ * @param userId - Current user ID from auth
+ * @param exerciseId - UUID of the exercise to update
+ * @param command - Exercise update data
+ * @returns Updated ExerciseDTO with is_system = false
+ * @throws NotFoundError if exercise doesn't exist or doesn't belong to user
+ * @throws ForbiddenError if trying to modify a system exercise
+ * @throws ExerciseConflictError if new name conflicts with existing exercise
+ */
+export async function updateExercise(
+  supabase: SupabaseClient,
+  userId: string,
+  exerciseId: string,
+  command: UpdateExerciseCommand
+): Promise<ExerciseDTO> {
+  const { name } = command;
+
+  // 1. Fetch exercise to validate existence and ownership
+  const { data: exercise, error: fetchError } = await supabase
+    .from("exercises")
+    .select("*")
+    .eq("id", exerciseId)
+    .single();
+
+  if (fetchError || !exercise) {
+    throw new NotFoundError("Exercise not found");
+  }
+
+  // 2. Check if system exercise (user_id is null for system exercises) - check before ownership
+  if (exercise.user_id === null) {
+    throw new ForbiddenError("Cannot modify system exercise");
+  }
+
+  // 3. Check ownership - return 404 to avoid leaking information about existence
+  if (exercise.user_id !== userId) {
+    throw new NotFoundError("Exercise not found");
+  }
+
+  // 4. Check name uniqueness (exclude current exercise)
+  const { data: existing, error: checkError } = await supabase
+    .from("exercises")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("name", name)
+    .neq("id", exerciseId)
+    .limit(1);
+
+  if (checkError) {
+    console.error("Error checking uniqueness:", checkError);
+    throw new Error("Failed to check exercise name uniqueness");
+  }
+
+  if (existing && existing.length > 0) {
+    throw new ExerciseConflictError("Exercise with this name already exists");
+  }
+
+  // 5. Update exercise
+  const { data: updated, error: updateError } = await supabase
+    .from("exercises")
+    .update({ name })
+    .eq("id", exerciseId)
+    .select()
+    .single();
+
+  if (updateError || !updated) {
+    console.error("Error updating exercise:", updateError);
+    throw new Error("Failed to update exercise");
+  }
+
+  // 6. Map to DTO with is_system = false (we already validated it's not a system exercise)
+  return { ...updated, is_system: false };
 }
