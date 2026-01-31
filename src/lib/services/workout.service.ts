@@ -13,6 +13,8 @@ import type {
   WorkoutSetDTO,
   Exercise,
   ExerciseType,
+  UpdateWorkoutCommand,
+  MessageResponse,
 } from "../../types";
 
 /**
@@ -379,5 +381,253 @@ export async function getLatestWorkout(supabase: SupabaseClient, userId: string)
   return {
     ...workoutData,
     sets,
+  };
+}
+
+/**
+ * Get workout details by ID
+ * @param supabase - Supabase client instance
+ * @param userId - Current user ID from auth
+ * @param workoutId - Workout ID to retrieve
+ * @returns WorkoutDetailsDTO or null if not found
+ */
+export async function getWorkoutById(
+  supabase: SupabaseClient,
+  userId: string,
+  workoutId: string
+): Promise<WorkoutDetailsDTO | null> {
+  // Query workout with sets and exercises using nested select
+  const { data: workout, error } = await supabase
+    .from("workouts")
+    .select(
+      `
+      *,
+      workout_sets (
+        *,
+        exercises (
+          name,
+          type
+        )
+      )
+    `
+    )
+    .eq("id", workoutId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching workout:", error);
+    throw new Error("Failed to fetch workout");
+  }
+
+  if (!workout) {
+    return null;
+  }
+
+  // Map workout_sets to WorkoutSetDTO with exercise info
+  const sets: WorkoutSetDTO[] = (workout.workout_sets || []).map((set: any) => {
+    const exercise = set.exercises;
+    const { exercises: _, ...setData } = set;
+
+    return {
+      ...setData,
+      exercise_name: exercise.name,
+      exercise_type: exercise.type as ExerciseType,
+    };
+  });
+
+  // Sort sets by sort_order
+  sets.sort((a, b) => a.sort_order - b.sort_order);
+
+  const { workout_sets, ...workoutData } = workout;
+
+  return {
+    ...workoutData,
+    sets,
+  };
+}
+
+/**
+ * Update an existing workout
+ * @param supabase - Supabase client instance
+ * @param userId - Current user ID from auth
+ * @param workoutId - Workout ID to update
+ * @param command - Update data with sets
+ * @returns Updated WorkoutDetailsDTO
+ */
+export async function updateWorkout(
+  supabase: SupabaseClient,
+  userId: string,
+  workoutId: string,
+  command: UpdateWorkoutCommand
+): Promise<WorkoutDetailsDTO> {
+  const { date, notes, sets } = command;
+
+  // Verify workout exists and belongs to user
+  const { data: existingWorkout, error: workoutCheckError } = await supabase
+    .from("workouts")
+    .select("id")
+    .eq("id", workoutId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (workoutCheckError) {
+    console.error("Error checking workout:", workoutCheckError);
+    throw new Error("Failed to verify workout ownership");
+  }
+
+  if (!existingWorkout) {
+    throw new Error("Workout not found or does not belong to user");
+  }
+
+  // Extract unique exercise IDs for validation
+  const exerciseIds = [...new Set(sets.map((set) => set.exercise_id))];
+
+  // Validate exercises exist and are accessible
+  const { data: exercises, error: exerciseError } = await supabase.from("exercises").select("*").in("id", exerciseIds);
+
+  if (exerciseError) {
+    console.error("Error fetching exercises:", exerciseError);
+    throw new Error("Failed to validate exercises");
+  }
+
+  if (!exercises || exercises.length !== exerciseIds.length) {
+    throw new ExerciseNotFoundError("One or more exercises not found or not accessible");
+  }
+
+  // Create exercise map
+  const exerciseMap = new Map<string, Exercise>(exercises.map((ex) => [ex.id, ex]));
+
+  // Validate exercise types match provided fields
+  for (const set of sets) {
+    const exercise = exerciseMap.get(set.exercise_id);
+    if (!exercise) {
+      throw new ExerciseNotFoundError(`Exercise ${set.exercise_id} not found`);
+    }
+
+    if (exercise.type === "strength") {
+      if (set.distance !== null && set.distance !== undefined) {
+        throw new ExerciseTypeMismatchError(`Strength exercise "${exercise.name}" cannot have distance field`);
+      }
+      if (set.time !== null && set.time !== undefined) {
+        throw new ExerciseTypeMismatchError(`Strength exercise "${exercise.name}" cannot have time field`);
+      }
+    } else {
+      if (set.weight !== null && set.weight !== undefined) {
+        throw new ExerciseTypeMismatchError(`Cardio exercise "${exercise.name}" cannot have weight field`);
+      }
+      if (set.reps !== null && set.reps !== undefined) {
+        throw new ExerciseTypeMismatchError(`Cardio exercise "${exercise.name}" cannot have reps field`);
+      }
+    }
+  }
+
+  // Update workout metadata if provided
+  if (date !== undefined || notes !== undefined) {
+    const updateData: any = {};
+    if (date !== undefined) updateData.date = date;
+    if (notes !== undefined) updateData.notes = notes;
+
+    const { error: updateError } = await supabase.from("workouts").update(updateData).eq("id", workoutId);
+
+    if (updateError) {
+      console.error("Error updating workout:", updateError);
+      throw new Error("Failed to update workout");
+    }
+  }
+
+  // Delete all existing sets for this workout
+  const { error: deleteError } = await supabase.from("workout_sets").delete().eq("workout_id", workoutId);
+
+  if (deleteError) {
+    console.error("Error deleting workout sets:", deleteError);
+    throw new Error("Failed to delete old workout sets");
+  }
+
+  // Prepare new workout sets with calculated fields
+  const workoutSets = sets.map((set) => {
+    const exercise = exerciseMap.get(set.exercise_id)!;
+    const setData: any = {
+      workout_id: workoutId,
+      exercise_id: set.exercise_id,
+      sort_order: set.sort_order,
+      weight: set.weight ?? null,
+      reps: set.reps ?? null,
+      distance: set.distance ?? null,
+      time: set.time ?? null,
+      calculated_1rm: null,
+      calculated_volume: null,
+    };
+
+    // Calculate 1RM and volume for strength exercises
+    if (exercise.type === "strength" && set.weight && set.reps) {
+      setData.calculated_1rm = calculate1RM(set.weight, set.reps);
+      setData.calculated_volume = calculateVolume(set.weight, set.reps);
+    }
+
+    return setData;
+  });
+
+  // Insert new workout sets
+  const { data: createdSets, error: setsError } = await supabase.from("workout_sets").insert(workoutSets).select();
+
+  if (setsError) {
+    console.error("Error creating workout sets:", setsError);
+    throw new Error("Failed to create workout sets");
+  }
+
+  if (!createdSets) {
+    throw new Error("Failed to retrieve created workout sets");
+  }
+
+  // Fetch updated workout
+  const updatedWorkout = await getWorkoutById(supabase, userId, workoutId);
+
+  if (!updatedWorkout) {
+    throw new Error("Failed to retrieve updated workout");
+  }
+
+  return updatedWorkout;
+}
+
+/**
+ * Delete a workout and all its sets
+ * @param supabase - Supabase client instance
+ * @param userId - Current user ID from auth
+ * @param workoutId - Workout ID to delete
+ * @returns Success message
+ */
+export async function deleteWorkout(
+  supabase: SupabaseClient,
+  userId: string,
+  workoutId: string
+): Promise<MessageResponse> {
+  // Verify workout exists and belongs to user
+  const { data: existingWorkout, error: workoutCheckError } = await supabase
+    .from("workouts")
+    .select("id")
+    .eq("id", workoutId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (workoutCheckError) {
+    console.error("Error checking workout:", workoutCheckError);
+    throw new Error("Failed to verify workout ownership");
+  }
+
+  if (!existingWorkout) {
+    throw new Error("Workout not found or does not belong to user");
+  }
+
+  // Delete workout (cascade will delete workout_sets)
+  const { error: deleteError } = await supabase.from("workouts").delete().eq("id", workoutId).eq("user_id", userId);
+
+  if (deleteError) {
+    console.error("Error deleting workout:", deleteError);
+    throw new Error("Failed to delete workout");
+  }
+
+  return {
+    message: "Workout deleted successfully",
   };
 }

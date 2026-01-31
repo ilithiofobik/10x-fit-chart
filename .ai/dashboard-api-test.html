@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard API Test Suite</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-200 { background: #28a745; color: white; }
+        .status-400 { background: #ffc107; color: black; }
+        .status-401 { background: #dc3545; color: white; }
+        .status-500 { background: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Dashboard API Test Suite</h1>
+    <p><strong>Endpoint:</strong> GET /api/analytics/dashboard</p>
+    <p><strong>Note:</strong> You must be logged in for these tests to work properly.</p>
+
+    <div class="test-section">
+        <h2>✓ Success Tests</h2>
+        
+        <button onclick="testDefault()">Test 1: Default Period (3 months)</button>
+        <div id="test1" class="result" style="display:none;"></div>
+
+        <button onclick="testCustom6()">Test 2: Custom Period (6 months)</button>
+        <div id="test2" class="result" style="display:none;"></div>
+
+        <button onclick="testCustom12()">Test 3: Maximum Period (12 months)</button>
+        <div id="test3" class="result" style="display:none;"></div>
+
+        <button onclick="testCustom1()">Test 4: Minimum Period (1 month)</button>
+        <div id="test4" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>✗ Error Tests</h2>
+        
+        <button onclick="testInvalidHigh()">Test 5: Invalid - Months Too High (13)</button>
+        <div id="test5" class="result" style="display:none;"></div>
+
+        <button onclick="testInvalidLow()">Test 6: Invalid - Months Too Low (0)</button>
+        <div id="test6" class="result" style="display:none;"></div>
+
+        <button onclick="testInvalidNaN()">Test 7: Invalid - Not a Number (abc)</button>
+        <div id="test7" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🚀 Run All Tests</h2>
+        <button onclick="runAllTests()" style="background: #28a745; font-size: 16px; padding: 12px 24px;">
+            Run All Tests
+        </button>
+        <div id="summary" class="result info" style="display:none;"></div>
+    </div>
+
+    <script>
+        async function testAPI(url, testId, expectedStatus, testName) {
+            const resultDiv = document.getElementById(testId);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<strong>${testName}</strong>\n\nTesting: ${url}\nLoading...`;
+            
+            try {
+                const startTime = performance.now();
+                const response = await fetch(url);
+                const endTime = performance.now();
+                const duration = Math.round(endTime - startTime);
+                
+                const statusClass = `status-${Math.floor(response.status / 100) * 100}`;
+                const data = await response.json();
+                
+                const passed = response.status === expectedStatus;
+                resultDiv.className = `result ${passed ? 'success' : 'error'}`;
+                
+                let output = `<strong>${testName}</strong>\n\n`;
+                output += `Status: ${response.status} <span class="status-badge ${statusClass}">${response.status}</span>\n`;
+                output += `Duration: ${duration}ms\n`;
+                output += `Expected: ${expectedStatus} | Actual: ${response.status}\n`;
+                output += `Result: ${passed ? '✓ PASSED' : '✗ FAILED'}\n\n`;
+                output += `Response:\n${JSON.stringify(data, null, 2)}`;
+                
+                resultDiv.innerHTML = output;
+                return { passed, status: response.status, duration };
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>${testName}</strong>\n\n✗ ERROR\n\n${error.message}`;
+                return { passed: false, error: error.message };
+            }
+        }
+
+        function testDefault() {
+            testAPI('/api/analytics/dashboard', 'test1', 200, 'Test 1: Default Period (3 months)');
+        }
+
+        function testCustom6() {
+            testAPI('/api/analytics/dashboard?months=6', 'test2', 200, 'Test 2: Custom Period (6 months)');
+        }
+
+        function testCustom12() {
+            testAPI('/api/analytics/dashboard?months=12', 'test3', 200, 'Test 3: Maximum Period (12 months)');
+        }
+
+        function testCustom1() {
+            testAPI('/api/analytics/dashboard?months=1', 'test4', 200, 'Test 4: Minimum Period (1 month)');
+        }
+
+        function testInvalidHigh() {
+            testAPI('/api/analytics/dashboard?months=13', 'test5', 400, 'Test 5: Invalid - Months Too High (13)');
+        }
+
+        function testInvalidLow() {
+            testAPI('/api/analytics/dashboard?months=0', 'test6', 400, 'Test 6: Invalid - Months Too Low (0)');
+        }
+
+        function testInvalidNaN() {
+            testAPI('/api/analytics/dashboard?months=abc', 'test7', 400, 'Test 7: Invalid - Not a Number (abc)');
+        }
+
+        async function runAllTests() {
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = 'block';
+            summaryDiv.className = 'result info';
+            summaryDiv.innerHTML = 'Running all tests... Please wait.\n\n';
+
+            const tests = [
+                { fn: testDefault, id: 'test1', expected: 200, name: 'Default Period' },
+                { fn: testCustom6, id: 'test2', expected: 200, name: 'Custom Period (6m)' },
+                { fn: testCustom12, id: 'test3', expected: 200, name: 'Max Period (12m)' },
+                { fn: testCustom1, id: 'test4', expected: 200, name: 'Min Period (1m)' },
+                { fn: testInvalidHigh, id: 'test5', expected: 400, name: 'Invalid High (13)' },
+                { fn: testInvalidLow, id: 'test6', expected: 400, name: 'Invalid Low (0)' },
+                { fn: testInvalidNaN, id: 'test7', expected: 400, name: 'Invalid NaN (abc)' }
+            ];
+
+            let passed = 0;
+            let failed = 0;
+            let totalDuration = 0;
+
+            for (const test of tests) {
+                const result = await testAPI(
+                    test.fn.toString().match(/\/api\/analytics\/dashboard[^'"]*/)?.[0] || '/api/analytics/dashboard',
+                    test.id,
+                    test.expected,
+                    test.name
+                );
+                
+                if (result.passed) {
+                    passed++;
+                } else {
+                    failed++;
+                }
+                
+                if (result.duration) {
+                    totalDuration += result.duration;
+                }
+                
+                // Small delay between tests
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            const avgDuration = Math.round(totalDuration / tests.length);
+            const allPassed = failed === 0;
+            
+            summaryDiv.className = `result ${allPassed ? 'success' : 'error'}`;
+            let summary = '=== TEST SUMMARY ===\n\n';
+            summary += `Total Tests: ${tests.length}\n`;
+            summary += `Passed: ${passed} ✓\n`;
+            summary += `Failed: ${failed} ✗\n`;
+            summary += `Average Duration: ${avgDuration}ms\n`;
+            summary += `Total Duration: ${totalDuration}ms\n\n`;
+            summary += allPassed ? '🎉 All tests passed!' : '⚠️ Some tests failed. Check individual results above.';
+            
+            summaryDiv.innerHTML = summary;
+        }
+
+        // Show instructions on load
+        console.log('%c🧪 Dashboard API Test Suite', 'font-size: 20px; font-weight: bold; color: #0066cc;');
+        console.log('Use the buttons above to test the endpoint, or run:');
+        console.log('%crunAllTests()', 'background: #f0f0f0; padding: 5px; border-radius: 3px;');
+    </script>
+</body>
+</html>

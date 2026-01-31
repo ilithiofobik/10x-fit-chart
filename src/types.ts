@@ -426,3 +426,56 @@ export function isStrengthDetails(details: StrengthDetailsDTO | CardioDetailsDTO
 export function isCardioDetails(details: StrengthDetailsDTO | CardioDetailsDTO): details is CardioDetailsDTO {
   return "distance" in details && "time" in details;
 }
+
+// ============================================================================
+// HISTORY VIEW TYPES (Training History)
+// ============================================================================
+
+/**
+ * Filters for workout history list
+ */
+export interface HistoryFilters {
+  start_date?: string | null;
+  end_date?: string | null;
+  exercise_id?: string | null;
+}
+
+/**
+ * State for workout history list
+ */
+export interface HistoryListState {
+  workouts: WorkoutListItemDTO[];
+  pagination: PaginationDTO;
+  filters: HistoryFilters;
+  availableExercises: ExerciseDTO[];
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  error: string | null;
+}
+
+/**
+ * State for workout editor (extends WorkoutLogger state)
+ */
+export interface WorkoutEditorState {
+  workoutId: string;
+  originalDate: string;
+  createdAt: string;
+  date: string;
+  notes: string | null;
+  exercises: {
+    id: string;
+    name: string;
+    type: ExerciseType;
+    sets: {
+      id?: string;
+      sort_order: number;
+      weight: number | null;
+      reps: number | null;
+      distance: number | null;
+      time: number | null;
+    }[];
+  }[];
+  isSaving: boolean;
+  isDeleting: boolean;
+  isLoading: boolean;
+}

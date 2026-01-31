@@ -1,0 +1,14 @@
+---
+/**
+ * Workout History Page
+ * 
+ * Displays paginated list of user's workouts with filtering capabilities.
+ */
+
+import LayoutApp from "../../../layouts/LayoutApp.astro";
+import { HistoryListProvider } from "../../../components/history/HistoryListProvider";
+---
+
+<LayoutApp title="Historia Treningów">
+  <HistoryListProvider client:load />
+</LayoutApp>

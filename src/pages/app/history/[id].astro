@@ -1,0 +1,20 @@
+---
+/**
+ * Edit Workout Page
+ * 
+ * Allows users to edit an existing workout from their history.
+ */
+
+import LayoutApp from "../../../layouts/LayoutApp.astro";
+import { WorkoutEditorProvider } from "../../../components/workout-editor/WorkoutEditorProvider";
+
+const { id } = Astro.params;
+
+if (!id) {
+  return Astro.redirect("/app/history");
+}
+---
+
+<LayoutApp title="Edytuj Trening">
+  <WorkoutEditorProvider workoutId={id} client:load />
+</LayoutApp>
