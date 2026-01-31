@@ -56,8 +56,11 @@ async function fetchDashboardData(months: number): Promise<DashboardSummaryDTO> 
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
       credentials: "include",
+      cache: "no-store",
       signal: controller.signal,
     });
 

@@ -65,7 +65,7 @@ export async function getDashboardSummary(
     });
   });
 
-  // Query recent workouts (last 5)
+  // Query recent workouts (last 5 within the period)
   const { data: recentWorkouts, error: recentError } = await supabase
     .from("workouts")
     .select(
@@ -76,6 +76,8 @@ export async function getDashboardSummary(
     `
     )
     .eq("user_id", userId)
+    .gte("date", period.start_date)
+    .lte("date", period.end_date)
     .order("date", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(5);

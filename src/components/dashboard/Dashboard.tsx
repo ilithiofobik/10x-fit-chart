@@ -12,7 +12,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 import type { ChartDataPoint } from "@/types";
-import { formatChartDate } from "@/lib/utils/formatters";
 
 /**
  * Transform recent workouts data to chart data points
@@ -23,7 +22,7 @@ function transformToChartData(workouts: { date: string; set_count: number; id: s
   const sortedWorkouts = [...workouts].sort((a, b) => a.date.localeCompare(b.date));
 
   return sortedWorkouts.map((workout) => ({
-    date: formatChartDate(workout.date),
+    date: workout.date, // Use ISO date as unique key for Recharts
     dateValue: workout.date,
     value: workout.set_count,
     label: `${workout.set_count} serii`,

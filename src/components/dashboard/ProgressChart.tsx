@@ -12,7 +12,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { formatChartValue } from "@/lib/utils/formatters";
+import { formatChartValue, formatChartDate, formatWorkoutDate } from "@/lib/utils/formatters";
 import type { ProgressChartProps } from "@/types";
 
 interface TooltipPayload {
@@ -20,6 +20,7 @@ interface TooltipPayload {
   name: string;
   payload: {
     date: string;
+    dateValue: string;
     label: string;
   };
 }
@@ -39,11 +40,16 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   return (
     <div className="bg-popover text-popover-foreground rounded-lg border p-3 shadow-md">
       <p className="text-sm font-medium">{data.payload.label}</p>
-      <p className="text-muted-foreground mt-1 text-xs">{data.payload.date}</p>
+      <p className="text-muted-foreground mt-1 text-xs">{formatWorkoutDate(data.payload.dateValue)}</p>
       <p className="mt-2 text-lg font-bold">{formatChartValue(data.value)}</p>
     </div>
   );
 }
+
+// Custom tick formatter for X axis - formats ISO date to short format
+const formatXAxisTick = (value: string) => {
+  return formatChartDate(value);
+};
 
 export function ProgressChart({ data, xAxisKey, yAxisKey, lineColor = "#2563eb" }: ProgressChartProps) {
   if (data.length === 0) {
@@ -58,6 +64,7 @@ export function ProgressChart({ data, xAxisKey, yAxisKey, lineColor = "#2563eb" 
           dataKey={xAxisKey}
           className="text-muted-foreground text-xs"
           tick={{ fill: "currentColor" }}
+          tickFormatter={formatXAxisTick}
         />
         <YAxis className="text-muted-foreground text-xs" tick={{ fill: "currentColor" }} />
         <Tooltip content={<CustomTooltip />} />
