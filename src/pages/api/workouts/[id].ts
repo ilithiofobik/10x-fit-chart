@@ -167,21 +167,23 @@ export async function PUT(context: APIContext) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error: any) {
-    console.error("Error in PUT /api/workouts/:id:", error);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error in PUT /api/workouts/:id:", error);
 
-    if (error.message.includes("not found")) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+      if (error.message.includes("not found")) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
 
-    if (error instanceof ExerciseNotFoundError || error instanceof ExerciseTypeMismatchError) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      if (error instanceof ExerciseNotFoundError || error instanceof ExerciseTypeMismatchError) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     }
 
     return new Response(JSON.stringify({ error: "Internal server error" }), {
@@ -223,14 +225,16 @@ export async function DELETE(context: APIContext) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error: any) {
-    console.error("Error in DELETE /api/workouts/:id:", error);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error in DELETE /api/workouts/:id:", error);
 
-    if (error.message.includes("not found")) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
+      if (error.message.includes("not found")) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     }
 
     return new Response(JSON.stringify({ error: "Internal server error" }), {

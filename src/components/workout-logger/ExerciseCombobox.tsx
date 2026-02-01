@@ -5,7 +5,7 @@
  */
 
 import { useState } from "react";
-import { Check, ChevronsUpDown, Plus, Dumbbell, HeartPulse } from "lucide-react";
+import { ChevronsUpDown, Plus, Dumbbell, HeartPulse } from "lucide-react";
 import { Button } from "../ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
@@ -13,7 +13,6 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn } from "../../lib/utils";
 import type { ExerciseComboboxProps } from "./types";
 import type { ExerciseType } from "../../types";
 import { toast } from "sonner";
@@ -114,7 +113,9 @@ export const ExerciseCombobox = ({ exercises, onAddExercise, onCreateExercise }:
                 <CommandList>
                   <CommandEmpty>
                     <div className="py-6 text-center">
-                      <p className="text-sm text-muted-foreground mb-3">Nie znaleziono ćwiczenia "{searchValue}"</p>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Nie znaleziono ćwiczenia &quot;{searchValue}&quot;
+                      </p>
                       <Button variant="outline" size="sm" onClick={handleOpenCreateDialog} className="gap-2">
                         <Plus className="h-4 w-4" />
                         Utwórz nowe ćwiczenie
@@ -193,7 +194,6 @@ export const ExerciseCombobox = ({ exercises, onAddExercise, onCreateExercise }:
                 value={newExerciseName}
                 onChange={(e) => setNewExerciseName(e.target.value)}
                 maxLength={100}
-                autoFocus
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !isCreating) {
                     handleCreateExercise();

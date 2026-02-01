@@ -54,10 +54,6 @@ function EmptyState() {
 }
 
 export function RecentWorkoutsList({ workouts, isLoading }: RecentWorkoutsListProps) {
-  const handleWorkoutClick = (workoutId: string) => {
-    window.location.href = `/app/history/${workoutId}`;
-  };
-
   // Limit to 5 most recent workouts
   const recentWorkouts = workouts.slice(0, 5);
 
@@ -76,7 +72,13 @@ export function RecentWorkoutsList({ workouts, isLoading }: RecentWorkoutsListPr
       ) : (
         <div className="space-y-3">
           {recentWorkouts.map((workout) => (
-            <WorkoutSummaryCard key={workout.id} workout={workout} onClick={handleWorkoutClick} />
+            <WorkoutSummaryCard
+              key={workout.id}
+              workout={workout}
+              onClick={(workoutId: string) => {
+                window.location.href = `/app/history/${workoutId}`;
+              }}
+            />
           ))}
         </div>
       )}

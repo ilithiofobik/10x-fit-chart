@@ -99,7 +99,11 @@ export interface WorkoutEditorActions {
   removeExercise: (exerciseId: string) => void;
   addSet: (exerciseId: string) => void;
   removeSet: (exerciseId: string, setIndex: number) => void;
-  updateSet: (exerciseId: string, setIndex: number, data: any) => void;
+  updateSet: (
+    exerciseId: string,
+    setIndex: number,
+    data: Partial<{ weight: number | null; reps: number | null; distance: number | null; time: number | null }>
+  ) => void;
   saveWorkout: () => Promise<void>;
   deleteWorkout: () => Promise<void>;
   cancelEdit: () => void;

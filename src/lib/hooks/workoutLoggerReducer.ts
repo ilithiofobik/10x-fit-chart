@@ -160,12 +160,15 @@ export const workoutLoggerReducer = (
           });
         }
 
-        exercisesMap.get(set.exercise_id)!.sets.push({
-          weight: set.weight,
-          reps: set.reps,
-          distance: set.distance,
-          time: set.time,
-        });
+        const exercise = exercisesMap.get(set.exercise_id);
+        if (exercise) {
+          exercise.sets.push({
+            weight: set.weight,
+            reps: set.reps,
+            distance: set.distance,
+            time: set.time,
+          });
+        }
       });
 
       return {

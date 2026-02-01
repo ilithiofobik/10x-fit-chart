@@ -28,10 +28,10 @@ export const prerender = false;
 export const DELETE: APIRoute = async ({ locals, cookies }) => {
   try {
     // 1. Verify authentication
-    const user = requireAuth(locals);
+    requireAuth(locals);
 
     // 2. Create Supabase client with cookie storage
-    const supabase = supabaseServer({ cookies } as any);
+    const supabase = supabaseServer({ cookies } as { cookies: typeof cookies });
 
     // 3. Call database function to delete user and all associated data
     // This function uses SECURITY DEFINER to safely delete from auth.users

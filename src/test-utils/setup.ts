@@ -26,7 +26,7 @@ const localStorageMock = (() => {
       store[key] = value.toString();
     }),
     removeItem: vi.fn((key: string) => {
-      delete store[key];
+      store = Object.fromEntries(Object.entries(store).filter(([k]) => k !== key));
     }),
     clear: vi.fn(() => {
       store = {};
@@ -55,7 +55,7 @@ const sessionStorageMock = (() => {
       store[key] = value.toString();
     }),
     removeItem: vi.fn((key: string) => {
-      delete store[key];
+      store = Object.fromEntries(Object.entries(store).filter(([k]) => k !== key));
     }),
     clear: vi.fn(() => {
       store = {};
@@ -91,22 +91,35 @@ Object.defineProperty(window, "matchMedia", {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
+  observe() {
+    // Mock implementation
+  }
+  disconnect() {
+    // Mock implementation
+  }
+  unobserve() {
+    // Mock implementation
+  }
   takeRecords() {
     return [];
   }
-  unobserve() {}
-} as any;
+  readonly root = null;
+  readonly rootMargin = "";
+  readonly thresholds: readonly number[] = [];
+} as unknown as typeof IntersectionObserver;
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-} as any;
+  observe() {
+    // Mock implementation
+  }
+  disconnect() {
+    // Mock implementation
+  }
+  unobserve() {
+    // Mock implementation
+  }
+} as unknown as typeof ResizeObserver;
 
 // Suppress console errors in tests (optional - uncomment if needed)
 // beforeAll(() => {

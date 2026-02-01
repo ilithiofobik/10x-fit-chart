@@ -11,7 +11,7 @@ import { ProgressChartWidget } from "./ProgressChartWidget";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
-import type { ChartDataPoint } from "@/types";
+import type { ChartDataPoint, DashboardSummary } from "@/types";
 
 /**
  * Transform recent workouts data to chart data points
@@ -64,7 +64,7 @@ export function Dashboard() {
       {!error && (
         <>
           {/* Stats Grid */}
-          <StatsGrid stats={data?.summary || ({} as any)} isLoading={isLoading} />
+          <StatsGrid stats={data?.summary || ({} as DashboardSummary)} isLoading={isLoading} />
 
           {/* Two column layout for Recent Workouts and Chart */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

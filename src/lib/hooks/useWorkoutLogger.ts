@@ -7,11 +7,7 @@
 import { useReducer, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { workoutLoggerReducer, getInitialState } from "./workoutLoggerReducer";
-import type {
-  WorkoutLoggerState,
-  WorkoutLoggerActions,
-  WORKOUT_DRAFT_KEY,
-} from "../../components/workout-logger/types";
+import type { WorkoutLoggerState, WorkoutLoggerActions } from "../../components/workout-logger/types";
 import type { ExerciseDTO, CreateWorkoutCommand, WorkoutDetailsDTO } from "../../types";
 
 const DRAFT_KEY = "workout_draft";

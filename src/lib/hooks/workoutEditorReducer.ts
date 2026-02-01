@@ -46,7 +46,20 @@ export const getInitialState = (): WorkoutEditorState => ({
  * Helper to convert WorkoutDetailsDTO to WorkoutExercise array
  */
 const convertWorkoutToExercises = (workout: WorkoutDetailsDTO) => {
-  const exercisesMap = new Map<string, any>();
+  interface WorkoutExerciseMap {
+    id: string;
+    exercise_id: string;
+    exercise_name: string;
+    exercise_type: "strength" | "cardio";
+    sets: {
+      weight: number | null;
+      reps: number | null;
+      distance: number | null;
+      time: number | null;
+    }[];
+  }
+
+  const exercisesMap = new Map<string, WorkoutExerciseMap>();
 
   workout.sets.forEach((set) => {
     if (!exercisesMap.has(set.exercise_id)) {
@@ -59,12 +72,15 @@ const convertWorkoutToExercises = (workout: WorkoutDetailsDTO) => {
       });
     }
 
-    exercisesMap.get(set.exercise_id)!.sets.push({
-      weight: set.weight,
-      reps: set.reps,
-      distance: set.distance,
-      time: set.time,
-    });
+    const exercise = exercisesMap.get(set.exercise_id);
+    if (exercise) {
+      exercise.sets.push({
+        weight: set.weight,
+        reps: set.reps,
+        distance: set.distance,
+        time: set.time,
+      });
+    }
   });
 
   return Array.from(exercisesMap.values());

@@ -181,12 +181,12 @@ export const mockUser = {
 
 export const mockLocalsAuthenticated = {
   user: mockUser,
-  supabase: {} as any, // Mock Supabase client if needed
+  supabase: {} as unknown,
 };
 
 export const mockLocalsUnauthenticated = {
   user: null,
-  supabase: {} as any,
+  supabase: {} as unknown,
 };
 
 // ============================================================================

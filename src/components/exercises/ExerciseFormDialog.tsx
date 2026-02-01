@@ -130,9 +130,12 @@ export default function ExerciseFormDialog({
 
     try {
       if (mode === "create") {
+        if (!formData.type) {
+          return;
+        }
         const command: CreateExerciseCommand = {
           name: formData.name.trim(),
-          type: formData.type!,
+          type: formData.type,
         };
         await onSubmit(command);
       } else {

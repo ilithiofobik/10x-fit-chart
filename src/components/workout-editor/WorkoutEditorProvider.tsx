@@ -14,7 +14,6 @@ import { WorkoutEditorActions } from "./WorkoutEditorActions";
 import { ExerciseCombobox } from "../workout-logger/ExerciseCombobox";
 import { ExerciseList } from "../workout-logger/ExerciseList";
 import type { ExerciseDTO, ExerciseType } from "../../types";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 /**

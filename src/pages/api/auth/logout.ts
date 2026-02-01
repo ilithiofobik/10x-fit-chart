@@ -20,7 +20,7 @@ export const prerender = false;
 export const POST: APIRoute = async ({ cookies }) => {
   try {
     // 1. Create Supabase client with cookie storage
-    const supabase = supabaseServer({ cookies } as any);
+    const supabase = supabaseServer({ cookies } as { cookies: typeof cookies });
 
     // 2. Sign out user
     const { error } = await supabase.auth.signOut();

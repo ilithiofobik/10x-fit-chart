@@ -135,11 +135,13 @@ export async function listWorkouts(
     // Count total sets
     const set_count = sets.length;
 
-    // Remove workout_sets from the response
-    const { workout_sets, ...workoutData } = workout;
-
     return {
-      ...workoutData,
+      id: workout.id,
+      user_id: workout.user_id,
+      date: workout.date,
+      notes: workout.notes,
+      created_at: workout.created_at,
+      updated_at: workout.updated_at,
       exercise_count,
       set_count,
     };
@@ -288,8 +290,22 @@ export async function createWorkout(
 
   // Prepare workout sets with calculated fields
   const workoutSets = sets.map((set) => {
-    const exercise = exerciseMap.get(set.exercise_id)!;
-    const setData: any = {
+    const exercise = exerciseMap.get(set.exercise_id);
+    if (!exercise) {
+      throw new Error(`Exercise ${set.exercise_id} not found`);
+    }
+
+    const setData: {
+      workout_id: string;
+      exercise_id: string;
+      sort_order: number;
+      weight: number | null;
+      reps: number | null;
+      distance: number | null;
+      time: number | null;
+      calculated_1rm: number | null;
+      calculated_volume: number | null;
+    } = {
       workout_id: workout.id,
       exercise_id: set.exercise_id,
       sort_order: set.sort_order,
@@ -328,7 +344,10 @@ export async function createWorkout(
 
   // Map sets to WorkoutSetDTO with exercise information
   const setsDTO: WorkoutSetDTO[] = createdSets.map((set) => {
-    const exercise = exerciseMap.get(set.exercise_id)!;
+    const exercise = exerciseMap.get(set.exercise_id);
+    if (!exercise) {
+      throw new Error(`Exercise ${set.exercise_id} not found`);
+    }
     return {
       ...set,
       exercise_name: exercise.name,
@@ -385,28 +404,42 @@ export async function getLatestWorkout(supabase: SupabaseClient, userId: string)
   }
 
   // Map workout_sets to WorkoutSetDTO with exercise info
-  const sets: WorkoutSetDTO[] = (workout.workout_sets || []).map((set: any) => {
-    const exercise = set.exercises;
+  const sets: WorkoutSetDTO[] = (workout.workout_sets || []).map(
+    (set: { exercises: { name: string; type: ExerciseType }; [key: string]: unknown }) => {
+      const exercise = set.exercises;
+      const setData = { ...set };
+      delete setData.exercises;
 
-    // Create WorkoutSetDTO without the nested exercises object
-    const { exercises: _, ...setData } = set;
-
-    return {
-      ...setData,
-      exercise_name: exercise.name,
-      exercise_type: exercise.type as ExerciseType,
-    };
-  });
+      return {
+        id: setData.id,
+        workout_id: setData.workout_id,
+        exercise_id: setData.exercise_id,
+        exercise_name: exercise.name,
+        exercise_type: exercise.type as ExerciseType,
+        sort_order: setData.sort_order,
+        weight: setData.weight as number | null,
+        reps: setData.reps as number | null,
+        distance: setData.distance as number | null,
+        time: setData.time as number | null,
+        calculated_1rm: setData.calculated_1rm as number | null,
+        calculated_volume: setData.calculated_volume as number | null,
+        created_at: setData.created_at as string,
+        updated_at: setData.updated_at as string,
+      } as WorkoutSetDTO;
+    }
+  );
 
   // Sort sets by sort_order to ensure correct display order
   sets.sort((a, b) => a.sort_order - b.sort_order);
 
-  // Remove workout_sets from workout object to avoid duplication
-  const { workout_sets, ...workoutData } = workout;
-
   // Return WorkoutDetailsDTO
   return {
-    ...workoutData,
+    id: workout.id,
+    user_id: workout.user_id,
+    date: workout.date,
+    notes: workout.notes,
+    created_at: workout.created_at,
+    updated_at: workout.updated_at,
     sets,
   };
 }
@@ -452,24 +485,30 @@ export async function getWorkoutById(
   }
 
   // Map workout_sets to WorkoutSetDTO with exercise info
-  const sets: WorkoutSetDTO[] = (workout.workout_sets || []).map((set: any) => {
-    const exercise = set.exercises;
-    const { exercises: _, ...setData } = set;
+  const sets: WorkoutSetDTO[] = (workout.workout_sets || []).map(
+    (set: { exercises: { name: string; type: ExerciseType }; [key: string]: unknown }) => {
+      const exercise = set.exercises;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { exercises: _exercises, ...setData } = set;
 
-    return {
-      ...setData,
-      exercise_name: exercise.name,
-      exercise_type: exercise.type as ExerciseType,
-    };
-  });
+      return {
+        ...setData,
+        exercise_name: exercise.name,
+        exercise_type: exercise.type as ExerciseType,
+      } as WorkoutSetDTO;
+    }
+  );
 
   // Sort sets by sort_order
   sets.sort((a, b) => a.sort_order - b.sort_order);
 
-  const { workout_sets, ...workoutData } = workout;
-
   return {
-    ...workoutData,
+    id: workout.id,
+    user_id: workout.user_id,
+    date: workout.date,
+    notes: workout.notes,
+    created_at: workout.created_at,
+    updated_at: workout.updated_at,
     sets,
   };
 }
@@ -551,7 +590,10 @@ export async function updateWorkout(
 
   // Update workout metadata if provided
   if (date !== undefined || notes !== undefined) {
-    const updateData: any = {};
+    const updateData: {
+      date?: string;
+      notes?: string | null;
+    } = {};
     if (date !== undefined) updateData.date = date;
     if (notes !== undefined) updateData.notes = notes;
 
@@ -573,8 +615,22 @@ export async function updateWorkout(
 
   // Prepare new workout sets with calculated fields
   const workoutSets = sets.map((set) => {
-    const exercise = exerciseMap.get(set.exercise_id)!;
-    const setData: any = {
+    const exercise = exerciseMap.get(set.exercise_id);
+    if (!exercise) {
+      throw new Error(`Exercise ${set.exercise_id} not found`);
+    }
+
+    const setData: {
+      workout_id: string;
+      exercise_id: string;
+      sort_order: number;
+      weight: number | null;
+      reps: number | null;
+      distance: number | null;
+      time: number | null;
+      calculated_1rm: number | null;
+      calculated_volume: number | null;
+    } = {
       workout_id: workoutId,
       exercise_id: set.exercise_id,
       sort_order: set.sort_order,

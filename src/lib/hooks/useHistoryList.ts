@@ -7,7 +7,7 @@
 import { useReducer, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { historyListReducer, getInitialState } from "./historyListReducer";
-import type { HistoryListState, HistoryFilters, ListWorkoutsResponse, ListExercisesResponse } from "../../types";
+import type { HistoryFilters, ListWorkoutsResponse, ListExercisesResponse } from "../../types";
 
 /**
  * Actions returned by useHistoryList hook
