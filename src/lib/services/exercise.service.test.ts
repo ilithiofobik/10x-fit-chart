@@ -29,7 +29,7 @@ describe("exercise.service - Validation", () => {
     vi.clearAllMocks();
     mockSupabase = {
       from: vi.fn(),
-    } as any;
+    } as unknown as SupabaseClient;
   });
 
   // ============================================================================
@@ -45,7 +45,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock: No existing exercises with this name
-      (mockSupabase.from as any).mockImplementation((table: string) => {
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         if (table === "exercises") {
           return {
             select: vi.fn().mockReturnValue({
@@ -95,7 +95,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock: Existing exercise with same name
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
@@ -123,7 +123,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock: Existing "Bench Press"
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
@@ -148,7 +148,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock: No exercises for THIS user with this name
-      (mockSupabase.from as any).mockImplementation((table: string) => {
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         if (table === "exercises") {
           return {
             select: vi.fn().mockReturnValue({
@@ -200,7 +200,7 @@ describe("exercise.service - Validation", () => {
       const insertMock = vi.fn();
 
       // Mock to track call order
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: selectMock.mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
@@ -260,7 +260,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock Supabase
-      (mockSupabase.from as any).mockImplementation((table: string) => {
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         if (table === "exercises") {
           return {
             select: vi.fn().mockReturnValue({
@@ -317,7 +317,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock Supabase
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
@@ -348,7 +348,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock Supabase
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
@@ -380,7 +380,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock Supabase
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
@@ -414,7 +414,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock Supabase
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
@@ -449,7 +449,7 @@ describe("exercise.service - Validation", () => {
       const uniqueCheckMock = vi.fn();
 
       // Mock Supabase
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: fetchMock.mockReturnValue({
             single: vi.fn().mockResolvedValue({
@@ -491,7 +491,7 @@ describe("exercise.service - Validation", () => {
       };
 
       // Mock Supabase
-      (mockSupabase.from as any).mockImplementation((table: string) => {
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         if (table === "exercises") {
           return {
             select: vi.fn().mockReturnValue({
@@ -545,7 +545,7 @@ describe("exercise.service - Validation", () => {
         type: "strength",
       };
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
@@ -572,7 +572,7 @@ describe("exercise.service - Validation", () => {
       // Arrange
       const command: UpdateExerciseCommand = { name: "New" };
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({
@@ -604,7 +604,7 @@ describe("exercise.service - Validation", () => {
         is_archived: false,
       };
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: vi.fn().mockResolvedValue({

@@ -28,24 +28,26 @@ describe("useDashboard - Logic", () => {
   function validateDashboardData(data: unknown): boolean {
     if (typeof data !== "object" || data === null) return false;
 
-    const d = data as any;
+    const d = data as Record<string, unknown>;
 
     // Sprawdź strukturę
     if (!d.period || !d.summary || !Array.isArray(d.recent_workouts)) {
       return false;
     }
 
+    const summary = d.summary as Record<string, unknown>;
+
     // Sprawdź wartości statystyk
     if (
-      typeof d.summary.total_workouts !== "number" ||
-      typeof d.summary.total_sets !== "number" ||
-      typeof d.summary.total_volume !== "number" ||
-      typeof d.summary.unique_exercises !== "number"
+      typeof summary.total_workouts !== "number" ||
+      typeof summary.total_sets !== "number" ||
+      typeof summary.total_volume !== "number" ||
+      typeof summary.unique_exercises !== "number"
     ) {
       return false;
     }
 
-    if (d.summary.total_workouts < 0 || d.summary.total_sets < 0) {
+    if (summary.total_workouts < 0 || summary.total_sets < 0) {
       return false;
     }
 
@@ -638,7 +640,8 @@ describe("useDashboard - Logic", () => {
       });
 
       // This verifies the logic: if (response.status === 401) window.location.href = "/login"
-      if (401 === 401) {
+      const responseStatus = 401;
+      if (responseStatus === 401) {
         mockLocation.href = "/login";
       }
 

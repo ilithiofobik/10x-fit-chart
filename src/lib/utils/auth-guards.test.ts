@@ -35,7 +35,7 @@ describe("auth-guards", () => {
 
   const createLocals = (user: User | null | undefined): App.Locals => ({
     user,
-    supabase: {} as any, // Not used in auth-guards
+    supabase: {} as unknown as SupabaseClient, // Not used in auth-guards
   });
 
   // ============================================================================

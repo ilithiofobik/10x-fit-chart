@@ -26,21 +26,21 @@ describe("workout.service - Validation", () => {
     // Create mock Supabase client
     mockSupabase = {
       from: vi.fn(),
-    } as any;
+    } as unknown as SupabaseClient;
   });
 
   // Mock helpers
-  const createMockExerciseResponse = (exercises: any[]) => ({
+  const createMockExerciseResponse = (exercises: Record<string, unknown>[]) => ({
     data: exercises,
     error: null,
   });
 
-  const createMockWorkoutResponse = (workout: any) => ({
+  const createMockWorkoutResponse = (workout: Record<string, unknown>) => ({
     data: workout,
     error: null,
   });
 
-  const createMockSetsResponse = (sets: any[]) => ({
+  const createMockSetsResponse = (sets: Record<string, unknown>[]) => ({
     data: sets,
     error: null,
   });
@@ -75,7 +75,7 @@ describe("workout.service - Validation", () => {
       };
 
       // Mock Supabase responses
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([strengthExercise])),
         }),
@@ -113,7 +113,7 @@ describe("workout.service - Validation", () => {
       };
 
       // Mock Supabase responses
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([strengthExercise])),
         }),
@@ -151,7 +151,7 @@ describe("workout.service - Validation", () => {
       };
 
       // Mock Supabase responses
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([cardioExercise])),
         }),
@@ -189,7 +189,7 @@ describe("workout.service - Validation", () => {
       };
 
       // Mock Supabase responses
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([cardioExercise])),
         }),
@@ -252,7 +252,7 @@ describe("workout.service - Validation", () => {
 
       // Mock Supabase responses
       let fromCallCount = 0;
-      (mockSupabase.from as any).mockImplementation((table: string) => {
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         fromCallCount++;
 
         if (table === "exercises") {
@@ -338,7 +338,7 @@ describe("workout.service - Validation", () => {
 
       // Mock Supabase responses
       let fromCallCount = 0;
-      (mockSupabase.from as any).mockImplementation((table: string) => {
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         fromCallCount++;
 
         if (table === "exercises") {
@@ -415,7 +415,7 @@ describe("workout.service - Validation", () => {
       };
 
       // Mock Supabase responses
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([strengthExercise])),
         }),
@@ -449,7 +449,7 @@ describe("workout.service - Validation", () => {
       };
 
       // Mock Supabase to return empty array (no exercises found)
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([])),
         }),
@@ -497,7 +497,7 @@ describe("workout.service - Validation", () => {
         },
       ];
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse(exercises)),
         }),
@@ -581,7 +581,7 @@ describe("workout.service - Validation", () => {
 
       // Mock Supabase responses
       let fromCallCount = 0;
-      (mockSupabase.from as any).mockImplementation((table: string) => {
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
         fromCallCount++;
 
         if (table === "exercises") {
@@ -640,7 +640,7 @@ describe("workout.service - Validation", () => {
         ],
       };
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([])),
         }),
@@ -680,7 +680,7 @@ describe("workout.service - Validation", () => {
         ],
       };
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([strengthExercise])),
         }),
@@ -713,7 +713,7 @@ describe("workout.service - Validation", () => {
         ],
       };
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([])),
         }),
@@ -753,7 +753,7 @@ describe("workout.service - Validation", () => {
         ],
       };
 
-      (mockSupabase.from as any).mockReturnValue({
+      (mockSupabase.from as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           in: vi.fn().mockResolvedValue(createMockExerciseResponse([strengthExercise])),
         }),
