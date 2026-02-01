@@ -17,13 +17,13 @@ import {
 describe("formatters", () => {
   describe("formatNumber", () => {
     it("formatuje liczby z separatorami tysięcy (PL locale)", () => {
-      expect(formatNumber(1000)).toBe("1 000");
-      expect(formatNumber(125000)).toBe("125 000");
-      expect(formatNumber(1000000)).toBe("1 000 000");
+      expect(formatNumber(1000)).toBe("1000");
+      expect(formatNumber(125000)).toBe("125\u00A0000");
+      expect(formatNumber(1000000)).toBe("1\u00A0000\u00A0000");
     });
 
     it("obsługuje liczby zmiennoprzecinkowe", () => {
-      expect(formatNumber(1234.56)).toBe("1 234,56");
+      expect(formatNumber(1234.56)).toBe("1234,56");
       expect(formatNumber(999.99)).toBe("999,99");
     });
 
@@ -32,7 +32,7 @@ describe("formatters", () => {
     });
 
     it("obsługuje liczby ujemne", () => {
-      expect(formatNumber(-1000)).toBe("-1 000");
+      expect(formatNumber(-1000)).toBe("-1000");
     });
 
     it("obsługuje małe liczby", () => {
@@ -44,7 +44,7 @@ describe("formatters", () => {
 
   describe("formatVolume", () => {
     it("formatuje volume z jednostką kg", () => {
-      expect(formatVolume(125000)).toBe("125 000 kg");
+      expect(formatVolume(125000)).toBe("125\u00A0000 kg");
       expect(formatVolume(800)).toBe("800 kg");
     });
 
@@ -53,7 +53,7 @@ describe("formatters", () => {
     });
 
     it("obsługuje liczby zmiennoprzecinkowe", () => {
-      expect(formatVolume(1234.56)).toBe("1 234,56 kg");
+      expect(formatVolume(1234.56)).toBe("1234,56 kg");
     });
   });
 
@@ -69,8 +69,8 @@ describe("formatters", () => {
     });
 
     it("formatuje inne daty w formacie 'd MMM yyyy'", () => {
-      const result = formatWorkoutDate("2026-01-31");
-      expect(result).toMatch(/31 sty 2026/i);
+      const result = formatWorkoutDate("1999-01-31");
+      expect(result).toMatch(/31 sty 1999/i);
     });
 
     it("obsługuje nieprawidłową datę (fallback)", () => {

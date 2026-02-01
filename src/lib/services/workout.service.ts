@@ -164,21 +164,48 @@ export async function listWorkouts(
  * @param weight - Weight lifted in kg
  * @param reps - Number of repetitions
  * @returns Calculated 1RM value
+ * @throws Error if reps <= 0 or weight < 0
+ *
+ * @remarks
+ * Brzycki formula is most accurate for 1-12 reps.
+ * For reps > 36, the formula becomes unreliable (denominator approaches zero).
+ * Formula: 1RM = weight / (1.0278 - 0.0278 * reps)
  */
-function calculate1RM(weight: number, reps: number): number {
+export function calculate1RM(weight: number, reps: number): number {
+  if (weight < 0) {
+    throw new Error("Weight must be non-negative");
+  }
+  if (reps <= 0) {
+    throw new Error("Reps must be greater than 0");
+  }
   if (reps === 1) return weight;
+
   // Brzycki formula: 1RM = weight / (1.0278 - 0.0278 * reps)
-  return weight / (1.0278 - 0.0278 * reps);
+  const result = weight / (1.0278 - 0.0278 * reps);
+
+  // Round to 2 decimal places
+  return Math.round(result * 100) / 100;
 }
 
 /**
  * Calculate volume (total work done)
  * @param weight - Weight lifted in kg
  * @param reps - Number of repetitions
- * @returns Volume (weight * reps)
+ * @returns Volume (weight * reps) rounded to 2 decimal places
+ * @throws Error if weight < 0 or reps <= 0
  */
-function calculateVolume(weight: number, reps: number): number {
-  return weight * reps;
+export function calculateVolume(weight: number, reps: number): number {
+  if (weight < 0) {
+    throw new Error("Weight must be non-negative");
+  }
+  if (reps <= 0) {
+    throw new Error("Reps must be greater than 0");
+  }
+
+  const result = weight * reps;
+
+  // Round to 2 decimal places
+  return Math.round(result * 100) / 100;
 }
 
 /**

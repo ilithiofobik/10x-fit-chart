@@ -424,8 +424,8 @@ describe('mapAuthError', () => {
 ### Sprint 1, Tydzień 1 (3h)
 - [x] Setup Vitest configuration
 - [x] Setup test utils i fixtures
-- [ ] Testy kalkulacji (`workout.service.ts` - calculations)
-- [ ] Testy formatery (`formatters.ts`)
+- [x] **Testy kalkulacji (`workout.service.ts` - calculations)** ✅ 53/53 testy
+- [ ] Testy formatery (`formatters.ts`) ⚠️ 26/32 testy (do poprawy)
 
 ### Sprint 1, Tydzień 2 (3h)
 - [ ] Testy reducery (`workoutLoggerReducer.ts`)
