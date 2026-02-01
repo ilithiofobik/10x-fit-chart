@@ -37,8 +37,8 @@ Regular trainees often struggle to see long-term trends using paper logs or mobi
 1.  Clone the repository:
 
     ```bash
-    git clone https://github.com/ilithiofobik/10x-fitness.git
-    cd 10x-fitness
+    git clone https://github.com/ilithiofobik/10x-fit-chart.git
+    cd 10x-fit-chart
     ```
 
 2.  Install dependencies:
