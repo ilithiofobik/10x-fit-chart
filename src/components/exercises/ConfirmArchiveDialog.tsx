@@ -40,20 +40,14 @@ export default function ConfirmArchiveDialog({
           <AlertDialogDescription className="space-y-3 pt-2">
             <p>
               Czy na pewno chcesz zarchiwizować ćwiczenie{" "}
-              <span className="font-semibold text-foreground">
-                {exercise.name}
-              </span>
-              ?
+              <span className="font-semibold text-foreground">{exercise.name}</span>?
             </p>
             <p>
               <strong>Konsekwencje:</strong>
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm">
               <li>Ćwiczenie zniknie z listy wyboru przy dodawaniu treningu</li>
-              <li>
-                Historyczne treningi zawierające to ćwiczenie pozostaną bez
-                zmian
-              </li>
+              <li>Historyczne treningi zawierające to ćwiczenie pozostaną bez zmian</li>
               <li>Możesz przywrócić ćwiczenie kontaktując się z supportem</li>
             </ul>
           </AlertDialogDescription>

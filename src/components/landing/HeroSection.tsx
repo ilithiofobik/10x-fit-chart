@@ -18,8 +18,7 @@ export function HeroSection({ isAuthenticated }: HeroSectionProps) {
 
           {/* Tagline */}
           <p className="mx-auto max-w-2xl text-xl text-muted-foreground sm:text-2xl">
-            Śledź postępy treningowe z precyzją. Desktop-first aplikacja do
-            analizy siłowej i cardio.
+            Śledź postępy treningowe z precyzją. Desktop-first aplikacja do analizy siłowej i cardio.
           </p>
 
           {/* CTA Buttons */}

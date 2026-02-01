@@ -10,13 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type {
   ExerciseFormDialogProps,
   ExerciseFormData,
@@ -157,10 +151,7 @@ export default function ExerciseFormDialog({
   }
 
   const isFormInvalid =
-    !formData.name.trim() ||
-    formData.name.length > 100 ||
-    (mode === "create" && !formData.type) ||
-    isSubmitting;
+    !formData.name.trim() || formData.name.length > 100 || (mode === "create" && !formData.type) || isSubmitting;
 
   const title = mode === "create" ? "Dodaj ćwiczenie" : "Edytuj ćwiczenie";
   const submitLabel = isSubmitting ? "Zapisywanie..." : "Zapisz";
@@ -195,12 +186,8 @@ export default function ExerciseFormDialog({
                 disabled={isSubmitting}
                 maxLength={100}
               />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name}</p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                {formData.name.length}/100 znaków
-              </p>
+              {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+              <p className="text-xs text-muted-foreground">{formData.name.length}/100 znaków</p>
             </div>
 
             {/* Pole typu */}
@@ -208,11 +195,7 @@ export default function ExerciseFormDialog({
               <Label htmlFor="type">
                 Typ ćwiczenia <span className="text-destructive">*</span>
               </Label>
-              <Select
-                value={formData.type}
-                onValueChange={handleTypeChange}
-                disabled={mode === "edit" || isSubmitting}
-              >
+              <Select value={formData.type} onValueChange={handleTypeChange} disabled={mode === "edit" || isSubmitting}>
                 <SelectTrigger id="type">
                   <SelectValue placeholder="Wybierz typ" />
                 </SelectTrigger>
@@ -222,20 +205,13 @@ export default function ExerciseFormDialog({
                 </SelectContent>
               </Select>
               {mode === "edit" && (
-                <p className="text-xs text-muted-foreground">
-                  Typ ćwiczenia nie może być zmieniony po utworzeniu.
-                </p>
+                <p className="text-xs text-muted-foreground">Typ ćwiczenia nie może być zmieniony po utworzeniu.</p>
               )}
             </div>
           </div>
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
               Anuluj
             </Button>
             <Button type="submit" disabled={isFormInvalid}>

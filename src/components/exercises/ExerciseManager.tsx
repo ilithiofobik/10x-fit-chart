@@ -100,9 +100,7 @@ export default function ExerciseManager() {
 
         // Filtr wyszukiwania
         if (state.searchQuery) {
-          return ex.name
-            .toLowerCase()
-            .includes(state.searchQuery.toLowerCase());
+          return ex.name.toLowerCase().includes(state.searchQuery.toLowerCase());
         }
 
         return true;
@@ -245,16 +243,13 @@ export default function ExerciseManager() {
         formDialog: { ...prev.formDialog, isSubmitting: true },
       }));
 
-      const response = await fetch(
-        `/api/exercises/${state.formDialog.exercise.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`/api/exercises/${state.formDialog.exercise.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       if (!response.ok) {
         if (response.status === 403) {
@@ -263,17 +258,13 @@ export default function ExerciseManager() {
           return;
         }
         if (response.status === 404) {
-          toast.error(
-            "Ćwiczenie nie zostało znalezione. Lista zostanie odświeżona."
-          );
+          toast.error("Ćwiczenie nie zostało znalezione. Lista zostanie odświeżona.");
           await fetchExercises();
           closeDialogs();
           return;
         }
         const error = await response.json();
-        throw new Error(
-          error.message || "Nie udało się zaktualizować ćwiczenia"
-        );
+        throw new Error(error.message || "Nie udało się zaktualizować ćwiczenia");
       }
 
       // Sukces - odśwież listę i zamknij dialog
@@ -304,12 +295,9 @@ export default function ExerciseManager() {
         archiveDialog: { ...prev.archiveDialog, isDeleting: true },
       }));
 
-      const response = await fetch(
-        `/api/exercises/${state.archiveDialog.exercise.id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/exercises/${state.archiveDialog.exercise.id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         if (response.status === 403) {
@@ -318,17 +306,13 @@ export default function ExerciseManager() {
           return;
         }
         if (response.status === 404) {
-          toast.error(
-            "Ćwiczenie nie zostało znalezione. Lista zostanie odświeżona."
-          );
+          toast.error("Ćwiczenie nie zostało znalezione. Lista zostanie odświeżona.");
           await fetchExercises();
           closeDialogs();
           return;
         }
         const error = await response.json();
-        throw new Error(
-          error.message || "Nie udało się zarchiwizować ćwiczenia"
-        );
+        throw new Error(error.message || "Nie udało się zarchiwizować ćwiczenia");
       }
 
       // Sukces - odśwież listę i zamknij dialog
@@ -349,9 +333,7 @@ export default function ExerciseManager() {
   /**
    * Obsługa submitu formularza
    */
-  async function handleFormSubmit(
-    data: CreateExerciseCommand | UpdateExerciseCommand
-  ) {
+  async function handleFormSubmit(data: CreateExerciseCommand | UpdateExerciseCommand) {
     if (state.formDialog.mode === "create") {
       await handleCreateExercise(data as CreateExerciseCommand);
     } else {
@@ -363,9 +345,7 @@ export default function ExerciseManager() {
   if (state.error && !state.exercises.length) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <p className="text-destructive text-lg mb-4">
-          Nie udało się załadować listy ćwiczeń
-        </p>
+        <p className="text-destructive text-lg mb-4">Nie udało się załadować listy ćwiczeń</p>
         <p className="text-muted-foreground mb-6">{state.error}</p>
         <button
           onClick={fetchExercises}

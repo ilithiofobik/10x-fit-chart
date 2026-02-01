@@ -1,6 +1,6 @@
 /**
  * Quick Actions Component
- * 
+ *
  * Provides quick action buttons like "Copy Last Workout"
  */
 
@@ -8,11 +8,7 @@ import { Button } from "../ui/button";
 import { Copy, Loader2 } from "lucide-react";
 import type { QuickActionsProps } from "./types";
 
-export const QuickActions = ({
-  onCopyLastWorkout,
-  hasExercises,
-  isLoading,
-}: QuickActionsProps) => {
+export const QuickActions = ({ onCopyLastWorkout, hasExercises, isLoading }: QuickActionsProps) => {
   const getButtonTooltip = () => {
     if (hasExercises) {
       return "Usuń wszystkie ćwiczenia, aby skopiować ostatni trening";
@@ -29,17 +25,11 @@ export const QuickActions = ({
         className="gap-2"
         title={getButtonTooltip()}
       >
-        {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Copy className="h-4 w-4" />
-        )}
+        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Copy className="h-4 w-4" />}
         {isLoading ? "Ładowanie..." : "Kopiuj ostatni trening"}
       </Button>
-      
-      <p className="text-sm text-muted-foreground">
-        Zaoszczędź czas kopiując strukturę poprzedniego treningu
-      </p>
+
+      <p className="text-sm text-muted-foreground">Zaoszczędź czas kopiując strukturę poprzedniego treningu</p>
     </div>
   );
 };

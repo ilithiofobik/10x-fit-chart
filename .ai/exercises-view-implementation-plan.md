@@ -47,6 +47,7 @@ ExercisesPage (Astro Layout)
 **Opis**: Główny komponent zarządzający stanem widoku, odpowiedzialny za pobieranie danych z API, zarządzanie filtrami oraz orchestrację dialogów i akcji użytkownika.
 
 **Główne elementy**:
+
 - Kontener `div` z responsywną siatką
 - `ExerciseHeader` - nagłówek z przyciskiem dodawania
 - `ExerciseFilters` - sekcja filtrów
@@ -55,6 +56,7 @@ ExercisesPage (Astro Layout)
 - `ConfirmArchiveDialog` - dialog potwierdzenia archiwizacji
 
 **Obsługiwane interakcje**:
+
 - Inicjalizacja: pobieranie listy ćwiczeń przy montowaniu komponentu
 - Filtrowanie: zmiana filtrów typu i wyszukiwania
 - Otwieranie dialogu dodawania nowego ćwiczenia
@@ -63,11 +65,13 @@ ExercisesPage (Astro Layout)
 - Obsługa odpowiedzi API (sukces/błąd)
 
 **Obsługiwana walidacja**:
+
 - Walidacja odpowiedzi API (status 200/201/400/401/403/404/409)
 - Walidacja dostępności danych przed renderowaniem
 - Walidacja uprawnień do edycji/archiwizacji (tylko własne ćwiczenia)
 
 **Typy**:
+
 - `ExercisesViewState` (stan widoku)
 - `ExerciseDTO` (pojedyncze ćwiczenie)
 - `ExerciseType` (typ ćwiczenia)
@@ -82,19 +86,23 @@ ExercisesPage (Astro Layout)
 **Opis**: Nagłówek widoku zawierający tytuł strony i przycisk do dodawania nowych ćwiczeń.
 
 **Główne elementy**:
+
 - Element `header` z klasami Tailwind dla layoutu
 - Element `h1` z tytułem "Baza Ćwiczeń"
 - Komponent `Button` (Shadcn/ui) z ikoną plus
 
 **Obsługiwane interakcje**:
+
 - Kliknięcie przycisku "Dodaj ćwiczenie" - wywołuje callback `onAddClick`
 
 **Obsługiwana walidacja**: Brak (komponent prezentacyjny)
 
 **Typy**:
+
 - `ExerciseHeaderProps` (interfejs propsów)
 
 **Propsy**:
+
 ```typescript
 interface ExerciseHeaderProps {
   onAddClick: () => void;
@@ -108,25 +116,30 @@ interface ExerciseHeaderProps {
 **Opis**: Sekcja filtrów umożliwiająca wyszukiwanie ćwiczeń po nazwie oraz filtrowanie po typie.
 
 **Główne elementy**:
+
 - Kontener `div` z flexbox layoutem
 - Komponent `Input` (Shadcn/ui) dla wyszukiwania
 - Komponent `Select` (Shadcn/ui) dla wyboru typu
 - Ikona `Search` przy polu wyszukiwania
 
 **Obsługiwane interakcje**:
+
 - Wpisywanie tekstu w pole wyszukiwania - callback `onSearchChange` z debounce 300ms
 - Zmiana filtra typu - callback `onTypeFilterChange`
 - Czyszczenie filtrów - wewnętrzna funkcja resetująca stan
 
 **Obsługiwana walidacja**:
+
 - Walidacja długości tekstu wyszukiwania (max 100 znaków)
 - Walidacja poprawności wartości filtra typu (enum)
 
 **Typy**:
+
 - `ExerciseFiltersProps`
 - `ExerciseTypeFilter` = 'all' | 'strength' | 'cardio'
 
 **Propsy**:
+
 ```typescript
 interface ExerciseFiltersProps {
   searchQuery: string;
@@ -143,22 +156,26 @@ interface ExerciseFiltersProps {
 **Opis**: Kontener wyświetlający listę ćwiczeń w formie kart, z obsługą stanów ładowania i braku danych.
 
 **Główne elementy**:
+
 - Element `div` z CSS Grid (responsive columns)
 - Tablica komponentów `ExerciseCard`
 - Skeleton loader dla stanu ładowania
 - Empty state dla braku wyników
 
 **Obsługiwane interakcje**:
+
 - Delegacja akcji edycji do `onEdit`
 - Delegacja akcji archiwizacji do `onArchive`
 
 **Obsługiwana walidacja**: Brak (walidacja na poziomie pojedynczych kart)
 
 **Typy**:
+
 - `ExerciseListProps`
 - `ExerciseDTO[]`
 
 **Propsy**:
+
 ```typescript
 interface ExerciseListProps {
   exercises: ExerciseDTO[];
@@ -175,6 +192,7 @@ interface ExerciseListProps {
 **Opis**: Pojedyncza karta reprezentująca jedno ćwiczenie, wyświetlająca nazwę, typ, status oraz przyciski akcji.
 
 **Główne elementy**:
+
 - Komponent `Card` (Shadcn/ui) jako kontener
 - Element `h3` z nazwą ćwiczenia
 - Komponent `Badge` (Shadcn/ui) dla typu
@@ -183,19 +201,23 @@ interface ExerciseListProps {
 - Ikony `Edit` i `Archive` (lucide-react)
 
 **Obsługiwane interakcje**:
+
 - Kliknięcie "Edytuj" - wywołuje `onEdit(exercise)`
 - Kliknięcie "Archiwizuj" - wywołuje `onArchive(exercise)`
 - Hover na karcie - wizualna zmiana (border/shadow)
 
 **Obsługiwana walidacja**:
+
 - Walidacja uprawnień: przyciski akcji widoczne tylko dla `!exercise.is_system`
 - Walidacja statusu archiwizacji: inny styl dla `exercise.is_archived`
 
 **Typy**:
+
 - `ExerciseCardProps`
 - `ExerciseDTO`
 
 **Propsy**:
+
 ```typescript
 interface ExerciseCardProps {
   exercise: ExerciseDTO;
@@ -211,6 +233,7 @@ interface ExerciseCardProps {
 **Opis**: Dialog modalny służący zarówno do tworzenia nowych ćwiczeń, jak i edycji istniejących. Zawiera formularz z walidacją.
 
 **Główne elementy**:
+
 - Komponent `Dialog` (Shadcn/ui) jako kontener modalny
 - `DialogHeader` z dynamicznym tytułem ("Dodaj ćwiczenie" / "Edytuj ćwiczenie")
 - Formularz z polami:
@@ -220,6 +243,7 @@ interface ExerciseCardProps {
 - `Label` dla dostępności
 
 **Obsługiwane interakcje**:
+
 - Otwieranie/zamykanie dialogu - prop `open` + callback `onOpenChange`
 - Wpisywanie w pole nazwy - lokalna walidacja real-time
 - Wybór typu - tylko w trybie tworzenia
@@ -228,6 +252,7 @@ interface ExerciseCardProps {
 - Enter w ostatnim polu - submit formularza
 
 **Obsługiwana walidacja**:
+
 - **Nazwa**:
   - Wymagana (min. 1 znak po trim)
   - Max. 100 znaków
@@ -239,15 +264,17 @@ interface ExerciseCardProps {
 - Wyświetlanie błędów API (409 - duplikat nazwy)
 
 **Typy**:
+
 - `ExerciseFormDialogProps`
 - `ExerciseFormData`
 - `CreateExerciseCommand` | `UpdateExerciseCommand`
 
 **Propsy**:
+
 ```typescript
 interface ExerciseFormDialogProps {
   open: boolean;
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
   exercise?: ExerciseDTO; // Tylko w trybie edit
   isSubmitting: boolean;
   onOpenChange: (open: boolean) => void;
@@ -267,6 +294,7 @@ interface ExerciseFormData {
 **Opis**: Dialog potwierdzenia archiwizacji ćwiczenia, informujący użytkownika o konsekwencjach (zniknięcie z listy wyboru, zachowanie historii).
 
 **Główne elementy**:
+
 - Komponent `AlertDialog` (Shadcn/ui) jako kontener
 - `AlertDialogHeader` z tytułem i ikoną ostrzeżenia
 - `AlertDialogDescription` z opisem konsekwencji
@@ -274,20 +302,24 @@ interface ExerciseFormData {
 - `AlertDialogFooter` z przyciskami Anuluj/Archiwizuj
 
 **Obsługiwane interakcje**:
+
 - Otwieranie/zamykanie dialogu - prop `open` + callback `onOpenChange`
 - Kliknięcie "Archiwizuj" - wywołanie `onConfirm`
 - Kliknięcie "Anuluj" - zamknięcie bez akcji
 - Escape - zamknięcie bez akcji
 
 **Obsługiwana walidacja**:
+
 - Walidacja obecności `exercise` przed renderowaniem treści
 - Blokowanie przycisku podczas wykonywania akcji (`isDeleting`)
 
 **Typy**:
+
 - `ConfirmArchiveDialogProps`
 - `ExerciseDTO`
 
 **Propsy**:
+
 ```typescript
 interface ConfirmArchiveDialogProps {
   open: boolean;
@@ -321,7 +353,7 @@ export interface ListExercisesResponse {
   exercises: ExerciseDTO[];
 }
 
-export type ExerciseType = 'strength' | 'cardio';
+export type ExerciseType = "strength" | "cardio";
 ```
 
 ### ViewModel Types (nowe, do dodania w `src/types.ts`)
@@ -333,23 +365,23 @@ export type ExerciseType = 'strength' | 'cardio';
 export interface ExercisesViewState {
   // Lista ćwiczeń
   exercises: ExerciseDTO[];
-  
+
   // Filtry
   searchQuery: string;
   typeFilter: ExerciseTypeFilter;
-  
+
   // Stany UI
   isLoading: boolean;
   error: string | null;
-  
+
   // Dialogi
   formDialog: {
     open: boolean;
-    mode: 'create' | 'edit';
+    mode: "create" | "edit";
     exercise: ExerciseDTO | null;
     isSubmitting: boolean;
   };
-  
+
   archiveDialog: {
     open: boolean;
     exercise: ExerciseDTO | null;
@@ -360,7 +392,7 @@ export interface ExercisesViewState {
 /**
  * Typ filtra ćwiczeń
  */
-export type ExerciseTypeFilter = 'all' | 'strength' | 'cardio';
+export type ExerciseTypeFilter = "all" | "strength" | "cardio";
 
 /**
  * Dane formularza ćwiczenia
@@ -416,7 +448,7 @@ export interface ExerciseCardProps {
 // ExerciseFormDialog
 export interface ExerciseFormDialogProps {
   open: boolean;
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
   exercise?: ExerciseDTO;
   isSubmitting: boolean;
   onOpenChange: (open: boolean) => void;
@@ -438,6 +470,7 @@ export interface ConfirmArchiveDialogProps {
 ### Strategia zarządzania stanem
 
 Widok wykorzystuje **lokalny stan komponentu React** zarządzany przez hooki `useState`. Nie jest wymagany custom hook ani Context API, ponieważ:
+
 - Stan nie jest współdzielony między różnymi częściami aplikacji
 - Hierarchia komponentów jest płaska (max 2-3 poziomy)
 - Brak złożonych interakcji wymagających centralizacji stanu
@@ -447,13 +480,13 @@ Widok wykorzystuje **lokalny stan komponentu React** zarządzany przez hooki `us
 ```typescript
 const [state, setState] = useState<ExercisesViewState>({
   exercises: [],
-  searchQuery: '',
-  typeFilter: 'all',
+  searchQuery: "",
+  typeFilter: "all",
   isLoading: true,
   error: null,
   formDialog: {
     open: false,
-    mode: 'create',
+    mode: "create",
     exercise: null,
     isSubmitting: false,
   },
@@ -469,28 +502,28 @@ const [state, setState] = useState<ExercisesViewState>({
 
 ```typescript
 // Pobieranie listy ćwiczeń
-async function fetchExercises(): Promise<void>
+async function fetchExercises(): Promise<void>;
 
 // Otwieranie dialogu dodawania
-function openCreateDialog(): void
+function openCreateDialog(): void;
 
 // Otwieranie dialogu edycji
-function openEditDialog(exercise: ExerciseDTO): void
+function openEditDialog(exercise: ExerciseDTO): void;
 
 // Otwieranie dialogu archiwizacji
-function openArchiveDialog(exercise: ExerciseDTO): void
+function openArchiveDialog(exercise: ExerciseDTO): void;
 
 // Zamykanie dialogów
-function closeDialogs(): void
+function closeDialogs(): void;
 
 // Aktualizacja filtrów
-function updateSearchQuery(query: string): void
-function updateTypeFilter(type: ExerciseTypeFilter): void
+function updateSearchQuery(query: string): void;
+function updateTypeFilter(type: ExerciseTypeFilter): void;
 
 // Obsługa submitów
-async function handleCreateExercise(data: CreateExerciseCommand): Promise<void>
-async function handleUpdateExercise(data: UpdateExerciseCommand): Promise<void>
-async function handleArchiveExercise(): Promise<void>
+async function handleCreateExercise(data: CreateExerciseCommand): Promise<void>;
+async function handleUpdateExercise(data: UpdateExerciseCommand): Promise<void>;
+async function handleArchiveExercise(): Promise<void>;
 ```
 
 ### Computed values (useMemo)
@@ -499,17 +532,17 @@ async function handleArchiveExercise(): Promise<void>
 // Filtrowana lista ćwiczeń
 const filteredExercises = useMemo(() => {
   return state.exercises
-    .filter(ex => {
+    .filter((ex) => {
       // Filtr typu
-      if (state.typeFilter !== 'all' && ex.type !== state.typeFilter) {
+      if (state.typeFilter !== "all" && ex.type !== state.typeFilter) {
         return false;
       }
-      
+
       // Filtr wyszukiwania
       if (state.searchQuery) {
         return ex.name.toLowerCase().includes(state.searchQuery.toLowerCase());
       }
-      
+
       return true;
     })
     .sort((a, b) => {
@@ -517,7 +550,7 @@ const filteredExercises = useMemo(() => {
       if (a.is_system && !b.is_system) return -1;
       if (!a.is_system && b.is_system) return 1;
       // Alfabetycznie
-      return a.name.localeCompare(b.name, 'pl');
+      return a.name.localeCompare(b.name, "pl");
     });
 }, [state.exercises, state.searchQuery, state.typeFilter]);
 ```
@@ -537,13 +570,15 @@ useEffect(() => {
 
 #### 1. GET /api/exercises - Pobieranie listy ćwiczeń
 
-**Kiedy wywoływane**: 
+**Kiedy wywoływane**:
+
 - Przy montowaniu komponentu (`useEffect`)
 - Po utworzeniu nowego ćwiczenia (odświeżenie)
 - Po edycji ćwiczenia (odświeżenie)
 - Po archiwizacji ćwiczenia (odświeżenie)
 
 **Query parameters**:
+
 ```typescript
 {
   type?: 'strength' | 'cardio',
@@ -554,6 +589,7 @@ useEffect(() => {
 **Typ żądania**: Brak body (GET)
 
 **Typ odpowiedzi**:
+
 ```typescript
 // Sukces (200)
 interface ListExercisesResponse {
@@ -567,41 +603,42 @@ interface ErrorResponse {
 ```
 
 **Implementacja w komponencie**:
+
 ```typescript
 async function fetchExercises() {
   try {
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
-    
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
     const params = new URLSearchParams();
-    if (state.typeFilter !== 'all') {
-      params.append('type', state.typeFilter);
+    if (state.typeFilter !== "all") {
+      params.append("type", state.typeFilter);
     }
-    params.append('include_archived', 'false');
-    
+    params.append("include_archived", "false");
+
     const response = await fetch(`/api/exercises?${params.toString()}`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
-    
+
     if (!response.ok) {
-      throw new Error('Nie udało się pobrać listy ćwiczeń');
+      throw new Error("Nie udało się pobrać listy ćwiczeń");
     }
-    
+
     const data: ListExercisesResponse = await response.json();
-    
-    setState(prev => ({
+
+    setState((prev) => ({
       ...prev,
       exercises: data.exercises,
       isLoading: false,
     }));
   } catch (error) {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       error: error.message,
       isLoading: false,
     }));
-    toast.error('Błąd podczas pobierania ćwiczeń');
+    toast.error("Błąd podczas pobierania ćwiczeń");
   }
 }
 ```
@@ -613,21 +650,23 @@ async function fetchExercises() {
 **Kiedy wywoływane**: Po submicie formularza dodawania nowego ćwiczenia
 
 **Typ żądania**:
+
 ```typescript
 interface CreateExerciseCommand {
   name: string;
-  type: 'strength' | 'cardio';
+  type: "strength" | "cardio";
 }
 ```
 
 **Typ odpowiedzi**:
+
 ```typescript
 // Sukces (201)
 interface ExerciseDTO {
   id: string;
   user_id: string;
   name: string;
-  type: 'strength' | 'cardio';
+  type: "strength" | "cardio";
   is_archived: boolean;
   is_system: boolean;
   created_at: string;
@@ -647,35 +686,36 @@ interface ErrorResponse {
 ```
 
 **Implementacja w komponencie**:
+
 ```typescript
 async function handleCreateExercise(data: CreateExerciseCommand) {
   try {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       formDialog: { ...prev.formDialog, isSubmitting: true },
     }));
-    
-    const response = await fetch('/api/exercises', {
-      method: 'POST',
+
+    const response = await fetch("/api/exercises", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Nie udało się utworzyć ćwiczenia');
+      throw new Error(error.message || "Nie udało się utworzyć ćwiczenia");
     }
-    
+
     // Sukces - odśwież listę i zamknij dialog
     await fetchExercises();
     closeDialogs();
-    toast.success('Ćwiczenie zostało dodane');
+    toast.success("Ćwiczenie zostało dodane");
   } catch (error) {
     toast.error(error.message);
   } finally {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       formDialog: { ...prev.formDialog, isSubmitting: false },
     }));
@@ -690,6 +730,7 @@ async function handleCreateExercise(data: CreateExerciseCommand) {
 **Kiedy wywoływane**: Po submicie formularza edycji ćwiczenia
 
 **Typ żądania**:
+
 ```typescript
 interface UpdateExerciseCommand {
   name: string;
@@ -697,6 +738,7 @@ interface UpdateExerciseCommand {
 ```
 
 **Typ odpowiedzi**:
+
 ```typescript
 // Sukces (200)
 interface ExerciseDTO { ... }
@@ -718,37 +760,38 @@ interface ErrorResponse {
 ```
 
 **Implementacja w komponencie**:
+
 ```typescript
 async function handleUpdateExercise(data: UpdateExerciseCommand) {
   if (!state.formDialog.exercise) return;
-  
+
   try {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       formDialog: { ...prev.formDialog, isSubmitting: true },
     }));
-    
+
     const response = await fetch(`/api/exercises/${state.formDialog.exercise.id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Nie udało się zaktualizować ćwiczenia');
+      throw new Error(error.message || "Nie udało się zaktualizować ćwiczenia");
     }
-    
+
     // Sukces - odśwież listę i zamknij dialog
     await fetchExercises();
     closeDialogs();
-    toast.success('Ćwiczenie zostało zaktualizowane');
+    toast.success("Ćwiczenie zostało zaktualizowane");
   } catch (error) {
     toast.error(error.message);
   } finally {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       formDialog: { ...prev.formDialog, isSubmitting: false },
     }));
@@ -765,6 +808,7 @@ async function handleUpdateExercise(data: UpdateExerciseCommand) {
 **Typ żądania**: Brak body (DELETE)
 
 **Typ odpowiedzi**:
+
 ```typescript
 // Sukces (200)
 interface ArchiveExerciseResponse {
@@ -785,33 +829,34 @@ interface ErrorResponse {
 ```
 
 **Implementacja w komponencie**:
+
 ```typescript
 async function handleArchiveExercise() {
   if (!state.archiveDialog.exercise) return;
-  
+
   try {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       archiveDialog: { ...prev.archiveDialog, isDeleting: true },
     }));
-    
+
     const response = await fetch(`/api/exercises/${state.archiveDialog.exercise.id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
-    
+
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Nie udało się zarchiwizować ćwiczenia');
+      throw new Error(error.message || "Nie udało się zarchiwizować ćwiczenia");
     }
-    
+
     // Sukces - odśwież listę i zamknij dialog
     await fetchExercises();
     closeDialogs();
-    toast.success('Ćwiczenie zostało zarchiwizowane');
+    toast.success("Ćwiczenie zostało zarchiwizowane");
   } catch (error) {
     toast.error(error.message);
   } finally {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       archiveDialog: { ...prev.archiveDialog, isDeleting: false },
     }));
@@ -824,12 +869,14 @@ async function handleArchiveExercise() {
 ### 8.1. Przeglądanie listy ćwiczeń
 
 **Kroki**:
+
 1. Użytkownik wchodzi na `/app/exercises`
 2. System wyświetla skeleton loader
 3. System pobiera listę ćwiczeń z API
 4. System renderuje karty ćwiczeń posortowane: systemowe → własne, alfabetycznie
 
 **Szczegóły**:
+
 - Ćwiczenia systemowe mają badge "Systemowe" (szary)
 - Własne ćwiczenia mają badge "Własne" (niebieski)
 - Przyciski akcji widoczne tylko dla własnych ćwiczeń
@@ -840,12 +887,14 @@ async function handleArchiveExercise() {
 ### 8.2. Wyszukiwanie ćwiczeń
 
 **Kroki**:
+
 1. Użytkownik wpisuje tekst w pole "Szukaj ćwiczenia..."
 2. System filtruje listę po 300ms (debounce)
 3. System wyświetla tylko pasujące wyniki (case-insensitive)
 4. Jeśli brak wyników - wyświetla komunikat "Nie znaleziono ćwiczeń"
 
 **Szczegóły**:
+
 - Wyszukiwanie po nazwie ćwiczenia
 - Ignoruje wielkość liter
 - Działa łącznie z filtrem typu
@@ -856,6 +905,7 @@ async function handleArchiveExercise() {
 ### 8.3. Filtrowanie po typie
 
 **Kroki**:
+
 1. Użytkownik wybiera opcję z dropdown "Typ ćwiczenia"
    - Wszystkie (domyślne)
    - Siłowe
@@ -864,6 +914,7 @@ async function handleArchiveExercise() {
 3. System zachowuje aktywny filtr wyszukiwania
 
 **Szczegóły**:
+
 - Filtrowanie lokalne (bez zapytania do API)
 - Działa łącznie z wyszukiwaniem
 - Wizualne wskazanie aktywnego filtra w dropdown
@@ -873,6 +924,7 @@ async function handleArchiveExercise() {
 ### 8.4. Dodawanie nowego ćwiczenia
 
 **Kroki**:
+
 1. Użytkownik klika przycisk "Dodaj ćwiczenie"
 2. System otwiera dialog modalny z formularzem
 3. Użytkownik:
@@ -895,6 +947,7 @@ async function handleArchiveExercise() {
    - Dialog pozostaje otwarty
 
 **Obsługa klawiatury**:
+
 - Tab: przejście między polami
 - Enter w ostatnim polu: submit formularza
 - Escape: zamknięcie dialogu (z potwierdzeniem jeśli są zmiany)
@@ -904,6 +957,7 @@ async function handleArchiveExercise() {
 ### 8.5. Edycja nazwy ćwiczenia
 
 **Kroki**:
+
 1. Użytkownik klika ikonę "⋮" (menu) na karcie **własnego** ćwiczenia
 2. Użytkownik wybiera "Edytuj" z dropdown menu
 3. System otwiera dialog modalny z formularzem
@@ -930,6 +984,7 @@ async function handleArchiveExercise() {
     - Dialog pozostaje otwarty
 
 **Zabezpieczenia**:
+
 - Przycisk "Edytuj" niewidoczny dla ćwiczeń systemowych
 - Backend dodatkowo weryfikuje uprawnienia (403)
 
@@ -938,6 +993,7 @@ async function handleArchiveExercise() {
 ### 8.6. Archiwizacja ćwiczenia
 
 **Kroki**:
+
 1. Użytkownik klika ikonę "⋮" (menu) na karcie **własnego** ćwiczenia
 2. Użytkownik wybiera "Archiwizuj" z dropdown menu
 3. System otwiera dialog potwierdzenia z ostrzeżeniem:
@@ -960,6 +1016,7 @@ async function handleArchiveExercise() {
    - Dialog pozostaje otwarty
 
 **Zabezpieczenia**:
+
 - Przycisk "Archiwizuj" niewidoczny dla ćwiczeń systemowych
 - Backend dodatkowo weryfikuje uprawnienia (403)
 - Dialog wymaga potwierdzenia (zapobiega przypadkowym usunięciom)
@@ -969,6 +1026,7 @@ async function handleArchiveExercise() {
 ### 8.7. Anulowanie operacji
 
 **Scenariusze**:
+
 - Kliknięcie "Anuluj" w dialogu formularza → zamknięcie bez zmian
 - Kliknięcie "Anuluj" w dialogu archiwizacji → zamknięcie bez akcji
 - Kliknięcie "X" (close) w dialogu → zamknięcie bez zmian
@@ -976,6 +1034,7 @@ async function handleArchiveExercise() {
 - Naciśnięcie Escape → zamknięcie bez zmian
 
 **Obsługa niezapisanych zmian**:
+
 - Jeśli użytkownik wprowadził zmiany w formularzu i próbuje zamknąć dialog:
   - System **nie** wyświetla dodatkowego potwierdzenia (MVP - uproszczenie UX)
   - Dialog zamyka się natychmiast
@@ -990,6 +1049,7 @@ async function handleArchiveExercise() {
 **Komponent**: `ExerciseFormDialog` → `Input`
 
 **Warunki walidacji**:
+
 1. **Wymagane**: Pole nie może być puste
    - Warunek: `name.trim().length > 0`
    - Komunikat: "Nazwa ćwiczenia jest wymagana"
@@ -1005,35 +1065,37 @@ async function handleArchiveExercise() {
    - Zapobiega zapisaniu pustych stringów
 
 **Wpływ na UI**:
+
 - Błąd walidacji → czerwona ramka wokół pola
 - Komunikat błędu → wyświetlany pod polem (czerwony tekst)
 - Przycisk "Zapisz" → disabled gdy formularz niepoprawny
 
 **Implementacja**:
+
 ```typescript
 const [errors, setErrors] = useState<{ name?: string }>({});
 
 function validateName(value: string): string | undefined {
   const trimmed = value.trim();
-  
+
   if (trimmed.length === 0) {
-    return 'Nazwa ćwiczenia jest wymagana';
+    return "Nazwa ćwiczenia jest wymagana";
   }
-  
+
   if (value.length > 100) {
-    return 'Nazwa nie może przekraczać 100 znaków';
+    return "Nazwa nie może przekraczać 100 znaków";
   }
-  
+
   return undefined;
 }
 
 function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
   const value = e.target.value;
-  setFormData(prev => ({ ...prev, name: value }));
-  
+  setFormData((prev) => ({ ...prev, name: value }));
+
   // Real-time walidacja długości
   const error = validateName(value);
-  setErrors(prev => ({ ...prev, name: error }));
+  setErrors((prev) => ({ ...prev, name: error }));
 }
 ```
 
@@ -1044,6 +1106,7 @@ function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 **Komponent**: `ExerciseFormDialog` → `Select`
 
 **Warunki walidacji**:
+
 1. **Wymagane** (tylko w trybie create): Użytkownik musi wybrać typ
    - Warunek: `type === 'strength' || type === 'cardio'`
    - Komunikat: "Wybierz typ ćwiczenia"
@@ -1054,6 +1117,7 @@ function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
    - Wpływ: `disabled={true}`, wartość z `exercise.type`
 
 **Wpływ na UI**:
+
 - Brak wyboru → czerwona ramka + komunikat błędu
 - Tryb edycji → pole szare (disabled), z ikoną kłódki (opcjonalnie)
 - Przycisk "Zapisz" → disabled gdy brak wyboru (create)
@@ -1110,25 +1174,26 @@ function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 **Komponent**: `ExerciseCard` → `DropdownMenu`
 
 **Warunek widoczności**:
+
 ```typescript
 const canModify = !exercise.is_system;
 ```
 
 **Implementacja**:
+
 ```tsx
-{canModify && (
-  <DropdownMenu>
-    <DropdownMenuItem onClick={() => onEdit(exercise)}>
-      Edytuj
-    </DropdownMenuItem>
-    <DropdownMenuItem onClick={() => onArchive(exercise)}>
-      Archiwizuj
-    </DropdownMenuItem>
-  </DropdownMenu>
-)}
+{
+  canModify && (
+    <DropdownMenu>
+      <DropdownMenuItem onClick={() => onEdit(exercise)}>Edytuj</DropdownMenuItem>
+      <DropdownMenuItem onClick={() => onArchive(exercise)}>Archiwizuj</DropdownMenuItem>
+    </DropdownMenu>
+  );
+}
 ```
 
 **Opis**:
+
 - Jeśli `exercise.is_system === true`: Menu akcji nie renderuje się
 - Jeśli `exercise.is_system === false`: Menu akcji widoczne
 - Zabezpiecza przed próbą edycji/archiwizacji ćwiczeń systemowych na poziomie UI
@@ -1140,11 +1205,13 @@ const canModify = !exercise.is_system;
 **Komponent**: `ExerciseFormDialog` → `Select`
 
 **Warunek blokady**:
+
 ```typescript
-const isTypeDisabled = mode === 'edit';
+const isTypeDisabled = mode === "edit";
 ```
 
 **Implementacja**:
+
 ```tsx
 <Select
   disabled={isTypeDisabled}
@@ -1156,6 +1223,7 @@ const isTypeDisabled = mode === 'edit';
 ```
 
 **Opis**:
+
 - W trybie create: pole aktywne, wymagane
 - W trybie edit: pole zablokowane, wyświetla aktualny typ
 - Zapobiega zmianie typu ćwiczenia (wymaganie biznesowe)
@@ -1169,8 +1237,9 @@ const isTypeDisabled = mode === 'edit';
 **Komponent**: `ExerciseFormDialog` → `Button[type="submit"]`
 
 **Warunki**:
+
 ```typescript
-const isFormInvalid = 
+const isFormInvalid =
   !formData.name.trim() ||
   formData.name.length > 100 ||
   (mode === 'create' && !formData.type) ||
@@ -1182,6 +1251,7 @@ const isFormInvalid =
 ```
 
 **Wpływ na UI**:
+
 - Przycisk nieaktywny (szary, brak hover)
 - Kursor: `cursor-not-allowed`
 - Zapobiega submisji niepoprawnego formularza
@@ -1193,10 +1263,12 @@ const isFormInvalid =
 **Komponenty**: `ExerciseFormDialog`, `ConfirmArchiveDialog`
 
 **Warunki**:
+
 - Form dialog: `isSubmitting === true`
 - Archive dialog: `isDeleting === true`
 
 **Wpływ na UI**:
+
 - Przycisk akcji: Wyświetla loader + tekst "Zapisywanie..." / "Archiwizowanie..."
 - Pozostałe przyciski: Disabled
 - Dialog: Blokada zamknięcia przez overlay/escape
@@ -1209,25 +1281,28 @@ const isFormInvalid =
 **Komponent**: `ExerciseList`
 
 **Warunki**:
+
 ```typescript
 const hasNoResults = !isLoading && filteredExercises.length === 0;
 ```
 
 **Implementacja**:
+
 ```tsx
-{hasNoResults && (
-  <div className="text-center py-12">
-    <p className="text-muted-foreground">Nie znaleziono ćwiczeń</p>
-    {(searchQuery || typeFilter !== 'all') && (
-      <p className="text-sm text-muted-foreground mt-2">
-        Spróbuj zmienić filtry
-      </p>
-    )}
-  </div>
-)}
+{
+  hasNoResults && (
+    <div className="text-center py-12">
+      <p className="text-muted-foreground">Nie znaleziono ćwiczeń</p>
+      {(searchQuery || typeFilter !== "all") && (
+        <p className="text-sm text-muted-foreground mt-2">Spróbuj zmienić filtry</p>
+      )}
+    </div>
+  );
+}
 ```
 
 **Opis**:
+
 - Wyświetla się gdy lista jest pusta po zastosowaniu filtrów
 - Sugeruje zmianę filtrów jeśli są aktywne
 - Nie wyświetla się podczas ładowania (skeleton loader ma priorytet)
@@ -1241,23 +1316,25 @@ const hasNoResults = !isLoading && filteredExercises.length === 0;
 **Scenariusz**: Użytkownik nie ma dostępu do sieci
 
 **Obsługa**:
+
 ```typescript
 try {
-  const response = await fetch('/api/exercises');
+  const response = await fetch("/api/exercises");
   // ...
 } catch (error) {
-  if (error instanceof TypeError && error.message === 'Failed to fetch') {
-    setState(prev => ({
+  if (error instanceof TypeError && error.message === "Failed to fetch") {
+    setState((prev) => ({
       ...prev,
-      error: 'Brak połączenia z internetem',
+      error: "Brak połączenia z internetem",
       isLoading: false,
     }));
-    toast.error('Sprawdź połączenie z internetem i spróbuj ponownie');
+    toast.error("Sprawdź połączenie z internetem i spróbuj ponownie");
   }
 }
 ```
 
 **UI**:
+
 - Toast z komunikatem błędu
 - Stan `error` w widoku → wyświetla error boundary
 - Przycisk "Spróbuj ponownie" → ponowne wywołanie `fetchExercises()`
@@ -1269,24 +1346,26 @@ try {
 **Scenariusz**: Zapytanie trwa zbyt długo (>30s)
 
 **Obsługa**:
+
 ```typescript
 const controller = new AbortController();
 const timeoutId = setTimeout(() => controller.abort(), 30000);
 
 try {
-  const response = await fetch('/api/exercises', {
+  const response = await fetch("/api/exercises", {
     signal: controller.signal,
   });
   clearTimeout(timeoutId);
   // ...
 } catch (error) {
-  if (error.name === 'AbortError') {
-    toast.error('Zapytanie przekroczyło limit czasu. Spróbuj ponownie.');
+  if (error.name === "AbortError") {
+    toast.error("Zapytanie przekroczyło limit czasu. Spróbuj ponownie.");
   }
 }
 ```
 
 **UI**:
+
 - Toast z komunikatem
 - Widok pozostaje w stanie ostatnich danych lub empty state
 - Przycisk "Odśwież" dostępny
@@ -1300,15 +1379,17 @@ try {
 **Scenariusz**: Sesja użytkownika wygasła lub nie istnieje
 
 **Obsługa**:
+
 ```typescript
 if (response.status === 401) {
-  toast.error('Sesja wygasła. Zaloguj się ponownie.');
+  toast.error("Sesja wygasła. Zaloguj się ponownie.");
   // Przekierowanie do strony logowania
-  window.location.href = '/login?redirect=/app/exercises';
+  window.location.href = "/login?redirect=/app/exercises";
 }
 ```
 
 **UI**:
+
 - Toast z komunikatem
 - Automatyczne przekierowanie do `/login`
 - Query param `redirect` zachowuje intencję użytkownika
@@ -1322,22 +1403,24 @@ if (response.status === 401) {
 **Scenariusz**: Dane formularza nie przeszły walidacji po stronie serwera
 
 **Obsługa**:
+
 ```typescript
 if (response.status === 400) {
   const error = await response.json();
-  
+
   // Jeśli API zwraca szczegóły błędów walidacji
   if (error.errors) {
     Object.entries(error.errors).forEach(([field, message]) => {
-      setErrors(prev => ({ ...prev, [field]: message }));
+      setErrors((prev) => ({ ...prev, [field]: message }));
     });
   } else {
-    toast.error(error.message || 'Niepoprawne dane formularza');
+    toast.error(error.message || "Niepoprawne dane formularza");
   }
 }
 ```
 
 **UI**:
+
 - Błędy walidacji wyświetlane pod odpowiednimi polami
 - Dialog pozostaje otwarty
 - Focus przenoszony na pierwsze pole z błędem
@@ -1349,11 +1432,12 @@ if (response.status === 400) {
 **Scenariusz**: Użytkownik próbuje utworzyć/edytować ćwiczenie o nazwie, która już istnieje
 
 **Obsługa**:
+
 ```typescript
 if (response.status === 409) {
-  setErrors(prev => ({
+  setErrors((prev) => ({
     ...prev,
-    name: 'Ćwiczenie o tej nazwie już istnieje',
+    name: "Ćwiczenie o tej nazwie już istnieje",
   }));
   // Focus na pole nazwy
   nameInputRef.current?.focus();
@@ -1361,6 +1445,7 @@ if (response.status === 409) {
 ```
 
 **UI**:
+
 - Komunikat błędu pod polem "Nazwa"
 - Czerwona ramka wokół pola
 - Dialog pozostaje otwarty
@@ -1372,21 +1457,24 @@ if (response.status === 409) {
 
 #### 403 Forbidden - Próba modyfikacji systemowego ćwiczenia
 
-**Scenariusz**: 
+**Scenariusz**:
+
 - Użytkownik obchodzi zabezpieczenie UI i próbuje edytować/archiwizować ćwiczenie systemowe
 - Błąd w logice aplikacji (race condition, cache)
 
 **Obsługa**:
+
 ```typescript
 if (response.status === 403) {
   const error = await response.json();
-  toast.error(error.message || 'Nie masz uprawnień do wykonania tej operacji');
+  toast.error(error.message || "Nie masz uprawnień do wykonania tej operacji");
   closeDialogs();
   await fetchExercises(); // Odśwież listę
 }
 ```
 
 **UI**:
+
 - Toast z komunikatem błędu
 - Automatyczne zamknięcie dialogu
 - Odświeżenie listy (synchronizacja stanu)
@@ -1398,19 +1486,22 @@ if (response.status === 403) {
 #### 404 Not Found - Ćwiczenie nie istnieje
 
 **Scenariusz**:
+
 - Użytkownik próbuje edytować/archiwizować ćwiczenie, które zostało już usunięte
 - Inny użytkownik ma dostęp do URL lub ID (race condition)
 
 **Obsługa**:
+
 ```typescript
 if (response.status === 404) {
-  toast.error('Ćwiczenie nie zostało znalezione. Lista zostanie odświeżona.');
+  toast.error("Ćwiczenie nie zostało znalezione. Lista zostanie odświeżona.");
   closeDialogs();
   await fetchExercises();
 }
 ```
 
 **UI**:
+
 - Toast z komunikatem
 - Zamknięcie dialogu
 - Odświeżenie listy (usunięcie nieistniejącego ćwiczenia z UI)
@@ -1424,15 +1515,17 @@ if (response.status === 404) {
 **Scenariusz**: Nieoczekiwany błąd po stronie serwera
 
 **Obsługa**:
+
 ```typescript
 if (response.status === 500) {
-  toast.error('Wystąpił błąd serwera. Spróbuj ponownie za chwilę.');
+  toast.error("Wystąpił błąd serwera. Spróbuj ponownie za chwilę.");
   // Opcjonalnie: logowanie błędu do systemu monitoringu
-  console.error('Server error:', await response.text());
+  console.error("Server error:", await response.text());
 }
 ```
 
 **UI**:
+
 - Toast z ogólnym komunikatem
 - Stan widoku bez zmian
 - Użytkownik może ponowić akcję
@@ -1446,6 +1539,7 @@ if (response.status === 500) {
 **Komponent**: `ExerciseManager` (wrapper)
 
 **Implementacja**:
+
 ```typescript
 if (state.error && !state.exercises.length) {
   return (
@@ -1461,6 +1555,7 @@ if (state.error && !state.exercises.length) {
 ```
 
 **UI**:
+
 - Ikona błędu
 - Komunikat z opisem problemu
 - Przycisk "Spróbuj ponownie"
@@ -1473,30 +1568,32 @@ if (state.error && !state.exercises.length) {
 #### Automatyczne ponowienie przy przejściowych błędach
 
 **Implementacja**:
+
 ```typescript
 async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url, options);
-      
+
       // Jeśli sukces lub błąd klienta (4xx) - nie retry
       if (response.ok || (response.status >= 400 && response.status < 500)) {
         return response;
       }
-      
+
       // Jeśli błąd serwera (5xx) - retry z exponential backoff
       if (i < retries - 1) {
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 1000));
       }
     } catch (error) {
       if (i === retries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+      await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 1000));
     }
   }
 }
 ```
 
 **Zastosowanie**:
+
 - GET /api/exercises - 3 próby
 - POST/PUT/DELETE - bez retry (operacje nie-idempotentne)
 
@@ -1507,6 +1604,7 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
 **Zadanie**: Przygotowanie struktury katalogów i plików dla widoku Bazy Ćwiczeń.
 
 **Akcje**:
+
 1. Utwórz plik strony Astro:
    - `src/pages/app/exercises.astro`
 2. Utwórz katalog dla komponentów React:
@@ -1529,6 +1627,7 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
 **Zadanie**: Dodanie nowych typów ViewModels dla widoku Bazy Ćwiczeń.
 
 **Akcje**:
+
 1. Otwórz plik `src/types.ts`
 2. Dodaj na końcu pliku nowe typy:
    - `ExercisesViewState`
@@ -1549,6 +1648,7 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
 **Zadanie**: Utworzenie strony Astro integrującej komponent React z layoutem aplikacji.
 
 **Akcje**:
+
 1. Otwórz plik `src/pages/app/exercises.astro`
 2. Zaimportuj layout aplikacji (np. `LayoutApp`)
 3. Zaimportuj komponent `ExerciseManager` (client:load)
@@ -1556,15 +1656,18 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
 5. Ustaw meta tags (tytuł, opis)
 
 **Przykładowa implementacja**:
+
 ```astro
 ---
-import LayoutApp from '@/layouts/LayoutApp.astro';
-import ExerciseManager from '@/components/exercises/ExerciseManager';
+import LayoutApp from "@/layouts/LayoutApp.astro";
+import ExerciseManager from "@/components/exercises/ExerciseManager";
 
 // Sprawdzenie autoryzacji
-const { data: { user } } = await locals.supabase.auth.getUser();
+const {
+  data: { user },
+} = await locals.supabase.auth.getUser();
 if (!user) {
-  return Astro.redirect('/login?redirect=/app/exercises');
+  return Astro.redirect("/login?redirect=/app/exercises");
 }
 ---
 
@@ -1582,6 +1685,7 @@ if (!user) {
 **Zadanie**: Stworzenie głównego komponentu zarządzającego stanem widoku.
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ExerciseManager.tsx`
 2. Zaimportuj hooki React: `useState`, `useEffect`, `useMemo`
 3. Zaimportuj typy z `src/types.ts`
@@ -1616,6 +1720,7 @@ if (!user) {
 **Zadanie**: Stworzenie nagłówka widoku z przyciskiem dodawania.
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ExerciseHeader.tsx`
 2. Zaimportuj komponent `Button` (Shadcn/ui)
 3. Zaimportuj ikonę `Plus` (lucide-react)
@@ -1635,6 +1740,7 @@ if (!user) {
 **Zadanie**: Stworzenie sekcji filtrów (wyszukiwanie + typ).
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ExerciseFilters.tsx`
 2. Zaimportuj `Input`, `Select` (Shadcn/ui)
 3. Zaimportuj ikonę `Search` (lucide-react)
@@ -1662,6 +1768,7 @@ if (!user) {
 **Zadanie**: Stworzenie karty pojedynczego ćwiczenia.
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ExerciseCard.tsx`
 2. Zaimportuj `Card`, `Badge`, `DropdownMenu` (Shadcn/ui)
 3. Zaimportuj ikony `MoreVertical`, `Edit`, `Archive` (lucide-react)
@@ -1688,6 +1795,7 @@ if (!user) {
 **Zadanie**: Stworzenie kontenera listy ćwiczeń.
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ExerciseList.tsx`
 2. Zaimportuj `ExerciseCard` (własny komponent)
 3. Zaimportuj `Skeleton` (Shadcn/ui) lub komponent loadera
@@ -1710,6 +1818,7 @@ if (!user) {
 **Zadanie**: Stworzenie dialogu formularza (create/edit).
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ExerciseFormDialog.tsx`
 2. Zaimportuj `Dialog`, `Input`, `Select`, `Label`, `Button` (Shadcn/ui)
 3. Zdefiniuj interfejs `ExerciseFormDialogProps`
@@ -1741,13 +1850,14 @@ if (!user) {
 **Zadanie**: Stworzenie dialogu potwierdzenia archiwizacji.
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ConfirmArchiveDialog.tsx`
 2. Zaimportuj `AlertDialog` (Shadcn/ui)
 3. Zaimportuj ikonę `AlertTriangle` (lucide-react)
 4. Zdefiniuj interfejs `ConfirmArchiveDialogProps`
 5. Zaimplementuj layout:
    - `AlertDialogHeader`: Ikona ostrzeżenia + tytuł
-   - `AlertDialogDescription`: 
+   - `AlertDialogDescription`:
      - "Czy na pewno chcesz zarchiwizować ćwiczenie **[Nazwa]**?"
      - Konsekwencje (znika z listy, historia zachowana)
    - `AlertDialogFooter`: Anuluj + Archiwizuj
@@ -1767,6 +1877,7 @@ if (!user) {
 **Zadanie**: Połączenie wszystkich komponentów w głównym kontenerze.
 
 **Akcje**:
+
 1. Otwórz `src/components/exercises/ExerciseManager.tsx`
 2. Zaimportuj wszystkie komponenty utworzone w krokach 5-10
 3. Zastąp placeholdery rzeczywistymi komponentami:
@@ -1787,6 +1898,7 @@ if (!user) {
 **Zadanie**: Dopracowanie stylów Tailwind i RWD.
 
 **Akcje**:
+
 1. Przejrzyj każdy komponent i dostosuj klasy Tailwind:
    - Padding/margin dla spójności
    - Responsywne breakpoints (sm/md/lg)
@@ -1810,6 +1922,7 @@ if (!user) {
 **Zadanie**: Manualne przetestowanie wszystkich user stories.
 
 **Akcje**:
+
 1. **US-004: Dodawanie własnego ćwiczenia**
    - Otwórz dialog dodawania
    - Wypełnij formularz (nazwa + typ)
@@ -1843,6 +1956,7 @@ if (!user) {
 **Zadanie**: Upewnienie się, że kod spełnia standardy projektu.
 
 **Akcje**:
+
 1. Uruchom linter: `npm run lint`
 2. Napraw wszystkie błędy i ostrzeżenia
 3. Uruchom formatter: `npm run format`
@@ -1862,13 +1976,12 @@ if (!user) {
 **Zadanie**: Dodanie linku do widoku Bazy Ćwiczeń w głównej nawigacji.
 
 **Akcje**:
+
 1. Otwórz plik layoutu aplikacji (np. `src/layouts/LayoutApp.astro`)
 2. Znajdź sekcję nawigacji (Desktop Nav)
 3. Dodaj link:
    ```astro
-   <a href="/app/exercises" class="nav-link">
-     Ćwiczenia
-   </a>
+   <a href="/app/exercises" class="nav-link"> Ćwiczenia </a>
    ```
 4. Dodaj link w mobile menu (jeśli istnieje)
 5. Opcjonalnie: Dodaj ikonę (np. `Dumbbell` z lucide-react)
@@ -1883,6 +1996,7 @@ if (!user) {
 **Zadanie**: Ostateczne porządki i dokumentacja.
 
 **Akcje**:
+
 1. Dodaj komentarze JSDoc do wszystkich funkcji publicznych
 2. Upewnij się, że wszystkie komponenty mają `displayName`
 3. Usuń nieużywany kod (console.logs, komentarze TODO)
@@ -1899,6 +2013,7 @@ if (!user) {
 **Zadanie**: Ostateczna weryfikacja przed wdrożeniem.
 
 **Akcje**:
+
 1. Uruchom aplikację lokalnie: `npm run dev`
 2. Przejdź przez pełny flow użytkownika (od logowania do archiwizacji)
 3. Przetestuj w różnych przeglądarkach (Chrome, Firefox, Safari)

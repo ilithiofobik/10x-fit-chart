@@ -48,8 +48,8 @@ Z `src/types.ts`:
 ```typescript
 z.object({
   name: z.string().min(1).max(100).trim(),
-  type: z.enum(['strength', 'cardio'])
-})
+  type: z.enum(["strength", "cardio"]),
+});
 ```
 
 ## 4. Szczegóły odpowiedzi
@@ -111,14 +111,14 @@ z.object({
 
 ## 7. Obsługa błędów
 
-| Scenariusz | Kod | Odpowiedź | Logowanie |
-|------------|-----|-----------|-----------|
-| Sukces | 201 | ExerciseDTO | Nie |
-| Brak autoryzacji | 401 | `{ message: "Unauthorized" }` | Nie |
-| Nieprawidłowy body | 400 | `{ message: "Invalid request body", errors: {...} }` | Nie |
-| Duplikat nazwy | 409 | `{ message: "Exercise with this name already exists" }` | Nie |
-| Błąd DB (check unique) | 500 | `{ message: "Internal server error" }` | Tak |
-| Błąd DB (insert) | 500 | `{ message: "Internal server error" }` | Tak |
+| Scenariusz             | Kod | Odpowiedź                                               | Logowanie |
+| ---------------------- | --- | ------------------------------------------------------- | --------- |
+| Sukces                 | 201 | ExerciseDTO                                             | Nie       |
+| Brak autoryzacji       | 401 | `{ message: "Unauthorized" }`                           | Nie       |
+| Nieprawidłowy body     | 400 | `{ message: "Invalid request body", errors: {...} }`    | Nie       |
+| Duplikat nazwy         | 409 | `{ message: "Exercise with this name already exists" }` | Nie       |
+| Błąd DB (check unique) | 500 | `{ message: "Internal server error" }`                  | Tak       |
+| Błąd DB (insert)       | 500 | `{ message: "Internal server error" }`                  | Tak       |
 
 **Strategia:**
 
@@ -158,7 +158,7 @@ export async function createExercise(
   supabase: SupabaseClient,
   userId: string,
   command: CreateExerciseCommand
-): Promise<ExerciseDTO>
+): Promise<ExerciseDTO>;
 ```
 
 **Logika:**
@@ -192,9 +192,9 @@ Dodaj do pliku endpointu:
 ```typescript
 const CreateExerciseBodySchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name too long").trim(),
-  type: z.enum(['strength', 'cardio'], { 
-    errorMap: () => ({ message: "Type must be 'strength' or 'cardio'" })
-  })
+  type: z.enum(["strength", "cardio"], {
+    errorMap: () => ({ message: "Type must be 'strength' or 'cardio'" }),
+  }),
 });
 ```
 
@@ -227,8 +227,8 @@ USING (user_id IS NULL OR user_id = auth.uid());
 ### Krok 6: Dodanie DB constraint (opcjonalne, ale zalecane)
 
 ```sql
-ALTER TABLE exercises 
-ADD CONSTRAINT exercises_user_name_unique 
+ALTER TABLE exercises
+ADD CONSTRAINT exercises_user_name_unique
 UNIQUE (user_id, name);
 ```
 

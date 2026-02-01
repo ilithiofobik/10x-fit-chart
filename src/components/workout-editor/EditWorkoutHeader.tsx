@@ -17,7 +17,7 @@ interface EditWorkoutHeaderProps {
 
 const formatCreatedAt = (timestamp: string | null): string => {
   if (!timestamp) return "";
-  
+
   const date = new Date(timestamp);
   return new Intl.DateTimeFormat("pl-PL", {
     day: "numeric",
@@ -41,11 +41,7 @@ export const EditWorkoutHeader = ({ date, notes, createdAt, onDateChange, onNote
     <div className="space-y-4 bg-card border rounded-lg p-6">
       <div>
         <h2 className="text-2xl font-bold mb-1">Edytuj Trening</h2>
-        {createdAt && (
-          <p className="text-sm text-muted-foreground">
-            Utworzono: {formatCreatedAt(createdAt)}
-          </p>
-        )}
+        {createdAt && <p className="text-sm text-muted-foreground">Utworzono: {formatCreatedAt(createdAt)}</p>}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -57,13 +53,9 @@ export const EditWorkoutHeader = ({ date, notes, createdAt, onDateChange, onNote
             value={date}
             max={today}
             onChange={(e) => onDateChange(e.target.value)}
-            className={`w-full px-3 py-2 border rounded-md ${
-              isDateInFuture ? "border-destructive" : ""
-            }`}
+            className={`w-full px-3 py-2 border rounded-md ${isDateInFuture ? "border-destructive" : ""}`}
           />
-          {isDateInFuture && (
-            <p className="text-xs text-destructive">Data nie może być w przyszłości</p>
-          )}
+          {isDateInFuture && <p className="text-xs text-destructive">Data nie może być w przyszłości</p>}
         </div>
       </div>
 
@@ -82,9 +74,7 @@ export const EditWorkoutHeader = ({ date, notes, createdAt, onDateChange, onNote
           <span className={isNotesTooLong ? "text-destructive" : "text-muted-foreground"}>
             {notesLength} / {maxLength} znaków
           </span>
-          {isNotesTooLong && (
-            <span className="text-destructive font-medium">Przekroczono limit znaków</span>
-          )}
+          {isNotesTooLong && <span className="text-destructive font-medium">Przekroczono limit znaków</span>}
         </div>
       </div>
     </div>

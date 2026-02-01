@@ -52,6 +52,7 @@ AND routine_name = 'delete_user_account';
 ```
 
 Powinieneś zobaczyć:
+
 ```
 routine_name: delete_user_account
 routine_type: FUNCTION
@@ -67,6 +68,7 @@ SELECT delete_user_account();
 ```
 
 Powinieneś otrzymać:
+
 ```json
 {
   "success": true,
@@ -80,6 +82,7 @@ Powinieneś otrzymać:
 ## Co robi funkcja?
 
 Funkcja `delete_user_account()`:
+
 1. Pobiera ID zalogowanego użytkownika (`auth.uid()`)
 2. Usuwa wszystkie workouts użytkownika (cascade → workout_sets)
 3. Usuwa wszystkie custom exercises użytkownika
@@ -87,6 +90,7 @@ Funkcja `delete_user_account()`:
 5. Zwraca podsumowanie wykonanych operacji
 
 **Bezpieczeństwo:**
+
 - Używa `SECURITY DEFINER` aby mieć uprawnienia do usunięcia z `auth.users`
 - Automatycznie weryfikuje autentykację (`auth.uid()`)
 - Tylko zalogowany użytkownik może usunąć swoje własne konto

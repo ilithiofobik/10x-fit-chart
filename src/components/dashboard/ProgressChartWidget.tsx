@@ -32,9 +32,7 @@ function EmptyChartState() {
         </div>
         <div className="text-center">
           <h3 className="font-semibold">Brak danych do wyświetlenia</h3>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Wykres pojawi się, gdy zaczniesz logować treningi
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">Wykres pojawi się, gdy zaczniesz logować treningi</p>
         </div>
       </CardContent>
     </Card>

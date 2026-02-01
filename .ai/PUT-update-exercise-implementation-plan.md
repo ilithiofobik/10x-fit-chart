@@ -5,6 +5,7 @@
 Endpoint służy do aktualizacji nazwy ćwiczenia utworzonego przez użytkownika. Umożliwia zmianę nazwy tylko dla ćwiczeń prywatnych (nie-systemowych), które należą do zalogowanego użytkownika.
 
 **Główne funkcjonalności:**
+
 - Edycja nazwy prywatnego ćwiczenia
 - Walidacja właścicielstwa zasobu
 - Blokada modyfikacji ćwiczeń systemowych
@@ -15,18 +16,22 @@ Endpoint służy do aktualizacji nazwy ćwiczenia utworzonego przez użytkownika
 ## 2. Szczegóły żądania
 
 ### HTTP Method & URL
+
 ```
 PUT /api/exercises/:id
 ```
 
 **Route Parameters:**
+
 - `id` (string, required) - UUID ćwiczenia do zaktualizowania
 
 ### Request Headers
+
 - `Content-Type: application/json`
 - `Cookie: sb-access-token, sb-refresh-token` (sesja Supabase Auth)
 
 ### Request Body
+
 ```json
 {
   "name": "Cable Flyes (Incline)"
@@ -34,6 +39,7 @@ PUT /api/exercises/:id
 ```
 
 **Body Schema:**
+
 - `name` (string, required) - Nowa nazwa ćwiczenia (1-100 znaków po trim)
 
 ---
@@ -41,6 +47,7 @@ PUT /api/exercises/:id
 ## 3. Wykorzystywane typy
 
 ### DTOs
+
 ```typescript
 // Request
 export interface UpdateExerciseCommand {
@@ -54,6 +61,7 @@ export type ExerciseDTO = Exercise & {
 ```
 
 ### Zod Schemas
+
 ```typescript
 const uuidParamSchema = z.string().uuid("Invalid exercise ID format");
 
@@ -71,6 +79,7 @@ const updateExerciseSchema = z.object({
 ## 4. Szczegóły odpowiedzi
 
 ### Success Response (200 OK)
+
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -86,20 +95,21 @@ const updateExerciseSchema = z.object({
 
 ### Error Responses
 
-| Status | Error | Przypadek |
-|--------|-------|-----------|
-| 400 | Invalid input | Błędna walidacja (pusty name, zły UUID) |
-| 401 | Unauthorized | Brak sesji użytkownika |
-| 403 | Cannot modify system exercise | Próba edycji ćwiczenia systemowego |
-| 404 | Exercise not found | Nie istnieje lub nie należy do użytkownika |
-| 409 | Exercise with this name already exists | Duplikat nazwy |
-| 500 | Internal server error | Błąd bazy danych |
+| Status | Error                                  | Przypadek                                  |
+| ------ | -------------------------------------- | ------------------------------------------ |
+| 400    | Invalid input                          | Błędna walidacja (pusty name, zły UUID)    |
+| 401    | Unauthorized                           | Brak sesji użytkownika                     |
+| 403    | Cannot modify system exercise          | Próba edycji ćwiczenia systemowego         |
+| 404    | Exercise not found                     | Nie istnieje lub nie należy do użytkownika |
+| 409    | Exercise with this name already exists | Duplikat nazwy                             |
+| 500    | Internal server error                  | Błąd bazy danych                           |
 
 ---
 
 ## 5. Przepływ danych
 
 ### High-Level Flow
+
 ```
 1. Request → Endpoint → Middleware (auth)
 2. Validate params (UUID) & body (name)
@@ -114,12 +124,13 @@ const updateExerciseSchema = z.object({
 ```
 
 ### Database Operations
+
 ```sql
 -- 1. Fetch for validation
 SELECT * FROM exercises WHERE id = :id LIMIT 1;
 
 -- 2. Check uniqueness
-SELECT id FROM exercises 
+SELECT id FROM exercises
 WHERE user_id = :userId AND name = :name AND id != :id LIMIT 1;
 
 -- 3. Update
@@ -131,6 +142,7 @@ UPDATE exercises SET name = :name WHERE id = :id RETURNING *;
 ## 6. Względy bezpieczeństwa
 
 ### Checklist
+
 - ✅ **Autentykacja** - Middleware sprawdza sesję Supabase Auth
 - ✅ **Autoryzacja** - Weryfikacja ownership (`user_id === userId`)
 - ✅ **System Exercise Protection** - Blokada edycji gdy `user_id IS NULL`
@@ -139,6 +151,7 @@ UPDATE exercises SET name = :name WHERE id = :id RETURNING *;
 - ✅ **RLS Policy** - Supabase Row Level Security jako dodatkowa warstwa
 
 ### RLS Policy (sprawdź/dodaj w bazie)
+
 ```sql
 CREATE POLICY "Users can update own exercises"
 ON exercises FOR UPDATE
@@ -150,6 +163,7 @@ USING (auth.uid() = user_id);
 ## 7. Obsługa błędów
 
 ### Custom Error Classes
+
 ```typescript
 // Dodaj w src/lib/services/exercise.service.ts
 export class NotFoundError extends Error {
@@ -170,15 +184,19 @@ export class ForbiddenError extends Error {
 ```
 
 ### Error Mapping
+
 ```typescript
 try {
   // validation & service call
 } catch (error) {
   if (error instanceof z.ZodError) {
-    return new Response(JSON.stringify({
-      error: "Invalid input",
-      details: error.errors.map(e => e.message)
-    }), { status: 400 });
+    return new Response(
+      JSON.stringify({
+        error: "Invalid input",
+        details: error.errors.map((e) => e.message),
+      }),
+      { status: 400 }
+    );
   }
   if (error instanceof ForbiddenError) {
     return new Response(JSON.stringify({ error: error.message }), { status: 403 });
@@ -199,6 +217,7 @@ try {
 ## 8. Rozważania dotyczące wydajności
 
 ### Database Indexes (dodaj jeśli nie istnieją)
+
 ```sql
 -- migrations/YYYYMMDD_add_exercise_indexes.sql
 CREATE INDEX IF NOT EXISTS idx_exercises_user_name ON exercises(user_id, name);
@@ -206,6 +225,7 @@ CREATE INDEX IF NOT EXISTS idx_exercises_user_id ON exercises(user_id);
 ```
 
 ### Cache Headers
+
 ```typescript
 headers: {
   "Content-Type": "application/json",
@@ -214,6 +234,7 @@ headers: {
 ```
 
 ### Performance Metrics
+
 - **Queries:** 3 (fetch, uniqueness check, update)
 - **Expected latency:** 100-200ms
 - **Optimizations:** Connection pooling (Supabase), indexes, Cloudflare Edge
@@ -223,9 +244,11 @@ headers: {
 ## 9. Etapy wdrożenia
 
 ### Krok 1: Service Layer
+
 **Lokalizacja:** `src/lib/services/exercise.service.ts`
 
 Dodaj error classes i funkcję:
+
 ```typescript
 export async function updateExercise(
   supabase: SupabaseClient,
@@ -293,6 +316,7 @@ export async function updateExercise(
 ```
 
 ### Krok 2: API Endpoint
+
 **Lokalizacja:** `src/pages/api/exercises/[id].ts`
 
 ```typescript
@@ -334,12 +358,7 @@ export const PUT: APIRoute = async (context) => {
     const body = await context.request.json();
     const validatedData: UpdateExerciseCommand = updateExerciseSchema.parse(body);
 
-    const updatedExercise = await updateExercise(
-      supabase,
-      user.id,
-      exerciseId,
-      validatedData
-    );
+    const updatedExercise = await updateExercise(supabase, user.id, exerciseId, validatedData);
 
     return new Response(JSON.stringify(updatedExercise), {
       status: 200,
@@ -355,12 +374,15 @@ export const PUT: APIRoute = async (context) => {
 ```
 
 ### Krok 3: Database Setup
+
 1. Dodaj indexy (jeśli nie istnieją)
 2. Sprawdź RLS policy
 3. Verify trigger na `updated_at`
 
 ### Krok 4: Testing
+
 **Scenariusze testowe:**
+
 1. ✅ Happy path (200)
 2. ✅ Invalid UUID (400)
 3. ✅ Empty name (400)
@@ -370,6 +392,7 @@ export const PUT: APIRoute = async (context) => {
 7. ✅ Duplicate name (409)
 
 ### Krok 5: Code Review Checklist
+
 - [ ] Service function implemented
 - [ ] Error classes added and exported
 - [ ] Endpoint file created in correct location
@@ -388,6 +411,7 @@ export const PUT: APIRoute = async (context) => {
 Endpoint `PUT /api/exercises/:id` umożliwia użytkownikom edycję nazw swoich prywatnych ćwiczeń z pełną walidacją, ochroną przed nieautoryzowanym dostępem i sprawdzaniem unikalności nazw.
 
 **Kluczowe punkty:**
+
 - ✅ Walidacja wejścia przez Zod
 - ✅ Autoryzacja na poziomie użytkownika i zasobu
 - ✅ Ochrona ćwiczeń systemowych

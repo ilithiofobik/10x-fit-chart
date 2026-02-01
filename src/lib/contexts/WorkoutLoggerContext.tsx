@@ -1,6 +1,6 @@
 /**
  * Workout Logger Context
- * 
+ *
  * Provides state management for the workout logger feature using React Context API.
  */
 

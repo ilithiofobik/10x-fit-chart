@@ -1,48 +1,24 @@
 /**
  * Exercise Combobox Component
- * 
+ *
  * Advanced combobox for selecting or creating exercises with search functionality
  */
 
 import { useState } from "react";
 import { Check, ChevronsUpDown, Plus, Dumbbell, HeartPulse } from "lucide-react";
 import { Button } from "../ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../ui/command";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "../../lib/utils";
 import type { ExerciseComboboxProps } from "./types";
 import type { ExerciseType } from "../../types";
 import { toast } from "sonner";
 
-export const ExerciseCombobox = ({
-  exercises,
-  onAddExercise,
-  onCreateExercise,
-}: ExerciseComboboxProps) => {
+export const ExerciseCombobox = ({ exercises, onAddExercise, onCreateExercise }: ExerciseComboboxProps) => {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -59,7 +35,7 @@ export const ExerciseCombobox = ({
   const systemExercises = filteredExercises.filter((ex) => ex.is_system);
   const userExercises = filteredExercises.filter((ex) => !ex.is_system);
 
-  const handleSelectExercise = (exercise: typeof exercises[0]) => {
+  const handleSelectExercise = (exercise: (typeof exercises)[0]) => {
     onAddExercise(exercise);
     setOpen(false);
     setSearchValue("");
@@ -93,7 +69,7 @@ export const ExerciseCombobox = ({
 
     try {
       const newExercise = await onCreateExercise(newExerciseName.trim(), newExerciseType);
-      
+
       // Close dialog and reset form
       setIsCreateDialogOpen(false);
       setNewExerciseName("");
@@ -134,23 +110,12 @@ export const ExerciseCombobox = ({
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0" align="start">
               <Command shouldFilter={false}>
-                <CommandInput
-                  placeholder="Szukaj ćwiczenia..."
-                  value={searchValue}
-                  onValueChange={setSearchValue}
-                />
+                <CommandInput placeholder="Szukaj ćwiczenia..." value={searchValue} onValueChange={setSearchValue} />
                 <CommandList>
                   <CommandEmpty>
                     <div className="py-6 text-center">
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Nie znaleziono ćwiczenia "{searchValue}"
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleOpenCreateDialog}
-                        className="gap-2"
-                      >
+                      <p className="text-sm text-muted-foreground mb-3">Nie znaleziono ćwiczenia "{searchValue}"</p>
+                      <Button variant="outline" size="sm" onClick={handleOpenCreateDialog} className="gap-2">
                         <Plus className="h-4 w-4" />
                         Utwórz nowe ćwiczenie
                       </Button>
@@ -205,9 +170,7 @@ export const ExerciseCombobox = ({
             </PopoverContent>
           </Popover>
 
-          <p className="text-sm text-muted-foreground">
-            Wybierz ćwiczenie z listy lub utwórz nowe
-          </p>
+          <p className="text-sm text-muted-foreground">Wybierz ćwiczenie z listy lub utwórz nowe</p>
         </div>
       </div>
 
@@ -237,17 +200,12 @@ export const ExerciseCombobox = ({
                   }
                 }}
               />
-              <p className="text-xs text-muted-foreground">
-                {newExerciseName.length}/100 znaków
-              </p>
+              <p className="text-xs text-muted-foreground">{newExerciseName.length}/100 znaków</p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="exercise-type">Typ ćwiczenia</Label>
-              <Select
-                value={newExerciseType}
-                onValueChange={(value) => setNewExerciseType(value as ExerciseType)}
-              >
+              <Select value={newExerciseType} onValueChange={(value) => setNewExerciseType(value as ExerciseType)}>
                 <SelectTrigger id="exercise-type">
                   <SelectValue />
                 </SelectTrigger>
@@ -275,17 +233,10 @@ export const ExerciseCombobox = ({
           </div>
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleCancelCreate}
-              disabled={isCreating}
-            >
+            <Button variant="outline" onClick={handleCancelCreate} disabled={isCreating}>
               Anuluj
             </Button>
-            <Button
-              onClick={handleCreateExercise}
-              disabled={isCreating || !newExerciseName.trim()}
-            >
+            <Button onClick={handleCreateExercise} disabled={isCreating || !newExerciseName.trim()}>
               {isCreating ? "Tworzenie..." : "Utwórz ćwiczenie"}
             </Button>
           </DialogFooter>

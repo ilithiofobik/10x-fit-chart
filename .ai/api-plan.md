@@ -4,13 +4,13 @@
 
 The 10xFitChart application exposes the following REST API resources:
 
-| Resource | Database Table | Description |
-|----------|---------------|-------------|
-| `/auth` | `auth.users` | User authentication and account management |
-| `/exercises` | `exercises` | Exercise dictionary (system and user-defined) |
-| `/workouts` | `workouts` | User workout sessions |
-| `/workout-sets` | `workout_sets` | Individual sets within workouts |
-| `/analytics` | Multiple tables | Aggregated analytics data and charts |
+| Resource        | Database Table  | Description                                   |
+| --------------- | --------------- | --------------------------------------------- |
+| `/auth`         | `auth.users`    | User authentication and account management    |
+| `/exercises`    | `exercises`     | Exercise dictionary (system and user-defined) |
+| `/workouts`     | `workouts`      | User workout sessions                         |
+| `/workout-sets` | `workout_sets`  | Individual sets within workouts               |
+| `/analytics`    | Multiple tables | Aggregated analytics data and charts          |
 
 ## 2. Endpoints
 
@@ -190,12 +190,12 @@ The 10xFitChart application exposes the following REST API resources:
         "exercise_name": "Bench Press",
         "exercise_type": "strength",
         "sort_order": 1,
-        "weight": 100.00,
+        "weight": 100.0,
         "reps": 8,
         "distance": null,
         "time": null,
-        "calculated_1rm": 125.00,
-        "calculated_volume": 800.00,
+        "calculated_1rm": 125.0,
+        "calculated_volume": 800.0,
         "created_at": "2026-01-16T20:05:00Z",
         "updated_at": "2026-01-16T20:05:00Z"
       }
@@ -220,13 +220,13 @@ The 10xFitChart application exposes the following REST API resources:
       {
         "exercise_id": "uuid",
         "sort_order": 1,
-        "weight": 100.00,
+        "weight": 100.0,
         "reps": 8
       },
       {
         "exercise_id": "uuid",
         "sort_order": 2,
-        "distance": 5.00,
+        "distance": 5.0,
         "time": 1800
       }
     ]
@@ -249,12 +249,12 @@ The 10xFitChart application exposes the following REST API resources:
         "workout_id": "workout_uuid",
         "exercise_id": "exercise_uuid",
         "sort_order": 1,
-        "weight": 100.00,
+        "weight": 100.0,
         "reps": 8,
         "distance": null,
         "time": null,
-        "calculated_1rm": 125.00,
-        "calculated_volume": 800.00,
+        "calculated_1rm": 125.0,
+        "calculated_volume": 800.0,
         "created_at": "2026-01-16T20:00:00Z",
         "updated_at": "2026-01-16T20:00:00Z"
       }
@@ -281,7 +281,7 @@ The 10xFitChart application exposes the following REST API resources:
         "id": "existing_set_uuid",
         "exercise_id": "uuid",
         "sort_order": 1,
-        "weight": 102.50,
+        "weight": 102.5,
         "reps": 8
       }
     ]
@@ -360,7 +360,7 @@ The 10xFitChart application exposes the following REST API resources:
           "exercise_name": "Bench Press",
           "exercise_type": "strength",
           "sort_order": 1,
-          "weight": 100.00,
+          "weight": 100.0,
           "reps": 8
         }
       ]
@@ -386,7 +386,7 @@ The 10xFitChart application exposes the following REST API resources:
     "workout_id": "uuid",
     "exercise_id": "uuid",
     "sort_order": 3,
-    "weight": 95.00,
+    "weight": 95.0,
     "reps": 10
   }
   ```
@@ -399,12 +399,12 @@ The 10xFitChart application exposes the following REST API resources:
     "workout_id": "workout_uuid",
     "exercise_id": "exercise_uuid",
     "sort_order": 3,
-    "weight": 95.00,
+    "weight": 95.0,
     "reps": 10,
     "distance": null,
     "time": null,
     "calculated_1rm": 126.67,
-    "calculated_volume": 950.00,
+    "calculated_volume": 950.0,
     "created_at": "2026-01-16T20:15:00Z",
     "updated_at": "2026-01-16T20:15:00Z"
   }
@@ -423,7 +423,7 @@ The 10xFitChart application exposes the following REST API resources:
 
   ```json
   {
-    "weight": 97.50,
+    "weight": 97.5,
     "reps": 10
   }
   ```
@@ -436,10 +436,10 @@ The 10xFitChart application exposes the following REST API resources:
     "workout_id": "workout_uuid",
     "exercise_id": "exercise_uuid",
     "sort_order": 3,
-    "weight": 97.50,
+    "weight": 97.5,
     "reps": 10,
-    "calculated_1rm": 130.00,
-    "calculated_volume": 975.00,
+    "calculated_1rm": 130.0,
+    "calculated_volume": 975.0,
     "updated_at": "2026-01-16T20:20:00Z"
   }
   ```
@@ -485,7 +485,7 @@ The 10xFitChart application exposes the following REST API resources:
     "summary": {
       "total_workouts": 36,
       "total_sets": 540,
-      "total_volume": 125000.00,
+      "total_volume": 125000.0,
       "unique_exercises": 12
     },
     "recent_workouts": [
@@ -524,9 +524,9 @@ The 10xFitChart application exposes the following REST API resources:
       {
         "date": "2026-01-10",
         "workout_id": "uuid",
-        "value": 125.00,
+        "value": 125.0,
         "details": {
-          "weight": 100.00,
+          "weight": 100.0,
           "reps": 8
         }
       }
@@ -550,7 +550,7 @@ The 10xFitChart application exposes the following REST API resources:
         "workout_id": "uuid",
         "value": 10.0,
         "details": {
-          "distance": 5.00,
+          "distance": 5.0,
           "time": 1800
         }
       }
@@ -576,9 +576,9 @@ The 10xFitChart application exposes the following REST API resources:
         "exercise_id": "uuid",
         "exercise_name": "Bench Press",
         "exercise_type": "strength",
-        "max_weight": 120.00,
-        "max_1rm": 150.00,
-        "max_volume": 1200.00,
+        "max_weight": 120.0,
+        "max_1rm": 150.0,
+        "max_volume": 1200.0,
         "achieved_date": "2026-01-15",
         "workout_id": "uuid"
       },
@@ -586,7 +586,7 @@ The 10xFitChart application exposes the following REST API resources:
         "exercise_id": "uuid",
         "exercise_name": "Running",
         "exercise_type": "cardio",
-        "max_distance": 10.00,
+        "max_distance": 10.0,
         "best_speed": 12.5,
         "achieved_date": "2026-01-12",
         "workout_id": "uuid"

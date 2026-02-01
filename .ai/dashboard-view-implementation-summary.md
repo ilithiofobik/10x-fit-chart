@@ -7,6 +7,7 @@ Data implementacji: 2026-01-31
 ## Przegląd
 
 Zaimplementowano pełny widok Dashboard zgodnie z planem implementacji. Widok prezentuje użytkownikowi:
+
 - KPI: łączna liczba treningów, serii, objętość, unikalne ćwiczenia
 - Listę ostatnich 5 treningów
 - Wykres postępu treningowego
@@ -15,6 +16,7 @@ Zaimplementowano pełny widok Dashboard zgodnie z planem implementacji. Widok pr
 ## Zaimplementowane komponenty
 
 ### Struktura katalogów
+
 ```
 src/
 ├── components/
@@ -44,6 +46,7 @@ src/
 ### Komponenty React
 
 #### 1. Dashboard (główny)
+
 - Zarządza stanem przez `useDashboard` hook
 - Conditional rendering (loading, error, success)
 - Layout z max-w-7xl
@@ -51,40 +54,47 @@ src/
 - ErrorState component dla obsługi błędów
 
 #### 2. DashboardHeader
+
 - Tytuł "Dashboard"
 - Select z opcjami: 1, 3, 6, 12 miesięcy
 - Callback onMonthsChange
 
 #### 3. StatsGrid
+
 - Responsywny grid: 1 → 2 → 4 kolumny
 - 4 karty StatCard z ikonami Lucide
 - Formatowanie liczb (separator tysięcy, jednostki)
 
 #### 4. StatCard
+
 - Ikona + etykieta + wartość
 - Skeleton state dla ładowania
 - Opcjonalny formatter dla wartości
 - Obsługa braku danych (wyświetla "—")
 
 #### 5. RecentWorkoutsList
+
 - Lista max 5 ostatnich treningów
 - Skeleton cards (5x) podczas ładowania
 - Empty state z przyciskiem "Zaloguj trening"
 - Nawigacja do szczegółów treningu
 
 #### 6. WorkoutSummaryCard
+
 - Klikalny Card z hover effect
 - Data (z relatywnymi etykietami: Dzisiaj/Wczoraj)
 - Liczba ćwiczeń + liczba serii
 - Accessibility (keyboard navigation, ARIA)
 
 #### 7. ProgressChartWidget
+
 - Integracja Recharts
 - Skeleton state (300px height)
 - Empty state dla braku danych
 - CustomTooltip z formatowaniem
 
 #### 8. ProgressChart
+
 - ResponsiveContainer (100% × 300px)
 - LineChart z CartesianGrid
 - XAxis (daty), YAxis (wartości)
@@ -93,6 +103,7 @@ src/
 ### Custom Hook
 
 #### useDashboard
+
 - Pobieranie danych z `/api/analytics/dashboard`
 - Walidacja parametrów (months: 1-12)
 - Walidacja odpowiedzi API
@@ -107,6 +118,7 @@ src/
 ### Funkcje pomocnicze
 
 #### formatters.ts
+
 - `formatNumber()` - separator tysięcy (Polish locale)
 - `formatVolume()` - objętość z jednostką "kg"
 - `formatWorkoutDate()` - daty z etykietami względnymi
@@ -118,6 +130,7 @@ src/
 ### Typy TypeScript
 
 Dodano do `src/types.ts`:
+
 - `DashboardState` - stan głównego komponentu
 - `ChartDataPoint` - punkt danych wykresu
 - `DashboardMetric` - typy metryk
@@ -127,6 +140,7 @@ Dodano do `src/types.ts`:
 ### Strona Astro
 
 `src/pages/app/dashboard.astro`:
+
 - Import Dashboard jako DashboardView (unikanie konfliktu nazw)
 - LayoutApp z title i description
 - `client:load` directive dla hydratacji
@@ -137,10 +151,12 @@ Dodano do `src/types.ts`:
 Endpoint: `GET /api/analytics/dashboard?months=3`
 
 Request:
+
 - Query param: `months` (1-12, default: 3)
 - Credentials: include (cookies)
 
 Response: `DashboardSummaryDTO`
+
 ```typescript
 {
   period: { start_date, end_date, months },
@@ -184,6 +200,7 @@ Response: `DashboardSummaryDTO`
 ## Stan ładowania (Loading states)
 
 Każdy komponent ma dedykowany Skeleton variant:
+
 - **StatCard** → ikona + etykieta + wartość (Skeleton)
 - **WorkoutSummaryCard** → 5x skeleton cards
 - **ProgressChartWidget** → skeleton card z wysokością 300px
@@ -198,9 +215,11 @@ Każdy komponent ma dedykowany Skeleton variant:
 ## Zależności
 
 Nowe zależności:
+
 - `recharts` (^2.x) - biblioteka wykresów
 
 Użyte istniejące:
+
 - `date-fns` - formatowanie dat
 - `lucide-react` - ikony
 - Shadcn/ui components: Card, Button, Select, Skeleton
@@ -225,6 +244,7 @@ Użyte istniejące:
 ## Testowanie
 
 Należy przetestować:
+
 - ✅ Załadowanie danych z API
 - ✅ Skeleton UI podczas ładowania
 - ✅ Wyświetlanie statystyk

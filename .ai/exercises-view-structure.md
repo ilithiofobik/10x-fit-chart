@@ -105,15 +105,15 @@ ExerciseManager (state)
 ExercisesViewState {
   // Data
   exercises: ExerciseDTO[]
-  
+
   // Filters
   searchQuery: string
   typeFilter: 'all' | 'strength' | 'cardio'
-  
+
   // UI States
   isLoading: boolean
   error: string | null
-  
+
   // Dialogs
   formDialog: {
     open: boolean
@@ -121,7 +121,7 @@ ExercisesViewState {
     exercise: ExerciseDTO | null
     isSubmitting: boolean
   }
-  
+
   archiveDialog: {
     open: boolean
     exercise: ExerciseDTO | null

@@ -48,6 +48,7 @@ Kliknij przycisk **New Query** (prawy górny róg)
 ### Krok 4: Wklej SQL migration
 
 Otwórz plik:
+
 ```
 supabase/migrations/20260130_delete_user_account_function.sql
 ```
@@ -61,6 +62,7 @@ Skopiuj **całą zawartość** i wklej do SQL Editor w Supabase.
 Kliknij **Run** (lub naciśnij Ctrl+Enter / Cmd+Enter)
 
 **Oczekiwany rezultat:**
+
 ```
 Success. No rows returned
 ```
@@ -81,6 +83,7 @@ AND routine_name = 'delete_user_account';
 ```
 
 **Oczekiwany output:**
+
 ```
 routine_name: delete_user_account
 routine_type: FUNCTION
@@ -101,6 +104,7 @@ Jeśli `security_type` to `DEFINER` - wszystko działa poprawnie! 🎉
 4. **WAŻNE:** Kliknij "Anuluj" (nie usuwaj jeszcze konta!)
 
 **Oczekiwane:**
+
 - ✅ Modal się otwiera
 - ✅ Widoczne ostrzeżenie
 - ✅ Przyciski "Anuluj" i "Tak, usuń moje konto"
@@ -114,14 +118,14 @@ Jeśli `security_type` to `DEFINER` - wszystko działa poprawnie! 🎉
 Wykonaj (będąc zalogowanym):
 
 ```javascript
-fetch('/api/auth/delete-account', { 
-  method: 'DELETE' 
+fetch("/api/auth/delete-account", {
+  method: "DELETE",
 })
-  .then(r => r.json())
-  .then(console.log)
+  .then((r) => r.json())
+  .then(console.log);
 ```
 
-**NIE WYKONUJ TEGO!** To usunie twoje konto. 
+**NIE WYKONUJ TEGO!** To usunie twoje konto.
 
 Alternatywnie, sprawdź w **Network tab** co się dzieje po kliknięciu "Usuń konto".
 
@@ -138,12 +142,14 @@ Alternatywnie, sprawdź w **Network tab** co się dzieje po kliknięciu "Usuń k
 5. Kliknij "Usuń konto" → "Tak, usuń moje konto"
 
 **Oczekiwane:**
+
 - ✅ Toast: "Konto zostało usunięte"
 - ✅ Automatyczne wylogowanie
 - ✅ Przekierowanie na `/` (landing page)
 - ✅ Próba zalogowania na to samo konto → błąd "Nieprawidłowy email lub hasło"
 
 **W konsoli serwera** (terminal gdzie działa `npm run dev`) zobaczysz:
+
 ```
 [DeleteAccount] Success: {
   success: true,
@@ -163,6 +169,7 @@ Alternatywnie, sprawdź w **Network tab** co się dzieje po kliknięciu "Usuń k
 **Przyczyna:** Migracja nie została zastosowana w Supabase.
 
 **Rozwiązanie:**
+
 1. Sprawdź czy jesteś w odpowiednim projekcie w Supabase Dashboard
 2. Wykonaj ponownie Krok 2-5 z sekcji "Jak to uruchomić"
 3. Sprawdź czy w SQL Editor nie ma błędów składni
@@ -174,6 +181,7 @@ Alternatywnie, sprawdź w **Network tab** co się dzieje po kliknięciu "Usuń k
 **Przyczyna:** Funkcja nie ma atrybutu `SECURITY DEFINER`.
 
 **Rozwiązanie:**
+
 1. Sprawdź czy migration zawiera `SECURITY DEFINER` (linia 19)
 2. Usuń funkcję i utwórz ponownie:
    ```sql
@@ -188,6 +196,7 @@ Alternatywnie, sprawdź w **Network tab** co się dzieje po kliknięciu "Usuń k
 **Przyczyna:** Sesja użytkownika wygasła lub nie istnieje.
 
 **Rozwiązanie:**
+
 1. Wyloguj się
 2. Zaloguj się ponownie
 3. Spróbuj ponownie
@@ -197,6 +206,7 @@ Alternatywnie, sprawdź w **Network tab** co się dzieje po kliknięciu "Usuń k
 ### Problem: Endpoint zwraca 500 ale nie ma szczegółów
 
 **Debugowanie:**
+
 1. Sprawdź terminal serwera (gdzie działa `npm run dev`)
 2. Poszukaj logów `[DeleteAccount]`
 3. W Supabase Dashboard → Logs → sprawdź Database logs

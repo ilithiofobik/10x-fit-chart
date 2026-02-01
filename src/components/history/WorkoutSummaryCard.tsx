@@ -38,7 +38,7 @@ const formatDate = (dateString: string): string => {
   }
 };
 
-const truncateNotes = (notes: string | null, maxLength: number = 100): string => {
+const truncateNotes = (notes: string | null, maxLength = 100): string => {
   if (!notes) return "";
   if (notes.length <= maxLength) return notes;
   return notes.substring(0, maxLength) + "...";

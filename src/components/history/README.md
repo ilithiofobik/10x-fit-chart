@@ -13,11 +13,13 @@ The Workout History feature allows users to browse their past workouts in chrono
 Main provider component that manages state for the entire history list using React Context API.
 
 **Usage:**
+
 ```tsx
 <HistoryListProvider client:load />
 ```
 
 **Features:**
+
 - Fetches workouts with pagination
 - Manages filters (date range, exercise)
 - Provides error handling and loading states
@@ -27,12 +29,14 @@ Main provider component that manages state for the entire history list using Rea
 Header section with title, description, and filter controls.
 
 **Props:**
+
 - `filters`: Current filter values
 - `exercises`: Available exercises for filtering
 - `onFilterChange`: Callback when filters are applied
 - `onResetFilters`: Callback to reset all filters
 
 **Features:**
+
 - Date range picker (start/end date)
 - Exercise dropdown filter
 - Active filter indicators
@@ -43,6 +47,7 @@ Header section with title, description, and filter controls.
 Main list component that renders workout cards in a responsive grid.
 
 **Props:**
+
 - `workouts`: Array of workout items
 - `pagination`: Pagination metadata
 - `isLoading`: Initial loading state
@@ -50,6 +55,7 @@ Main list component that renders workout cards in a responsive grid.
 - `onLoadMore`: Callback for infinite scroll
 
 **Features:**
+
 - Responsive grid layout (1-3 columns)
 - Loading skeletons
 - Infinite scroll support
@@ -60,9 +66,11 @@ Main list component that renders workout cards in a responsive grid.
 Individual workout card showing summary information.
 
 **Props:**
+
 - `workout`: Workout data to display
 
 **Features:**
+
 - Date formatting (Today, Yesterday, full date)
 - Exercise and set counts with icons
 - Truncated notes preview (100 chars)
@@ -73,11 +81,13 @@ Individual workout card showing summary information.
 Button for loading next page of workouts.
 
 **Props:**
+
 - `hasMore`: Whether more items are available
 - `isLoading`: Loading state
 - `onClick`: Callback to load more
 
 **Features:**
+
 - Loading spinner
 - Disabled state during load
 - Auto-hide when no more items
@@ -87,6 +97,7 @@ Button for loading next page of workouts.
 Displayed when user has no workouts.
 
 **Features:**
+
 - Friendly illustration
 - Call-to-action button to log first workout
 - Centered layout
@@ -98,12 +109,14 @@ Displayed when user has no workouts.
 Custom hook managing all history list state and API calls.
 
 **Returns:**
+
 - `state`: Current list state
 - `actions`: Available actions (loadMore, applyFilters, resetFilters, reload)
 
 ### historyListReducer
 
 Reducer handling all state mutations:
+
 - Load workouts (initial + more)
 - Apply/reset filters
 - Set available exercises
@@ -127,6 +140,7 @@ Reducer handling all state mutations:
 ## Styling
 
 All components use Tailwind CSS and shadcn/ui components for consistent styling:
+
 - Responsive grid (md:2 cols, lg:3 cols)
 - Card-based layout
 - Hover effects and transitions

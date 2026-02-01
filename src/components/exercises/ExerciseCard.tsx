@@ -1,10 +1,5 @@
 import { MoreVertical, Edit, Archive } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -18,11 +13,7 @@ import type { ExerciseCardProps } from "@/types";
 /**
  * Karta pojedynczego ćwiczenia
  */
-export default function ExerciseCard({
-  exercise,
-  onEdit,
-  onArchive,
-}: ExerciseCardProps) {
+export default function ExerciseCard({ exercise, onEdit, onArchive }: ExerciseCardProps) {
   const canModify = !exercise.is_system;
 
   // Mapowanie typu na label

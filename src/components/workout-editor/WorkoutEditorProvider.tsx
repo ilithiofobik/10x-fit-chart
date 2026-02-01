@@ -124,7 +124,7 @@ export const WorkoutEditorProvider = ({ workoutId }: WorkoutEditorProviderProps)
 
           <div className="bg-card border rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4">Ćwiczenia</h3>
-            
+
             <ExerciseCombobox
               exercises={state.availableExercises}
               onAddExercise={actions.addExercise}
@@ -144,9 +144,7 @@ export const WorkoutEditorProvider = ({ workoutId }: WorkoutEditorProviderProps)
             )}
 
             {state.exercises.length === 0 && (
-              <p className="text-center text-muted-foreground py-8">
-                Dodaj ćwiczenia używając pola powyżej
-              </p>
+              <p className="text-center text-muted-foreground py-8">Dodaj ćwiczenia używając pola powyżej</p>
             )}
           </div>
 

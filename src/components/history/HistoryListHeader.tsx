@@ -46,9 +46,7 @@ export const HistoryListHeader = ({ filters, exercises, onFilterChange, onResetF
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">Historia Treningów</h1>
-          <p className="text-muted-foreground">
-            Przeglądaj i edytuj swoje wcześniejsze treningi
-          </p>
+          <p className="text-muted-foreground">Przeglądaj i edytuj swoje wcześniejsze treningi</p>
         </div>
 
         <div className="flex gap-2">
@@ -75,9 +73,7 @@ export const HistoryListHeader = ({ filters, exercises, onFilterChange, onResetF
                   <input
                     type="date"
                     value={localFilters.start_date || ""}
-                    onChange={(e) =>
-                      setLocalFilters({ ...localFilters, start_date: e.target.value || null })
-                    }
+                    onChange={(e) => setLocalFilters({ ...localFilters, start_date: e.target.value || null })}
                     className="w-full px-3 py-2 border rounded-md"
                   />
                 </div>
@@ -87,9 +83,7 @@ export const HistoryListHeader = ({ filters, exercises, onFilterChange, onResetF
                   <input
                     type="date"
                     value={localFilters.end_date || ""}
-                    onChange={(e) =>
-                      setLocalFilters({ ...localFilters, end_date: e.target.value || null })
-                    }
+                    onChange={(e) => setLocalFilters({ ...localFilters, end_date: e.target.value || null })}
                     className="w-full px-3 py-2 border rounded-md"
                   />
                 </div>

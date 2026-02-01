@@ -43,7 +43,7 @@ WorkoutLoggerPage (Astro Page)
 ### WorkoutLoggerPage (Astro Page)
 
 - **Opis komponentu**: Główna strona widoku `/app/log`, renderowana przez Astro. Zapewnia SSR i osadzenie React Island z logiką loggera.
-- **Główne elementy**: 
+- **Główne elementy**:
   - Container strony z paddingiem i max-width
   - Tytuł strony "Nowy Trening"
   - Komponent `<WorkoutLoggerProvider client:load>`
@@ -60,7 +60,7 @@ WorkoutLoggerPage (Astro Page)
   - Wrapper `<div>` renderujący wszystkie komponenty dzieci
   - useEffect do synchronizacji z `localStorage` (debounced)
   - useEffect do ładowania listy ćwiczeń z API przy montowaniu
-- **Obsługiwane zdarzenia**: 
+- **Obsługiwane zdarzenia**:
   - Inicjalizacja: Ładowanie stanu z `localStorage` lub tworzenie pustego
   - Autoload exercises: Pobieranie listy ćwiczeń z `/api/exercises`
   - Autosave: Debounced zapis do `localStorage` przy każdej zmianie stanu
@@ -83,7 +83,7 @@ WorkoutLoggerPage (Astro Page)
   - Data w formacie YYYY-MM-DD
   - Notatki max 1000 znaków
 - **Typy**: `WorkoutHeaderProps`
-- **Propsy**: 
+- **Propsy**:
   ```typescript
   {
     date: string;
@@ -215,12 +215,12 @@ WorkoutLoggerPage (Astro Page)
   - `<td>` z `Button` ikona (trash) do usunięcia serii
 - **Obsługiwane zdarzenia**:
   - `onChange`: Aktualizacja wartości pola i propagacja do rodzica
-  - `onKeyDown`: 
+  - `onKeyDown`:
     - Enter w ostatnim polu → automatyczne dodanie nowej serii i focus
     - Tab naturalnie przechodzi między polami
   - `onRemove`: Usunięcie serii
 - **Warunki walidacji**:
-  - **Strength**: 
+  - **Strength**:
     - `weight` >= 0, max 999.99
     - `reps` >= 1, integer
     - `distance` i `time` muszą być null
@@ -454,33 +454,34 @@ Stan w widoku Logger Treningowy jest zarządzany za pomocą **React Context API*
 
 ### Struktura zarządzania stanem
 
-1. **WorkoutLoggerContext**: 
+1. **WorkoutLoggerContext**:
    - Przechowuje główny stan `WorkoutLoggerState`
    - Udostępnia akcje `WorkoutLoggerActions`
    - Provider opakowuje całą treść widoku
 
 2. **Custom Hook: useWorkoutLogger**:
+
    ```typescript
    function useWorkoutLogger() {
      const [state, dispatch] = useReducer(workoutLoggerReducer, initialState);
-     
+
      // Effects
      useEffect(() => {
        // Load draft from localStorage on mount
        const draft = localStorage.getItem(WORKOUT_DRAFT_KEY);
        if (draft) {
          const parsed = JSON.parse(draft);
-         dispatch({ type: 'LOAD_DRAFT', payload: parsed });
+         dispatch({ type: "LOAD_DRAFT", payload: parsed });
        }
      }, []);
-     
+
      useEffect(() => {
        // Fetch available exercises
-       fetchExercises().then(exercises => {
-         dispatch({ type: 'SET_AVAILABLE_EXERCISES', payload: exercises });
+       fetchExercises().then((exercises) => {
+         dispatch({ type: "SET_AVAILABLE_EXERCISES", payload: exercises });
        });
      }, []);
-     
+
      useEffect(() => {
        // Debounced save to localStorage
        const timeout = setTimeout(() => {
@@ -488,31 +489,30 @@ Stan w widoku Logger Treningowy jest zarządzany za pomocą **React Context API*
        }, 500);
        return () => clearTimeout(timeout);
      }, [state]);
-     
+
      // Actions
      const actions: WorkoutLoggerActions = {
-       setDate: (date) => dispatch({ type: 'SET_DATE', payload: date }),
-       setNotes: (notes) => dispatch({ type: 'SET_NOTES', payload: notes }),
-       addExercise: (exercise) => dispatch({ type: 'ADD_EXERCISE', payload: exercise }),
-       removeExercise: (id) => dispatch({ type: 'REMOVE_EXERCISE', payload: id }),
-       addSet: (exerciseId) => dispatch({ type: 'ADD_SET', payload: exerciseId }),
-       removeSet: (exerciseId, setIndex) => 
-         dispatch({ type: 'REMOVE_SET', payload: { exerciseId, setIndex } }),
-       updateSet: (exerciseId, setIndex, data) => 
-         dispatch({ type: 'UPDATE_SET', payload: { exerciseId, setIndex, data } }),
-       loadTemplate: (template) => dispatch({ type: 'LOAD_TEMPLATE', payload: template }),
+       setDate: (date) => dispatch({ type: "SET_DATE", payload: date }),
+       setNotes: (notes) => dispatch({ type: "SET_NOTES", payload: notes }),
+       addExercise: (exercise) => dispatch({ type: "ADD_EXERCISE", payload: exercise }),
+       removeExercise: (id) => dispatch({ type: "REMOVE_EXERCISE", payload: id }),
+       addSet: (exerciseId) => dispatch({ type: "ADD_SET", payload: exerciseId }),
+       removeSet: (exerciseId, setIndex) => dispatch({ type: "REMOVE_SET", payload: { exerciseId, setIndex } }),
+       updateSet: (exerciseId, setIndex, data) =>
+         dispatch({ type: "UPDATE_SET", payload: { exerciseId, setIndex, data } }),
+       loadTemplate: (template) => dispatch({ type: "LOAD_TEMPLATE", payload: template }),
        resetWorkout: () => {
-         dispatch({ type: 'RESET' });
+         dispatch({ type: "RESET" });
          localStorage.removeItem(WORKOUT_DRAFT_KEY);
        },
        saveWorkout: async () => {
-         dispatch({ type: 'SET_SAVING', payload: true });
+         dispatch({ type: "SET_SAVING", payload: true });
          try {
            const payload = transformStateToPayload(state);
-           await fetch('/api/workouts', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify(payload)
+           await fetch("/api/workouts", {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify(payload),
            });
            localStorage.removeItem(WORKOUT_DRAFT_KEY);
            // Show success toast
@@ -520,16 +520,16 @@ Stan w widoku Logger Treningowy jest zarządzany za pomocą **React Context API*
          } catch (error) {
            // Show error toast
          } finally {
-           dispatch({ type: 'SET_SAVING', payload: false });
+           dispatch({ type: "SET_SAVING", payload: false });
          }
-       }
+       },
      };
-     
+
      return { state, actions };
    }
    ```
 
-3. **Reducer**: 
+3. **Reducer**:
    - Czysty reducer obsługujący wszystkie akcje
    - Immutable updates dla zagnieżdżonych struktur (exercises.sets)
 
@@ -542,11 +542,11 @@ Stan w widoku Logger Treningowy jest zarządzany za pomocą **React Context API*
 ### Przepływ danych
 
 ```
-User Action 
-  → Component Event Handler 
-    → Context Action (dispatch) 
-      → Reducer 
-        → New State 
+User Action
+  → Component Event Handler
+    → Context Action (dispatch)
+      → Reducer
+        → New State
           → localStorage (debounced)
             → Component Re-render
 ```
@@ -556,6 +556,7 @@ User Action
 ### Endpointy wykorzystywane przez widok
 
 #### 1. GET /api/exercises
+
 - **Cel**: Pobranie listy dostępnych ćwiczeń do wyboru
 - **Moment wywołania**: Przy montowaniu komponentu WorkoutLoggerProvider
 - **Request**: Brak body, opcjonalne query params `include_archived=false`
@@ -565,11 +566,12 @@ User Action
     exercises: ExerciseDTO[]
   }
   ```
-- **Obsługa błędów**: 
+- **Obsługa błędów**:
   - 401: Przekierowanie do logowania
   - 500: Toast z komunikatem błędu
 
 #### 2. GET /api/workouts/latest
+
 - **Cel**: Pobranie ostatniego treningu jako szablon do skopiowania
 - **Moment wywołania**: Po kliknięciu przycisku "Kopiuj ostatni trening"
 - **Request**: Brak body i params
@@ -591,6 +593,7 @@ User Action
   - 500: Toast z komunikatem błędu
 
 #### 3. POST /api/exercises
+
 - **Cel**: Tworzenie nowego ćwiczenia (inline w Combobox)
 - **Moment wywołania**: Po wypełnieniu formularza w modalu "Utwórz ćwiczenie"
 - **Request Body**: `CreateExerciseCommand`
@@ -619,6 +622,7 @@ User Action
   - 500: Toast z komunikatem błędu
 
 #### 4. POST /api/workouts
+
 - **Cel**: Zapisanie nowego treningu z seriami
 - **Moment wywołania**: Po kliknięciu "Zapisz trening"
 - **Request Body**: `CreateWorkoutCommand`
@@ -665,7 +669,7 @@ Przed wysłaniem do API, stan formularza musi zostać przetransformowany:
 function transformStateToPayload(state: WorkoutLoggerState): CreateWorkoutCommand {
   const sets: CreateWorkoutSetCommand[] = [];
   let sortOrder = 1;
-  
+
   state.exercises.forEach((exercise) => {
     exercise.sets.forEach((set) => {
       sets.push({
@@ -678,7 +682,7 @@ function transformStateToPayload(state: WorkoutLoggerState): CreateWorkoutComman
       });
     });
   });
-  
+
   return {
     date: state.date,
     notes: state.notes,
@@ -693,7 +697,7 @@ Po załadowaniu szablonu z `/api/workouts/latest`, dane muszą być przekształc
 function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutLoggerState> {
   // Group sets by exercise_id
   const exercisesMap = new Map<string, WorkoutExercise>();
-  
+
   template.sets.forEach((set) => {
     if (!exercisesMap.has(set.exercise_id)) {
       exercisesMap.set(set.exercise_id, {
@@ -704,7 +708,7 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
         sets: [],
       });
     }
-    
+
     exercisesMap.get(set.exercise_id)!.sets.push({
       weight: set.weight,
       reps: set.reps,
@@ -712,9 +716,9 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
       time: set.time,
     });
   });
-  
+
   return {
-    date: new Date().toISOString().split('T')[0], // today, not template date
+    date: new Date().toISOString().split("T")[0], // today, not template date
     notes: null, // clear notes
     exercises: Array.from(exercisesMap.values()),
   };
@@ -792,7 +796,7 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 2. Użytkownik wpisuje np. `5.5` (km)
 3. Naciśnięcie Tab → focus na "Czas"
 4. Użytkownik wpisuje np. `30` (minuty)
-5. System konwertuje minuty na sekundy (30 * 60 = 1800)
+5. System konwertuje minuty na sekundy (30 \* 60 = 1800)
 6. Naciśnięcie Enter:
    - Walidacja
    - Dodanie nowej pustej serii
@@ -854,11 +858,12 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 ### 9.1. Walidacja na poziomie WorkoutHeader
 
 **Data treningu**:
+
 - **Warunek**: Data nie może być w przyszłości
 - **Komponent**: WorkoutHeader
-- **Metoda**: 
+- **Metoda**:
   ```typescript
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   if (date > today) {
     // Show error
     return false;
@@ -867,9 +872,10 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 - **Wpływ na UI**: Disabled przycisk "Zapisz", czerwona ramka na polu, tooltip z błędem
 
 **Notatki**:
+
 - **Warunek**: Max 1000 znaków
 - **Komponent**: WorkoutHeader
-- **Metoda**: 
+- **Metoda**:
   ```typescript
   if (notes && notes.length > 1000) {
     // Show warning
@@ -880,6 +886,7 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 ### 9.2. Walidacja na poziomie SetRow (Strength)
 
 **Ciężar (weight)**:
+
 - **Warunki**:
   - Wartość >= 0
   - Wartość <= 999.99
@@ -889,11 +896,12 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 - **Wpływ na UI**: Czerwona ramka, tooltip "Ciężar musi być między 0 a 999.99 kg"
 
 **Powtórzenia (reps)**:
+
 - **Warunki**:
   - Wartość >= 1
   - Liczba całkowita
 - **Komponent**: SetRow
-- **Metoda**: 
+- **Metoda**:
   ```typescript
   if (!Number.isInteger(reps) || reps < 1) {
     // Show error
@@ -902,6 +910,7 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 - **Wpływ na UI**: Czerwona ramka, tooltip "Powtórzenia muszą być liczbą całkowitą >= 1"
 
 **Pola cardio (distance, time)**:
+
 - **Warunek**: Muszą być `null` dla ćwiczeń siłowych
 - **Komponent**: SetRow (sprawdzenie przed zapisem)
 - **Metoda**: Type checking przy transformacji
@@ -910,6 +919,7 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 ### 9.3. Walidacja na poziomie SetRow (Cardio)
 
 **Dystans (distance)**:
+
 - **Warunki**:
   - Wartość >= 0
   - Wartość <= 999999.99
@@ -919,6 +929,7 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 - **Wpływ na UI**: Czerwona ramka, tooltip "Dystans musi być między 0 a 999999.99 km"
 
 **Czas (time)**:
+
 - **Warunki**:
   - Wartość >= 0 (minuty w UI, sekundy w API)
   - Liczba całkowita lub zmiennoprzecinkowa
@@ -927,6 +938,7 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 - **Wpływ na UI**: Czerwona ramka, tooltip "Czas musi być >= 0 minut"
 
 **Pola strength (weight, reps)**:
+
 - **Warunek**: Muszą być `null` dla ćwiczeń cardio
 - **Komponent**: SetRow
 - **Metoda**: Type checking
@@ -935,25 +947,28 @@ function transformTemplateToState(template: WorkoutDetailsDTO): Partial<WorkoutL
 ### 9.4. Walidacja na poziomie całego formularza (WorkoutActions)
 
 **Obecność ćwiczeń**:
+
 - **Warunek**: Trening musi zawierać przynajmniej jedno ćwiczenie
 - **Komponent**: WorkoutActions
 - **Metoda**: `state.exercises.length > 0`
 - **Wpływ na UI**: Przycisk "Zapisz" disabled, tooltip "Dodaj przynajmniej jedno ćwiczenie"
 
 **Obecność serii w ćwiczeniach**:
+
 - **Warunek**: Każde ćwiczenie musi mieć przynajmniej jedną serię
 - **Komponent**: WorkoutActions
 - **Metoda**: `state.exercises.every(ex => ex.sets.length > 0)`
 - **Wpływ na UI**: Przycisk "Zapisz" disabled, podświetlenie ćwiczeń bez serii
 
 **Kompletność danych w seriach**:
+
 - **Warunek**: Wszystkie wymagane pola w seriach muszą być wypełnione
 - **Komponent**: WorkoutActions
-- **Metoda**: 
+- **Metoda**:
   ```typescript
-  const allSetsValid = state.exercises.every(ex => 
-    ex.sets.every(set => {
-      if (ex.exercise_type === 'strength') {
+  const allSetsValid = state.exercises.every((ex) =>
+    ex.sets.every((set) => {
+      if (ex.exercise_type === "strength") {
         return set.weight !== null && set.reps !== null;
       } else {
         return set.distance !== null && set.time !== null;
@@ -981,6 +996,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
    - **Błąd**: 400 + szczegóły walidacji
 
 **Obsługa błędów API w UI**:
+
 - Parsowanie response body
 - Pokazanie Toast z komunikatem
 - Jeśli możliwe: Podświetlenie konkretnego błędnego pola
@@ -992,6 +1008,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: Utracenie połączenia podczas zapisu treningu
 
 **Obsługa**:
+
 1. Catch blok w `saveWorkout()`
 2. Sprawdzenie `error instanceof TypeError` (network error)
 3. Toast: "Brak połączenia z internetem. Trening zapisano lokalnie jako draft."
@@ -1003,6 +1020,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: Sesja wygasła podczas pracy
 
 **Obsługa**:
+
 1. Wykrycie statusu 401 w każdym API call
 2. Toast: "Sesja wygasła. Za chwilę nastąpi przekierowanie do logowania."
 3. Zapis draft do localStorage (zabezpieczenie danych)
@@ -1014,6 +1032,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: Backend odrzuca dane mimo walidacji front-endowej
 
 **Obsługa**:
+
 1. Parsowanie response body z API
 2. Mapowanie błędów do konkretnych pól:
    ```typescript
@@ -1030,6 +1049,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: Użytkownik próbuje zapisać trening z ćwiczeniem, które zostało usunięte
 
 **Obsługa**:
+
 1. Wykrycie `ExerciseNotFoundError` w response
 2. Toast: "Ćwiczenie '{exercise_name}' nie istnieje. Usuń je z treningu."
 3. Podświetlenie problematycznego ExerciseCard na czerwono
@@ -1040,6 +1060,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: Nieoczekiwany błąd po stronie backendu
 
 **Obsługa**:
+
 1. Catch błędu 500
 2. Toast: "Wystąpił błąd serwera. Spróbuj ponownie za chwilę."
 3. Draft pozostaje w localStorage
@@ -1051,8 +1072,9 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: Browser ma pełny localStorage lub jest zablokowany
 
 **Obsługa**:
+
 1. Try-catch wokół `localStorage.setItem()`
-2. Jeśli catch: 
+2. Jeśli catch:
    - Wyłączenie auto-save
    - Toast: "Nie można zapisać draftu lokalnie. Upewnij się, że przeglądarka ma dostęp do localStorage."
 3. Aplikacja nadal działa, ale bez ochrony przed F5
@@ -1062,6 +1084,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: Użytkownik próbuje stworzyć ćwiczenie o nazwie, która już istnieje
 
 **Obsługa**:
+
 1. Wykrycie statusu 409 z POST `/api/exercises`
 2. Toast: "Ćwiczenie o tej nazwie już istnieje. Wybierz je z listy."
 3. Modal tworzenia pozostaje otwarty
@@ -1073,6 +1096,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: GET `/api/exercises` trwa zbyt długo
 
 **Obsługa**:
+
 1. Timeout 10s na fetch
 2. Jeśli przekroczony:
    - Toast: "Nie udało się załadować listy ćwiczeń. Odśwież stronę."
@@ -1085,6 +1109,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 **Scenariusz**: API zwraca nieprawidłowy JSON
 
 **Obsługa**:
+
 1. Try-catch wokół `response.json()`
 2. Jeśli catch:
    - Toast: "Błąd komunikacji z serwerem. Spróbuj ponownie."
@@ -1094,20 +1119,24 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 ### 10.10. Przypadki brzegowe (Edge Cases)
 
 **Użytkownik dodaje ćwiczenie bez serii i próbuje zapisać**:
+
 - Walidacja blokuje zapis
 - Toast: "Każde ćwiczenie musi mieć przynajmniej jedną serię"
 - Auto-scroll do ćwiczenia bez serii
 
 **Użytkownik wpisuje wartości poza zakresem (np. 10000 kg)**:
+
 - Walidacja na input level (max attribute)
 - Jeśli ominie: Walidacja przed zapisem
 - Toast: "Ciężar nie może przekraczać 999.99 kg"
 
 **Użytkownik próbuje zapisać pusty trening**:
+
 - Przycisk "Zapisz" disabled
 - Tooltip: "Dodaj przynajmniej jedno ćwiczenie"
 
 **Draft w localStorage jest uszkodzony (nieprawidłowy JSON)**:
+
 - Try-catch przy parsowaniu
 - Jeśli błąd: Usunięcie draft, inicjalizacja pustego formularza
 - Toast: "Nie udało się przywrócić draftu. Rozpocznij od nowa."
@@ -1115,6 +1144,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 ## 11. Kroki implementacji
 
 ### Krok 1: Przygotowanie struktury projektu
+
 1. Utworzenie folderu `src/pages/app/log/`
 2. Utworzenie pliku `index.astro` jako główna strona widoku
 3. Utworzenie folderu `src/components/workout-logger/` dla komponentów React
@@ -1122,6 +1152,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 5. Utworzenie pliku `src/lib/contexts/WorkoutLoggerContext.tsx` dla contextu
 
 ### Krok 2: Implementacja Context i State Management
+
 1. Zdefiniowanie typów stanu w `WorkoutLoggerContext.tsx`:
    - `WorkoutLoggerState`
    - `WorkoutLoggerActions`
@@ -1136,6 +1167,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 4. Utworzenie `WorkoutLoggerProvider` opakowującego dzieci w Context.Provider
 
 ### Krok 3: Implementacja WorkoutHeader
+
 1. Utworzenie komponentu `WorkoutHeader.tsx`
 2. Import i konfiguracja DatePicker z Shadcn/ui
 3. Implementacja walidacji daty (nie w przyszłości)
@@ -1144,6 +1176,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 6. Styling Tailwind + responsywność
 
 ### Krok 4: Implementacja QuickActions
+
 1. Utworzenie komponentu `QuickActions.tsx`
 2. Implementacja przycisku "Kopiuj ostatni trening"
 3. Implementacja fetcha do `/api/workouts/latest`
@@ -1152,6 +1185,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 6. Integracja z contextem (wywołanie loadTemplate)
 
 ### Krok 5: Implementacja SetRow (kluczowy komponent)
+
 1. Utworzenie komponentu `SetRow.tsx`
 2. Implementacja logiki polimorficznej:
    - Conditional rendering pól w zależności od `exerciseType`
@@ -1167,6 +1201,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 6. Styling z focus states i error states
 
 ### Krok 6: Implementacja SetTable
+
 1. Utworzenie komponentu `SetTable.tsx`
 2. Implementacja dynamicznych nagłówków tabeli:
    - Conditional rendering w zależności od `exerciseType`
@@ -1176,6 +1211,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 6. Styling tabeli (Tailwind) z responsywnością
 
 ### Krok 7: Implementacja ExerciseHeader
+
 1. Utworzenie komponentu `ExerciseHeader.tsx`
 2. Layout z nazwą ćwiczenia, badge typu i przyciskiem X
 3. Implementacja Badge z różnymi kolorami dla strength/cardio
@@ -1183,6 +1219,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 5. Styling Tailwind
 
 ### Krok 8: Implementacja ExerciseCard
+
 1. Utworzenie komponentu `ExerciseCard.tsx`
 2. Kompozycja z `ExerciseHeader` i `SetTable`
 3. Przekazywanie propsów z rodzica do dzieci
@@ -1190,6 +1227,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 5. Styling z marginesami i paddingiem
 
 ### Krok 9: Implementacja ExerciseList
+
 1. Utworzenie komponentu `ExerciseList.tsx`
 2. Mapowanie przez tablicę ćwiczeń
 3. Renderowanie `ExerciseCard` dla każdego z unikalnym key
@@ -1197,6 +1235,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 5. Layout pionowy z odstępami
 
 ### Krok 10: Implementacja ExerciseCombobox
+
 1. Utworzenie komponentu `ExerciseCombobox.tsx`
 2. Implementacja Popover z Command (Shadcn/ui)
 3. Implementacja wyszukiwania (filtrowanie case-insensitive)
@@ -1212,6 +1251,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 10. Styling i responsywność
 
 ### Krok 11: Implementacja WorkoutActions
+
 1. Utworzenie komponentu `WorkoutActions.tsx`
 2. Implementacja przycisków "Zapisz trening" i "Anuluj"
 3. Implementacja walidacji całego formularza:
@@ -1230,6 +1270,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 7. Styling z loading spinnerami
 
 ### Krok 12: Integracja wszystkich komponentów w Provider
+
 1. W `WorkoutLoggerProvider.tsx`:
    - Renderowanie `WorkoutHeader`
    - Renderowanie `QuickActions`
@@ -1240,6 +1281,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 3. Layout głównego kontenera (max-width, padding, spacing)
 
 ### Krok 13: Utworzenie strony Astro
+
 1. W `src/pages/app/log/index.astro`:
    - Import `WorkoutLoggerProvider`
    - Renderowanie z dyrektywą `client:load`
@@ -1247,6 +1289,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
    - Wrapper w wspólnym Layout aplikacji
 
 ### Krok 14: Implementacja Toast notifications
+
 1. Instalacja biblioteki toast (np. Sonner)
 2. Dodanie `<Toaster />` do Layout aplikacji
 3. Utworzenie helper funkcji `showToast` w utils
@@ -1257,6 +1300,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
    - Walidacja
 
 ### Krok 15: Implementacja localStorage persistence
+
 1. Definicja klucza `WORKOUT_DRAFT_KEY = "workout_draft"`
 2. W useEffect providera:
    - Load on mount
@@ -1266,6 +1310,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 5. Obsługa błędów localStorage (try-catch)
 
 ### Krok 16: Accessibility i keyboard navigation
+
 1. Dodanie odpowiednich `aria-label` do wszystkich przycisków i inputów
 2. Konfiguracja `tabIndex` dla logicznego flow:
    - Data → Notatki → Dodaj ćwiczenie → Pola serii → Akcje
@@ -1275,6 +1320,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 6. Testing z screen readerem
 
 ### Krok 17: Styling i responsywność
+
 1. Implementacja Dark Mode (zgodnie z PRD: domyślny i jedyny)
 2. Tailwind classes dla wszystkich komponentów
 3. Responsive breakpoints:
@@ -1287,6 +1333,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 7. Error states (czerwone ramki, ikony)
 
 ### Krok 18: Testowanie integracyjne
+
 1. Ręczne testowanie pełnego flow:
    - Rozpoczęcie nowego treningu
    - Dodanie ćwiczenia siłowego + wprowadzenie serii
@@ -1306,6 +1353,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 4. Testowanie na różnych przeglądarkach (Chrome, Firefox, Safari, Edge)
 
 ### Krok 19: Optymalizacja wydajności
+
 1. Implementacja React.memo dla komponentów bez częstych zmian
 2. Implementacja useMemo dla ciężkich obliczeń (np. walidacja)
 3. Implementacja useCallback dla callbacks przekazywanych do dzieci
@@ -1314,6 +1362,7 @@ Po wysłaniu POST `/api/workouts`, backend dodatkowo waliduje:
 6. Code splitting jeśli bundle zbyt duży
 
 ### Krok 20: Dokumentacja i finalizacja
+
 1. Dodanie komentarzy JSDoc do wszystkich komponentów i funkcji
 2. Dokumentacja propsów (TypeScript interfaces wystarczą)
 3. Update README jeśli potrzebne

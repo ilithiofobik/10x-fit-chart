@@ -7,29 +7,25 @@ export function SignOutButton() {
 
   async function handleSignOut() {
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch('/api/auth/logout', { method: 'POST' });
-      
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+
       if (!response.ok) {
-        throw new Error('Nie udało się wylogować');
+        throw new Error("Nie udało się wylogować");
       }
-      
-      toast.success('Wylogowano pomyślnie');
-      window.location.href = '/';
+
+      toast.success("Wylogowano pomyślnie");
+      window.location.href = "/";
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Nie udało się wylogować');
+      toast.error(err instanceof Error ? err.message : "Nie udało się wylogować");
       setIsLoading(false);
     }
   }
 
   return (
-    <Button 
-      variant="outline" 
-      onClick={handleSignOut} 
-      disabled={isLoading}
-    >
-      {isLoading ? 'Wylogowywanie...' : 'Wyloguj się'}
+    <Button variant="outline" onClick={handleSignOut} disabled={isLoading}>
+      {isLoading ? "Wylogowywanie..." : "Wyloguj się"}
     </Button>
   );
 }

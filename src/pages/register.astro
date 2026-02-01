@@ -6,7 +6,9 @@ import { Toaster } from "@/components/ui/sonner";
 
 // Sprawdź czy użytkownik jest już zalogowany
 const supabase = supabaseServer(Astro);
-const { data: { session } } = await supabase.auth.getSession();
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 
 // Przekieruj na dashboard jeśli zalogowany
 if (session) {
@@ -14,10 +16,7 @@ if (session) {
 }
 ---
 
-<Layout
-  title="Rejestracja - 10xFitChart"
-  description="Zarejestruj się w 10xFitChart"
->
+<Layout title="Rejestracja - 10xFitChart" description="Zarejestruj się w 10xFitChart">
   <div class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-md">
       <RegisterForm client:load />

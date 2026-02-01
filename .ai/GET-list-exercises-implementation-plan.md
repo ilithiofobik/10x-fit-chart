@@ -38,9 +38,9 @@ Z `src/types.ts`:
 
 ```typescript
 z.object({
-  type: z.enum(['strength', 'cardio']).optional(),
-  include_archived: z.coerce.boolean().optional().default(false)
-})
+  type: z.enum(["strength", "cardio"]).optional(),
+  include_archived: z.coerce.boolean().optional().default(false),
+});
 ```
 
 ## 4. Szczegóły odpowiedzi
@@ -94,12 +94,12 @@ z.object({
 
 ## 7. Obsługa błędów
 
-| Scenariusz | Kod | Odpowiedź | Logowanie |
-|------------|-----|-----------|-----------|
-| Brak autoryzacji | 401 | `{ message: "Unauthorized" }` | Nie |
-| Nieprawidłowe parametry | 400 | `{ message: "Invalid query parameters" }` | Nie |
-| Błąd bazy danych | 500 | `{ message: "Internal server error" }` | Tak (console.error) |
-| Nieoczekiwany błąd | 500 | `{ message: "Internal server error" }` | Tak (console.error) |
+| Scenariusz              | Kod | Odpowiedź                                 | Logowanie           |
+| ----------------------- | --- | ----------------------------------------- | ------------------- |
+| Brak autoryzacji        | 401 | `{ message: "Unauthorized" }`             | Nie                 |
+| Nieprawidłowe parametry | 400 | `{ message: "Invalid query parameters" }` | Nie                 |
+| Błąd bazy danych        | 500 | `{ message: "Internal server error" }`    | Tak (console.error) |
+| Nieoczekiwany błąd      | 500 | `{ message: "Internal server error" }`    | Tak (console.error) |
 
 ## 8. Etapy wdrożenia
 

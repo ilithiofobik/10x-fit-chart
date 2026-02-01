@@ -1,6 +1,6 @@
 /**
  * Workout Logger Provider
- * 
+ *
  * Main provider component that wraps the workout logger feature and provides
  * state management via Context API.
  */
@@ -60,10 +60,7 @@ export const WorkoutLoggerProvider = () => {
   };
 
   // Create exercise handler
-  const handleCreateExercise = async (
-    name: string,
-    type: ExerciseType
-  ): Promise<ExerciseDTO> => {
+  const handleCreateExercise = async (name: string, type: ExerciseType): Promise<ExerciseDTO> => {
     const response = await fetch("/api/exercises", {
       method: "POST",
       headers: {
@@ -81,19 +78,17 @@ export const WorkoutLoggerProvider = () => {
     }
 
     const newExercise = await response.json();
-    
+
     // Automatically add the newly created exercise to the workout
     actions.addExercise(newExercise);
-    
+
     return newExercise;
   };
 
   // Cancel handler
   const handleCancel = () => {
     if (state.exercises.length > 0) {
-      const confirmed = window.confirm(
-        "Masz niezapisane zmiany. Czy na pewno chcesz wyjść?"
-      );
+      const confirmed = window.confirm("Masz niezapisane zmiany. Czy na pewno chcesz wyjść?");
       if (!confirmed) return;
     }
 

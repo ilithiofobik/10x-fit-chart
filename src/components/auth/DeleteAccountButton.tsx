@@ -19,21 +19,21 @@ export function DeleteAccountButton() {
 
   async function handleDeleteAccount() {
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch('/api/auth/delete-account', { 
-        method: 'DELETE' 
+      const response = await fetch("/api/auth/delete-account", {
+        method: "DELETE",
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Nie udało się usunąć konta');
+        throw new Error(errorData.error || "Nie udało się usunąć konta");
       }
-      
-      toast.success('Konto zostało usunięte');
-      window.location.href = '/';
+
+      toast.success("Konto zostało usunięte");
+      window.location.href = "/";
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Nie udało się usunąć konta');
+      toast.error(err instanceof Error ? err.message : "Nie udało się usunąć konta");
       setIsLoading(false);
       setIsOpen(false);
     }
@@ -42,28 +42,24 @@ export function DeleteAccountButton() {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">
-          Usuń konto
-        </Button>
+        <Button variant="destructive">Usuń konto</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Czy na pewno chcesz usunąć konto?</AlertDialogTitle>
           <AlertDialogDescription>
-            Ta akcja jest nieodwracalna. Wszystkie Twoje dane (treningi, ćwiczenia, statystyki) 
-            zostaną trwale usunięte z naszych serwerów.
+            Ta akcja jest nieodwracalna. Wszystkie Twoje dane (treningi, ćwiczenia, statystyki) zostaną trwale usunięte
+            z naszych serwerów.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>
-            Anuluj
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>Anuluj</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDeleteAccount}
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? 'Usuwanie...' : 'Tak, usuń moje konto'}
+            {isLoading ? "Usuwanie..." : "Tak, usuń moje konto"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

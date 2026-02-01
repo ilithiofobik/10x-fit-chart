@@ -1,6 +1,6 @@
 /**
  * Set Table Component
- * 
+ *
  * Table displaying all sets for an exercise
  */
 
@@ -9,13 +9,7 @@ import { Plus } from "lucide-react";
 import { SetRow } from "./SetRow";
 import type { SetTableProps } from "./types";
 
-export const SetTable = ({
-  exerciseType,
-  sets,
-  onUpdateSet,
-  onRemoveSet,
-  onAddSet,
-}: SetTableProps) => {
+export const SetTable = ({ exerciseType, sets, onUpdateSet, onRemoveSet, onAddSet }: SetTableProps) => {
   const isStrength = exerciseType === "strength";
 
   return (
@@ -56,13 +50,7 @@ export const SetTable = ({
         </table>
       </div>
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={onAddSet}
-        className="gap-2"
-      >
+      <Button type="button" variant="outline" size="sm" onClick={onAddSet} className="gap-2">
         <Plus className="h-4 w-4" />
         Dodaj serię
       </Button>

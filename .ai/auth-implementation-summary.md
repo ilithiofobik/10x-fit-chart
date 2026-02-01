@@ -3,6 +3,7 @@
 ## Data: 30.01.2026
 
 ## Zakres implementacji
+
 Pełna integracja procesu logowania, rejestracji i zarządzania kontem użytkownika zgodnie ze specyfikacją w `auth-spec.md` i wymaganiami z `prd.md` (US-001, US-002, US-003).
 
 ---
@@ -12,45 +13,56 @@ Pełna integracja procesu logowania, rejestracji i zarządzania kontem użytkown
 ### 1. Infrastruktura i narzędzia pomocnicze
 
 #### ✅ `src/db/supabase-server.ts` (zmodyfikowany)
+
 **Zmiana:** Cookie security - warunkowe HTTPS
+
 ```typescript
-secure: import.meta.env.PROD  // Tylko HTTPS w produkcji
-httpOnly: false              // Wymagane dla Supabase client-side
+secure: import.meta.env.PROD; // Tylko HTTPS w produkcji
+httpOnly: false; // Wymagane dla Supabase client-side
 ```
+
 **Uzasadnienie:** Umożliwia pracę z cookies lokalnie bez HTTPS.
 
 #### ✅ `src/lib/utils/auth-errors.ts` (nowy)
+
 **Funkcjonalność:**
+
 - Centralized error mapper dla błędów Supabase
 - Mapowanie komunikatów z angielskiego na polski
 - Helper functions: `isEmailExistsError()`, `isInvalidCredentialsError()`
 - Server-side logging nieznanych błędów
 
 **Przykład użycia:**
+
 ```typescript
 const errorMessage = mapAuthError(error.message, "Fallback message");
 ```
 
 #### ✅ `src/lib/utils/auth-guards.ts` (nowy)
+
 **Funkcjonalność:**
+
 - `requireAuth(locals)` - wymusza autentykację w API routes (rzuca Response 401)
 - `isAuthenticated(locals)` - sprawdza czy user jest zalogowany
 - `getUser(locals)` - pobiera user lub null
 
 **Przykład użycia:**
+
 ```typescript
 export const GET: APIRoute = async ({ locals }) => {
   const user = requireAuth(locals);
   // user jest zagwarantowany jako non-null
-}
+};
 ```
 
 #### ✅ `src/env.d.ts` (zmodyfikowany)
+
 **Zmiana:** Rozszerzono typy `App.Locals`
+
 ```typescript
 interface Locals {
   supabase: SupabaseClient;
-  user: User | null;  // NOWE
+  user: User | null; // NOWE
 }
 ```
 
@@ -59,17 +71,21 @@ interface Locals {
 ### 2. Middleware i ochrona tras
 
 #### ✅ `src/middleware/index.ts` (refaktoryzacja)
+
 **Zmiany:**
+
 - **Przed:** Token-based auth z `Authorization` header
 - **Po:** Cookie-based auth z `supabaseServer()`
 
 **Funkcjonalność:**
+
 1. Tworzy Supabase client z cookie storage
 2. Pobiera user session i dodaje do `locals.user`
 3. Chroni trasy `/app/*` (redirect do `/login` jeśli niezalogowany)
 4. Przekierowuje zalogowanych z `/login` i `/register` do `/app/dashboard`
 
 **Logika przekierowań:**
+
 ```
 Niezalogowany + /app/*          → Redirect /login
 Zalogowany + /login|/register   → Redirect /app/dashboard
@@ -82,9 +98,11 @@ Niezalogowany + publiczne       → Renderuj stronę
 ### 3. API Endpoints
 
 #### ✅ `POST /api/auth/login`
+
 **Plik:** `src/pages/api/auth/login.ts`
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -93,6 +111,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Zalogowano pomyślnie",
@@ -104,6 +123,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Error (401):**
+
 ```json
 {
   "error": "Nieprawidłowy email lub hasło"
@@ -111,6 +131,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Funkcjonalność:**
+
 - Walidacja Zod (email format, password required)
 - `supabase.auth.signInWithPassword()`
 - Automatyczne ustawienie session w cookies
@@ -119,9 +140,11 @@ Niezalogowany + publiczne       → Renderuj stronę
 ---
 
 #### ✅ `POST /api/auth/register`
+
 **Plik:** `src/pages/api/auth/register.ts`
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -130,6 +153,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Response (201):**
+
 ```json
 {
   "message": "Konto utworzone pomyślnie",
@@ -141,6 +165,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Error (409) - Email exists:**
+
 ```json
 {
   "error": "Ten adres email jest już zarejestrowany"
@@ -148,6 +173,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Funkcjonalność:**
+
 - Walidacja Zod (email format, password min 8 chars)
 - `supabase.auth.signUp()` bez email confirmation
 - Automatyczne logowanie po rejestracji
@@ -156,11 +182,13 @@ Niezalogowany + publiczne       → Renderuj stronę
 ---
 
 #### ✅ `POST /api/auth/logout`
+
 **Plik:** `src/pages/api/auth/logout.ts`
 
 **Request:** Empty body
 
 **Response (200):**
+
 ```json
 {
   "message": "Wylogowano pomyślnie"
@@ -168,6 +196,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Funkcjonalność:**
+
 - `supabase.auth.signOut()`
 - Automatyczne usunięcie cookies
 - Minimalistyczny endpoint (no auth required)
@@ -175,11 +204,13 @@ Niezalogowany + publiczne       → Renderuj stronę
 ---
 
 #### ✅ `DELETE /api/auth/delete-account`
+
 **Plik:** `src/pages/api/auth/delete-account.ts`
 
 **Request:** Authenticated (via session)
 
 **Response (200):**
+
 ```json
 {
   "message": "Konto zostało usunięte"
@@ -187,6 +218,7 @@ Niezalogowany + publiczne       → Renderuj stronę
 ```
 
 **Funkcjonalność:**
+
 - Realizacja **US-003** (Trwałe usuwanie konta)
 - Wymaga autentykacji (`requireAuth()`)
 - Kaskadowe usuwanie:
@@ -195,7 +227,7 @@ Niezalogowany + publiczne       → Renderuj stronę
   3. User z auth.users (przez `admin.deleteUser()`)
 - Automatyczne wylogowanie po usunięciu
 
-**⚠️ UWAGA:** Endpoint używa `supabase.auth.admin.deleteUser()` który wymaga **service_role key**. 
+**⚠️ UWAGA:** Endpoint używa `supabase.auth.admin.deleteUser()` który wymaga **service_role key**.
 Zalecana alternatywa: Database function z `SECURITY DEFINER`.
 
 ---
@@ -203,55 +235,59 @@ Zalecana alternatywa: Database function z `SECURITY DEFINER`.
 ## Przepływ użytkownika (User Flow)
 
 ### Scenariusz 1: Rejestracja i pierwsze logowanie
+
 ```
 1. User wchodzi na / (landing page)
    └─ Middleware: Brak sesji → Renderuje landing
-   
+
 2. User klika "Zarejestruj się" → /register
    └─ Middleware: Brak sesji → Renderuje RegisterForm
-   
+
 3. User wypełnia formularz i submituje
    └─ POST /api/auth/register
       ├─ Walidacja Zod
       ├─ supabase.auth.signUp()
       └─ Session cookie ustawiony ✓
-      
+
 4. Frontend redirect → /app/dashboard
    └─ Middleware: Sesja istnieje → Renderuje dashboard
 ```
 
 ### Scenariusz 2: Logowanie powracającego użytkownika
+
 ```
 1. User wchodzi na / (landing page)
    └─ Middleware: Brak sesji → Renderuje landing
-   
+
 2. User klika "Zaloguj się" → /login
    └─ Middleware: Brak sesji → Renderuje LoginForm
-   
+
 3. User wypełnia formularz i submituje
    └─ POST /api/auth/login
       ├─ Walidacja Zod
       ├─ supabase.auth.signInWithPassword()
       └─ Session cookie ustawiony ✓
-      
+
 4. Frontend redirect → /app/dashboard
    └─ Middleware: Sesja istnieje → Renderuje dashboard
 ```
 
 ### Scenariusz 3: Ochrona tras
+
 ```
 1. Niezalogowany user próbuje wejść na /app/dashboard
    └─ Middleware: Brak sesji + /app/* → Redirect /login
-   
+
 2. Zalogowany user próbuje wejść na /login
    └─ Middleware: Sesja exists + /login → Redirect /app/dashboard
 ```
 
 ### Scenariusz 4: Usuwanie konta
+
 ```
 1. User w /app/profile klika "Usuń konto"
    └─ Modal z potwierdzeniem (AlertDialog)
-   
+
 2. User potwierdza usunięcie
    └─ DELETE /api/auth/delete-account
       ├─ requireAuth() sprawdza sesję
@@ -259,7 +295,7 @@ Zalecana alternatywa: Database function z `SECURITY DEFINER`.
       ├─ Usuwa exercises użytkownika
       ├─ Usuwa user z auth.users
       └─ signOut() + clear cookies
-      
+
 3. Frontend redirect → /
    └─ Middleware: Brak sesji → Renderuje landing
 ```
@@ -269,6 +305,7 @@ Zalecana alternatywa: Database function z `SECURITY DEFINER`.
 ## Strategia sesji i refresh tokenów
 
 ### Cookie Configuration
+
 ```typescript
 {
   path: "/",
@@ -280,6 +317,7 @@ Zalecana alternatywa: Database function z `SECURITY DEFINER`.
 ```
 
 ### Token Lifecycle
+
 - **Access Token TTL:** 1 godzina (Supabase default)
 - **Refresh Token TTL:** 7 dni (cookie maxAge)
 - **Automatyczne odświeżanie:** Middleware wywołuje `supabase.auth.getUser()` przy każdym request
@@ -288,7 +326,9 @@ Zalecana alternatywa: Database function z `SECURITY DEFINER`.
 - **Strategia:** Sliding session (odnawia się przy aktywności)
 
 ### Wygaśnięcie sesji
+
 Po 7 dniach nieaktywności:
+
 1. Refresh token wygasa
 2. `getUser()` zwraca null
 3. Middleware przekierowuje na `/login`
@@ -301,30 +341,36 @@ Po 7 dniach nieaktywności:
 ### Implementowane zabezpieczenia
 
 ✅ **Hasła:**
+
 - Minimalna długość: 8 znaków (walidacja client + server)
 - Hashowanie: bcrypt (automatyczne przez Supabase)
 - Never plain text
 
 ✅ **Cookies:**
+
 - `sameSite: "lax"` - ochrona przed CSRF
 - `secure: true` w produkcji (tylko HTTPS)
 - `httpOnly: false` - wymagane dla Supabase client SDK
 
 ✅ **API Endpoints:**
+
 - Walidacja Zod na wszystkich endpointach
 - Centralized error messages (nie ujawniamy szczegółów ataku)
 - Server-side logging błędów
 
 ✅ **Middleware:**
+
 - Weryfikacja sesji przed każdą chronioną trasą
 - Automatyczne przekierowania dla unauthorized
 - Type-safe auth guards
 
 ✅ **Row Level Security (RLS):**
+
 - TODO: Implementacja polityk RLS w Supabase (poza zakresem tej integracji)
 - `auth.uid()` będzie używany do filtrowania danych
 
 ### Zalecenia na przyszłość
+
 ⚠️ **Rate limiting** - dodać w przyszłości (ochrona przed brute-force)
 ⚠️ **CAPTCHA** - rozważyć dla rejestracji (ochrona przed botami)
 ⚠️ **Password strength meter** - UX improvement
@@ -335,6 +381,7 @@ Po 7 dniach nieaktywności:
 ## Zgodność z wymaganiami (PRD)
 
 ### US-001: Rejestracja nowego użytkownika ✅
+
 - [x] Formularz z polami Email i Hasło
 - [x] Walidacja formatu emaila i minimalnej długości hasła (8 znaków)
 - [x] Automatyczne logowanie po rejestracji
@@ -342,12 +389,14 @@ Po 7 dniach nieaktywności:
 - [x] Przekierowanie do Dashboardu po sukcesie
 
 ### US-002: Logowanie do systemu ✅
+
 - [x] Pola Email i Hasło
 - [x] Toast z komunikatem błędu dla nieprawidłowych danych
 - [x] Przekierowanie do Dashboardu po sukcesie
 - [x] Walidacja po stronie klienta i serwera
 
 ### US-003: Usuwanie konta ✅
+
 - [x] Przycisk "Usuń konto" w profilu
 - [x] Modal z potwierdzeniem (AlertDialog)
 - [x] Jasna informacja o konsekwencjach
@@ -359,6 +408,7 @@ Po 7 dniach nieaktywności:
 ## Struktura plików
 
 ### Nowe pliki
+
 ```
 src/
 ├── lib/
@@ -375,6 +425,7 @@ src/
 ```
 
 ### Zmodyfikowane pliki
+
 ```
 src/
 ├── db/
@@ -420,6 +471,7 @@ src/
    - [ ] Przekierowanie na stronę główną
 
 ### Testy sesji
+
 - [ ] Sesja wygasa po 1h bezczynności (access token)
 - [ ] Sesja odnawia się przy aktywności (refresh token)
 - [ ] Sesja wygasa po 7 dniach całkowitej bezczynności
@@ -429,12 +481,15 @@ src/
 ## Znane ograniczenia i uwagi
 
 ### ⚠️ Admin delete user
+
 Endpoint `DELETE /api/auth/delete-account` używa `supabase.auth.admin.deleteUser()` który wymaga:
+
 - **Service role key** w zmiennej środowiskowej
 - Lub alternatywnie: **Database function z SECURITY DEFINER**
 
 **Zalecane rozwiązanie:**
 Utworzyć Supabase migration z function:
+
 ```sql
 CREATE OR REPLACE FUNCTION delete_user_account()
 RETURNS void
@@ -450,18 +505,23 @@ $$;
 ```
 
 Następnie w endpointcie użyć:
+
 ```typescript
-const { error } = await supabase.rpc('delete_user_account');
+const { error } = await supabase.rpc("delete_user_account");
 ```
 
 ### 📝 Row Level Security (RLS)
+
 Polityki RLS opisane w specyfikacji powinny być zaimplementowane w Supabase Dashboard:
+
 - `exercises` - user może widzieć swoje + systemowe (user_id IS NULL)
 - `workouts` - user widzi tylko swoje
 - `workout_sets` - user widzi serie ze swoich treningów
 
 ### 🔧 Environment variables
+
 Upewnij się, że `.env` zawiera:
+
 ```env
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_anon_key
@@ -474,6 +534,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ## Podsumowanie
 
 ### ✅ Zaimplementowano
+
 - ✅ Cookie-based authentication z Supabase
 - ✅ Middleware z protection dla `/app/*`
 - ✅ Wszystkie wymagane endpointy API
@@ -482,10 +543,12 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 - ✅ Pełna zgodność z US-001, US-002, US-003
 
 ### 🎯 Gotowe do testowania
-System autentykacji jest w pełni funkcjonalny i gotowy do testów manualnych. 
+
+System autentykacji jest w pełni funkcjonalny i gotowy do testów manualnych.
 Frontend (LoginForm, RegisterForm) już jest zintegrowany - wystarczy uruchomić dev server.
 
 ### 📋 Next steps
+
 1. Testy manualne w przeglądarce
 2. Implementacja RLS policies w Supabase
 3. (Opcjonalnie) Migracja delete-account do database function

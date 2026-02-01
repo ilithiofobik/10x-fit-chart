@@ -42,9 +42,7 @@ function EmptyState() {
         </div>
         <div className="text-center">
           <h3 className="font-semibold">Brak treningów</h3>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Zacznij logować swoje treningi, aby zobaczyć postępy!
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">Zacznij logować swoje treningi, aby zobaczyć postępy!</p>
         </div>
         <Button onClick={handleAddWorkout} className="gap-2">
           <Plus className="h-4 w-4" />

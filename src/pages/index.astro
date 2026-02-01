@@ -11,7 +11,10 @@ const supabase = supabaseServer(Astro);
 
 let isAuthenticated = false;
 try {
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
   if (error) {
     console.error("Session check failed:", error);
   }

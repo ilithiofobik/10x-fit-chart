@@ -7,6 +7,7 @@ Landing Page jest głównym punktem wejścia do aplikacji 10xFitChart dla niezal
 Widok implementowany jest jako strona statyczna z elementami interaktywnymi (React Islands pattern w Astro), wykrywająca stan sesji użytkownika. Jeśli użytkownik jest już zalogowany, przyciski autoryzacyjne zamieniają się w link "Idź do aplikacji".
 
 Kluczowe cechy:
+
 - Desktop-first (responsywna, ale priorytet dla dużych ekranów)
 - Dark mode (jedyny obsługiwany tryb)
 - Język polski
@@ -22,6 +23,7 @@ Kluczowe cechy:
 **Plik**: `src/pages/index.astro`
 
 **Logika przekierowania**:
+
 - Jeśli użytkownik posiada aktywną sesję → wyświetla CTA "Przejdź do aplikacji" prowadzący do `/dashboard`
 - Jeśli użytkownik nie jest zalogowany → wyświetla przyciski "Zaloguj się" i "Zarejestruj się"
 
@@ -58,6 +60,7 @@ index.astro (Astro Page)
 **Opis**: Layout bazowy dla całej aplikacji, zawierający strukturę HTML, meta tagi, style globalne i nawigację.
 
 **Główne elementy**:
+
 - `<html lang="pl">` z klasą dark mode
 - `<head>` z meta tagami (title, description, viewport, charset)
 - `<body>` z containerem głównym
@@ -67,7 +70,8 @@ index.astro (Astro Page)
 
 **Warunki walidacji**: Brak
 
-**Typy**: 
+**Typy**:
+
 ```typescript
 interface Props {
   title: string;
@@ -76,6 +80,7 @@ interface Props {
 ```
 
 **Propsy**:
+
 - `title: string` - tytuł strony do `<title>` tag
 - `description?: string` - opcjonalny opis do meta description
 
@@ -84,18 +89,21 @@ interface Props {
 **Opis**: Sekcja hero zawierająca główny nagłówek aplikacji, krótki opis wartości oraz przyciski Call-to-Action. Komponent wykrywa stan sesji użytkownika i dostosowuje wyświetlane przyciski.
 
 **Główne elementy**:
+
 - `<section>` z klasami Tailwind (flex, min-h-screen, items-center, justify-center)
 - `<div>` container z max-width
 - `<h1>` - główny nagłówek "10xFitChart"
 - `<p>` - tagline/opis wartości (2-3 zdania)
 - `<AuthButtons />` - komponent z przyciskami CTA
 
-**Obsługiwane zdarzenia**: 
+**Obsługiwane zdarzenia**:
+
 - Brak bezpośrednich zdarzeń (delegowane do AuthButtons)
 
 **Warunki walidacji**: Brak
 
 **Typy**:
+
 ```typescript
 interface HeroSectionProps {
   isAuthenticated: boolean;
@@ -103,6 +111,7 @@ interface HeroSectionProps {
 ```
 
 **Propsy**:
+
 - `isAuthenticated: boolean` - czy użytkownik jest zalogowany (przekazywane z SSR)
 
 ### 4.3. AuthButtons (React Component)
@@ -110,12 +119,14 @@ interface HeroSectionProps {
 **Opis**: Inteligentny komponent wyświetlający odpowiednie przyciski w zależności od stanu sesji. Dla niezalogowanych pokazuje "Zaloguj się" i "Zarejestruj się", dla zalogowanych pokazuje "Przejdź do aplikacji".
 
 **Główne elementy**:
+
 - `<div>` flex container dla przycisków
 - `Button` (Shadcn/ui) - "Zarejestruj się" (variant="default")
 - `Button` (Shadcn/ui) - "Zaloguj się" (variant="outline")
 - `Button` (Shadcn/ui) - "Przejdź do aplikacji" (variant="default", conditional)
 
 **Obsługiwane zdarzenia**:
+
 - `onClick` na przyciskach → nawigacja do odpowiednich ścieżek:
   - "Zarejestruj się" → `/register`
   - "Zaloguj się" → `/login`
@@ -124,6 +135,7 @@ interface HeroSectionProps {
 **Warunki walidacji**: Brak (routing nie wymaga walidacji)
 
 **Typy**:
+
 ```typescript
 interface AuthButtonsProps {
   isAuthenticated: boolean;
@@ -131,6 +143,7 @@ interface AuthButtonsProps {
 ```
 
 **Propsy**:
+
 - `isAuthenticated: boolean` - stan sesji użytkownika
 
 ### 4.4. FeatureGrid (React/Astro Component)
@@ -138,6 +151,7 @@ interface AuthButtonsProps {
 **Opis**: Siatka prezentująca kluczowe funkcje aplikacji. Może być implementowana jako statyczny komponent Astro (preferowane dla wydajności) lub React (jeśli wymagane animacje).
 
 **Główne elementy**:
+
 - `<section>` z klasami Tailwind
 - `<div>` grid container (grid-cols-1 md:grid-cols-2 lg:grid-cols-4)
 - 4x `<FeatureCard />` - karty z ikonami i opisami funkcji
@@ -147,6 +161,7 @@ interface AuthButtonsProps {
 **Warunki walidacji**: Brak
 
 **Typy**:
+
 ```typescript
 interface FeatureGridProps {
   features: FeatureItem[];
@@ -160,6 +175,7 @@ interface FeatureItem {
 ```
 
 **Propsy**:
+
 - `features: FeatureItem[]` - tablica z opisami funkcji
 
 ### 4.5. FeatureCard (React/Astro Component)
@@ -167,6 +183,7 @@ interface FeatureItem {
 **Opis**: Pojedyncza karta prezentująca funkcję aplikacji - ikona, tytuł i krótki opis.
 
 **Główne elementy**:
+
 - `<div>` card container z border i padding
 - Ikona (z biblioteki lucide-react)
 - `<h3>` - tytuł funkcji
@@ -177,6 +194,7 @@ interface FeatureItem {
 **Warunki walidacji**: Brak
 
 **Typy**:
+
 ```typescript
 interface FeatureCardProps {
   title: string;
@@ -186,6 +204,7 @@ interface FeatureCardProps {
 ```
 
 **Propsy**:
+
 - `title: string` - nazwa funkcji
 - `description: string` - opis funkcji
 - `icon: string` - nazwa ikony
@@ -195,6 +214,7 @@ interface FeatureCardProps {
 **Opis**: Stopka strony z informacjami o prawach autorskich.
 
 **Główne elementy**:
+
 - `<footer>` z klasami Tailwind
 - `<div>` container z tekstem copyright
 - Opcjonalnie: linki do polityki prywatności (out-of-scope dla MVP)
@@ -271,29 +291,29 @@ export interface BaseLayoutProps {
 ```typescript
 // src/data/landing-features.ts
 
-import type { FeatureItem } from '@/components/landing/types';
+import type { FeatureItem } from "@/components/landing/types";
 
 export const landingFeatures: FeatureItem[] = [
   {
     title: "Szybkie wprowadzanie",
     description: "Nawigacja klawiaturą i kopiowanie treningów oszczędza czas",
-    icon: "Keyboard"
+    icon: "Keyboard",
   },
   {
     title: "Głęboka analiza",
     description: "Wykresy postępów i trendy historyczne w jednym miejscu",
-    icon: "BarChart3"
+    icon: "BarChart3",
   },
   {
     title: "Siłowe i Cardio",
     description: "Oddzielne metryki dla różnych typów aktywności",
-    icon: "Dumbbell"
+    icon: "Dumbbell",
   },
   {
     title: "Desktop-first",
     description: "Zoptymalizowane pod kątem komputerów i dużych ekranów",
-    icon: "Monitor"
-  }
+    icon: "Monitor",
+  },
 ];
 ```
 
@@ -302,16 +322,19 @@ export const landingFeatures: FeatureItem[] = [
 ### 6.1. Stan na poziomie strony (SSR)
 
 **Wykrywanie sesji**:
+
 ```typescript
 // src/pages/index.astro
 
-import { supabaseServer } from '@/db/supabase-server';
+import { supabaseServer } from "@/db/supabase-server";
 
 const { cookies } = Astro;
 const supabase = supabaseServer(Astro);
 
 // Sprawdzenie sesji użytkownika
-const { data: { session } } = await supabase.auth.getSession();
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 const isAuthenticated = !!session;
 ```
 
@@ -322,10 +345,12 @@ Stan `isAuthenticated` jest określany podczas SSR i przekazywany jako props do 
 Komponenty Landing Page są głównie prezentacyjne i nie wymagają złożonego zarządzania stanem. Jedyny stan przechowywany to:
 
 **HeroSection/AuthButtons**:
+
 - `isAuthenticated` - przekazywany jako prop z poziomu strony Astro
 - Brak lokalnego stanu - komponent jest stateless
 
 **FeatureGrid**:
+
 - Statyczne dane funkcji przekazywane jako props
 - Brak lokalnego stanu
 
@@ -334,6 +359,7 @@ Komponenty Landing Page są głównie prezentacyjne i nie wymagają złożonego 
 **Nie wymagane** dla Landing Page. Wszystkie komponenty są proste, prezentacyjne i nie potrzebują złożonej logiki.
 
 W przyszłości, jeśli dodamy animacje lub śledzenie interakcji, możemy rozważyć:
+
 ```typescript
 // Przykład (opcjonalnie, out-of-scope dla MVP)
 // useScrollAnimation() - dla animacji przy scrollowaniu
@@ -348,7 +374,9 @@ Landing Page **nie wykonuje żadnych wywołań API** po stronie klienta. Jedyna 
 
 ```typescript
 // W src/pages/index.astro (Server-Side)
-const { data: { session } } = await supabase.auth.getSession();
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 ```
 
 ### 7.2. Nawigacja do endpointów autoryzacji
@@ -360,6 +388,7 @@ Przyciski CTA prowadzą do innych widoków aplikacji, które obsługują autoryz
 - **Przycisk "Przejdź do aplikacji"**: `window.location.href = '/dashboard'`
 
 Nawigacja może być zaimplementowana przez:
+
 1. Standardowe linki `<a href="...">` (preferowane dla SEO)
 2. Astro `<a>` z `data-astro-prefetch`
 3. Client-side navigation z `window.location.href`
@@ -373,10 +402,12 @@ Nawigacja może być zaimplementowana przez:
 **Trigger**: Kliknięcie przycisku "Zarejestruj się"
 
 **Akcja**:
+
 1. Nawigacja do `/register`
 2. Brak walidacji (to tylko link)
 
-**Oczekiwany rezultat**: 
+**Oczekiwany rezultat**:
+
 - Użytkownik jest przekierowany na stronę rejestracji
 
 ### 8.2. Kliknięcie "Zaloguj się"
@@ -384,10 +415,12 @@ Nawigacja może być zaimplementowana przez:
 **Trigger**: Kliknięcie przycisku "Zaloguj się"
 
 **Akcja**:
+
 1. Nawigacja do `/login`
 2. Brak walidacji
 
-**Oczekiwany rezultat**: 
+**Oczekiwany rezultat**:
+
 - Użytkownik jest przekierowany na stronę logowania
 
 ### 8.3. Kliknięcie "Przejdź do aplikacji"
@@ -395,10 +428,12 @@ Nawigacja może być zaimplementowana przez:
 **Trigger**: Kliknięcie przycisku "Przejdź do aplikacji" (tylko dla zalogowanych)
 
 **Akcja**:
+
 1. Nawigacja do `/dashboard`
 2. Brak walidacji (sesja już zweryfikowana przez SSR)
 
-**Oczekiwany rezultat**: 
+**Oczekiwany rezultat**:
+
 - Zalogowany użytkownik jest przekierowany do dashboardu
 
 ### 8.4. Hover nad przyciskami
@@ -406,10 +441,12 @@ Nawigacja może być zaimplementowana przez:
 **Trigger**: Najechanie kursorem na przyciski CTA
 
 **Akcja**:
+
 - Zmiana stylu przycisku (Shadcn/ui hover states)
 - Opcjonalnie: delikatna animacja (scale, shadow)
 
-**Oczekiwany rezultat**: 
+**Oczekiwany rezultat**:
+
 - Wizualna informacja zwrotna o możliwości kliknięcia
 
 ### 8.5. Scrollowanie strony
@@ -417,10 +454,12 @@ Nawigacja może być zaimplementowana przez:
 **Trigger**: Scrollowanie w dół strony
 
 **Akcja**:
+
 - Wyświetlenie kolejnych sekcji (Hero → Features → Footer)
 - Opcjonalnie: animacje fade-in/slide-in (out-of-scope dla MVP)
 
-**Oczekiwany rezultat**: 
+**Oczekiwany rezultat**:
+
 - Płynne przewijanie treści
 
 ## 9. Warunki i walidacja
@@ -432,6 +471,7 @@ Nawigacja może być zaimplementowana przez:
 **Komponent**: `HeroSection` → `AuthButtons`
 
 **Logika**:
+
 ```typescript
 if (isAuthenticated) {
   // Pokaż przycisk "Przejdź do aplikacji"
@@ -441,6 +481,7 @@ if (isAuthenticated) {
 ```
 
 **Wpływ na UI**:
+
 - Zmiana widoczności przycisków
 - Zmiana tekstu CTA
 - Zmiana ścieżki nawigacji
@@ -452,16 +493,18 @@ if (isAuthenticated) {
 **Komponent**: `FeatureGrid` → `FeatureCard`
 
 **Logika**:
+
 ```typescript
 // Walidacja struktury danych
-landingFeatures.forEach(feature => {
+landingFeatures.forEach((feature) => {
   if (!feature.title || !feature.description || !feature.icon) {
-    console.error('Invalid feature data:', feature);
+    console.error("Invalid feature data:", feature);
   }
 });
 ```
 
 **Wpływ na UI**:
+
 - Poprawne renderowanie kart funkcji
 - Wyświetlenie odpowiednich ikon
 
@@ -476,20 +519,25 @@ Landing Page **nie zawiera formularzy** - wszystkie interakcje są prostymi link
 **Scenariusz**: Supabase zwraca błąd podczas `getSession()`
 
 **Obsługa**:
+
 ```typescript
 try {
-  const { data: { session }, error } = await supabase.auth.getSession();
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
   if (error) {
-    console.error('Session check failed:', error);
+    console.error("Session check failed:", error);
   }
   const isAuthenticated = !!session && !error;
 } catch (err) {
-  console.error('Unexpected error:', err);
+  console.error("Unexpected error:", err);
   const isAuthenticated = false; // Domyślnie traktuj jako niezalogowanego
 }
 ```
 
-**Rezultat**: 
+**Rezultat**:
+
 - Użytkownik traktowany jako niezalogowany
 - Wyświetlenie domyślnych przycisków CTA
 - Nie blokuje działania strony
@@ -499,12 +547,14 @@ try {
 **Scenariusz**: Błąd hydratacji lub renderowania komponentu
 
 **Obsługa**:
+
 ```typescript
 // ErrorBoundary (opcjonalnie, out-of-scope dla MVP)
 // Jeśli komponent się nie załaduje, strona nadal wyświetli statyczną treść
 ```
 
-**Rezultat**: 
+**Rezultat**:
+
 - Graceful degradation - strona nadal czytelna
 - Logowanie błędu do konsoli
 
@@ -513,10 +563,12 @@ try {
 **Scenariusz**: Kliknięcie linku, który nie istnieje
 
 **Obsługa**:
+
 - Astro routing automatycznie obsługuje 404
 - Middleware może przekierować do Landing Page
 
-**Rezultat**: 
+**Rezultat**:
+
 - Wyświetlenie strony 404 (jeśli zaimplementowana)
 - Lub przekierowanie do `/`
 
@@ -525,11 +577,13 @@ try {
 **Scenariusz**: Przeglądarka ma wyłączony JavaScript
 
 **Obsługa**:
+
 - Komponenty Astro renderują się server-side
 - Linki `<a>` działają bez JS
 - React Islands mogą nie być interaktywne, ale treść jest dostępna
 
-**Rezultat**: 
+**Rezultat**:
+
 - Podstawowa funkcjonalność zachowana (linki działają)
 - Brak animacji i interakcji React
 
@@ -613,14 +667,22 @@ src/
 3. Dodać logikę warunkową:
    ```tsx
    if (isAuthenticated) {
-     return <Button asChild><a href="/dashboard">Przejdź do aplikacji</a></Button>
+     return (
+       <Button asChild>
+         <a href="/dashboard">Przejdź do aplikacji</a>
+       </Button>
+     );
    }
    return (
      <div className="flex gap-4">
-       <Button asChild><a href="/register">Zarejestruj się</a></Button>
-       <Button variant="outline" asChild><a href="/login">Zaloguj się</a></Button>
+       <Button asChild>
+         <a href="/register">Zarejestruj się</a>
+       </Button>
+       <Button variant="outline" asChild>
+         <a href="/login">Zaloguj się</a>
+       </Button>
      </div>
-   )
+   );
    ```
 4. Zastosować odpowiednie style (flex, gap, center)
 5. Dodać `client:load` directive przy użyciu w Astro
@@ -653,17 +715,19 @@ src/
 2. Funkcja powinna tworzyć klienta Supabase z server-side cookies:
    ```typescript
    export function supabaseServer(Astro: AstroGlobal) {
-     return createServerClient(
-       import.meta.env.SUPABASE_URL,
-       import.meta.env.SUPABASE_ANON_KEY,
-       {
-         cookies: {
-           get(key) { return Astro.cookies.get(key)?.value },
-           set(key, value, options) { Astro.cookies.set(key, value, options) },
-           remove(key) { Astro.cookies.delete(key) }
-         }
-       }
-     )
+     return createServerClient(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_ANON_KEY, {
+       cookies: {
+         get(key) {
+           return Astro.cookies.get(key)?.value;
+         },
+         set(key, value, options) {
+           Astro.cookies.set(key, value, options);
+         },
+         remove(key) {
+           Astro.cookies.delete(key);
+         },
+       },
+     });
    }
    ```
 
@@ -673,13 +737,18 @@ src/
 2. Zaimportować `HeroSection`, `FeatureGrid`, `Footer`
 3. Zaimportować dane `landingFeatures`
 4. Dodać blok frontmatter do sprawdzenia sesji:
+
    ```typescript
-   import { supabaseServer } from '@/db/supabase-server';
-   
+   import { supabaseServer } from "@/db/supabase-server";
+
    const supabase = supabaseServer(Astro);
-   const { data: { session }, error } = await supabase.auth.getSession();
+   const {
+     data: { session },
+     error,
+   } = await supabase.auth.getSession();
    const isAuthenticated = !!session && !error;
    ```
+
 5. Zbudować strukturę strony:
    ```astro
    <BaseLayout title="10xFitChart - Śledź postępy treningowe" description="...">
@@ -693,7 +762,7 @@ src/
 
 1. Upewnić się, że w `tailwind.config.js` jest włączony dark mode:
    ```js
-   darkMode: "class"
+   darkMode: "class";
    ```
 2. Dodać klasę `dark` do `<html>` w `BaseLayout.astro`
 3. Użyć zmiennych CSS z Shadcn/ui dla spójnych kolorów:
@@ -730,6 +799,7 @@ src/
 ### Krok 15: Dodanie meta tagów SEO
 
 W `BaseLayout.astro` dodać:
+
 1. `<meta name="description" content="...">`
 2. Open Graph tags:
    - `og:title`
@@ -786,6 +856,7 @@ W `BaseLayout.astro` dodać:
 ## Uwagi końcowe
 
 ### Priorytety dla MVP:
+
 1. ✅ Funkcjonalność podstawowa (przyciski działają, sesja wykrywana)
 2. ✅ Responsywność (szczególnie desktop)
 3. ✅ Dostępność (a11y podstawowa)
@@ -793,16 +864,19 @@ W `BaseLayout.astro` dodać:
 5. ⚠️ Zaawansowane SEO (out-of-scope)
 
 ### Szacowany czas implementacji:
+
 - Doświadczony programista: **4-6 godzin**
 - Junior programista: **8-12 godzin**
 
 ### Zależności:
+
 - Supabase Auth musi być skonfigurowane
 - Shadcn/ui Button musi być zainstalowany
 - Tailwind CSS 4 musi być skonfigurowany z dark mode
 - Strony `/register`, `/login`, `/dashboard` muszą istnieć (mogą być placeholder)
 
 ### Możliwe rozszerzenia (poza MVP):
+
 - Animacje scroll (framer-motion)
 - Video demo w Hero Section
 - Sekcja testimoniali

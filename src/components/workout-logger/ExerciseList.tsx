@@ -1,6 +1,6 @@
 /**
  * Exercise List Component
- * 
+ *
  * Displays list of exercises in the workout
  */
 
@@ -22,9 +22,7 @@ export const ExerciseList = ({
           <Dumbbell className="h-12 w-12 opacity-50" />
           <div>
             <p className="font-medium">Brak ćwiczeń w treningu</p>
-            <p className="text-sm mt-1">
-              Dodaj pierwsze ćwiczenie, aby rozpocząć
-            </p>
+            <p className="text-sm mt-1">Dodaj pierwsze ćwiczenie, aby rozpocząć</p>
           </div>
         </div>
       </div>
@@ -39,7 +37,7 @@ export const ExerciseList = ({
           <div className="absolute -left-3 -top-3 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm">
             {index + 1}
           </div>
-          
+
           <ExerciseCard
             exercise={exercise}
             onRemove={() => onRemoveExercise(exercise.id)}

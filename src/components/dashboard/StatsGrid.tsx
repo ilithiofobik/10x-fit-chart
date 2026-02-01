@@ -11,12 +11,7 @@ import type { StatsGridProps } from "@/types";
 export function StatsGrid({ stats, isLoading }: StatsGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard
-        icon={Dumbbell}
-        label="Łącznie treningów"
-        value={stats?.total_workouts}
-        isLoading={isLoading}
-      />
+      <StatCard icon={Dumbbell} label="Łącznie treningów" value={stats?.total_workouts} isLoading={isLoading} />
 
       <StatCard
         icon={ListChecks}
@@ -34,12 +29,7 @@ export function StatsGrid({ stats, isLoading }: StatsGridProps) {
         isLoading={isLoading}
       />
 
-      <StatCard
-        icon={Activity}
-        label="Unikalne ćwiczenia"
-        value={stats?.unique_exercises}
-        isLoading={isLoading}
-      />
+      <StatCard icon={Activity} label="Unikalne ćwiczenia" value={stats?.unique_exercises} isLoading={isLoading} />
     </div>
   );
 }

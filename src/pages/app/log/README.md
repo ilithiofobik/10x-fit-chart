@@ -9,6 +9,7 @@ Główny widok do wprowadzania danych treningowych. Umożliwia szybkie logowanie
 ## Funkcjonalność
 
 ### Podstawowe
+
 - ✅ Wybór daty treningu (backdating support)
 - ✅ Dodawanie notatek (max 1000 znaków)
 - ✅ Wyszukiwanie i wybór ćwiczeń
@@ -16,6 +17,7 @@ Główny widok do wprowadzania danych treningowych. Umożliwia szybkie logowanie
 - ✅ Kopiowanie ostatniego treningu
 
 ### Logowanie serii
+
 - ✅ **Siłowe**: Ciężar (kg) + Powtórzenia
 - ✅ **Cardio**: Dystans (km) + Czas (min)
 - ✅ Dynamiczne pola w zależności od typu
@@ -23,6 +25,7 @@ Główny widok do wprowadzania danych treningowych. Umożliwia szybkie logowanie
 - ✅ Keyboard navigation (Tab/Enter)
 
 ### Smart Features
+
 - ✅ Auto-save do localStorage (protection przed F5)
 - ✅ Debounced persistence (500ms)
 - ✅ Loading states dla wszystkich akcji
@@ -54,6 +57,7 @@ Widok składa się z 10 komponentów React:
 ## User Stories
 
 Widok realizuje następujące User Stories z PRD:
+
 - **US-006**: Backdating support
 - **US-007**: Logowanie siłowe z 1RM/Volume
 - **US-008**: Logowanie cardio z prędkością
@@ -73,6 +77,7 @@ Widok realizuje następujące User Stories z PRD:
 Bundle size: **156.73 kB** (45.98 kB gzipped)
 
 Optymalizacje:
+
 - Debounced localStorage save
 - useCallback dla event handlers
 - Conditional rendering (exercises list)
@@ -81,6 +86,7 @@ Optymalizacje:
 ## Testing Checklist
 
 ### Manual Testing
+
 - [ ] Dodawanie ćwiczenia siłowego
 - [ ] Dodawanie ćwiczenia cardio
 - [ ] Tworzenie nowego ćwiczenia inline
@@ -98,6 +104,7 @@ Optymalizacje:
 - [ ] Loading states
 
 ### Edge Cases
+
 - [ ] Brak internetu podczas zapisu
 - [ ] Sesja wygasła (401)
 - [ ] Błędy walidacji (400)

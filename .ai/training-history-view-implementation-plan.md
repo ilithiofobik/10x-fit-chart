@@ -7,11 +7,13 @@ Widok Historia Treningów (Workout History) służy do przeglądania archiwum ws
 ## 2. Routing widoku
 
 ### Routing główny (Lista)
+
 - **Ścieżka**: `/app/history`
 - **Plik Astro**: `src/pages/app/history/index.astro`
 - **Typ**: Strona chroniona autoryzacją (middleware)
 
 ### Routing szczegółów (Edycja)
+
 - **Ścieżka**: `/app/history/[id]`
 - **Plik Astro**: `src/pages/app/history/[id].astro`
 - **Typ**: Strona chroniona autoryzacją (middleware)
@@ -20,6 +22,7 @@ Widok Historia Treningów (Workout History) służy do przeglądania archiwum ws
 ## 3. Struktura komponentów
 
 ### Widok listy (`/app/history`)
+
 ```
 HistoryPage (Astro)
 └── HistoryListProvider (React Context)
@@ -37,6 +40,7 @@ HistoryPage (Astro)
 ```
 
 ### Widok edycji (`/app/history/[id]`)
+
 ```
 EditWorkoutPage (Astro)
 └── WorkoutEditorProvider (React Context - reużycie logiki WorkoutLogger)
@@ -57,32 +61,36 @@ EditWorkoutPage (Astro)
 
 ### 4.1. HistoryListProvider
 
-**Opis komponentu**: 
+**Opis komponentu**:
 Provider React Context zarządzający stanem listy treningów. Obsługuje paginację, filtrowanie, oraz infinite scroll. Odpowiada za pobieranie danych z API i zarządzanie stanem ładowania.
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `<div>` kontener główny
 - `HistoryListHeader` - nagłówek z filtrami
 - `HistoryList` - lista kart treningów
 - `EmptyState` - stan pusty (gdy brak treningów)
 
 **Obsługiwane zdarzenia**:
+
 - `onLoadMore` - ładowanie kolejnej strony wyników (offset += limit)
 - `onFilterChange` - zmiana filtrów daty lub ćwiczenia
 - `onResetFilters` - reset filtrów do wartości domyślnych
 
 **Warunki walidacji**:
+
 - Daty: start_date <= end_date
 - Limit: 1-100 (domyślnie 20)
 - Offset: >= 0
 
 **Typy**:
+
 - `HistoryListState` (ViewModel)
 - `ListWorkoutsResponse` (API DTO)
 - `WorkoutListItemDTO` (API DTO)
 - `HistoryFilters` (ViewModel)
 
-**Propsy**: 
+**Propsy**:
 Brak (komponent root na stronie)
 
 ---
@@ -93,6 +101,7 @@ Brak (komponent root na stronie)
 Nagłówek widoku listy zawierający tytuł, opis oraz kontrolki filtrowania po zakresie dat i ćwiczeniu.
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `<div>` kontener nagłówka
 - `<h1>` tytuł "Historia Treningów"
 - `<p>` opis widoku
@@ -100,17 +109,21 @@ Nagłówek widoku listy zawierający tytuł, opis oraz kontrolki filtrowania po 
 - `Button` "Resetuj filtry"
 
 **Obsługiwane zdarzenia**:
+
 - `onFilterChange(filters: HistoryFilters)` - zmiana filtrów
 - `onResetFilters()` - reset filtrów
 
 **Warunki walidacji**:
+
 - start_date musi być <= end_date
 - Exercise filter: opcjonalny UUID z listy dostępnych ćwiczeń
 
 **Typy**:
+
 - `HistoryFilters` (ViewModel)
 
 **Propsy**:
+
 ```typescript
 interface HistoryListHeaderProps {
   filters: HistoryFilters;
@@ -128,12 +141,14 @@ interface HistoryListHeaderProps {
 Lista treningów wyświetlana w formie kart. Obsługuje infinite scroll poprzez "Load More" button. Renderuje pusty stan jeśli użytkownik nie ma treningów lub wszystkie zostały odfiltrowane.
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `<div>` kontener listy z grid layout
 - `WorkoutSummaryCard[]` - karty treningów (array)
 - `LoadMoreButton` - przycisk ładowania kolejnych treningów
 - `Skeleton` (podczas ładowania)
 
 **Obsługivane zdarzenia**:
+
 - `onLoadMore()` - kliknięcie "Pokaż więcej"
 - `onEditWorkout(workoutId: string)` - przekierowanie do edycji
 
@@ -141,10 +156,12 @@ Lista treningów wyświetlana w formie kart. Obsługuje infinite scroll poprzez 
 Brak - komponent prezentacyjny
 
 **Typy**:
+
 - `WorkoutListItemDTO[]` (API DTO)
 - `PaginationDTO` (API DTO)
 
 **Propsy**:
+
 ```typescript
 interface HistoryListProps {
   workouts: WorkoutListItemDTO[];
@@ -162,6 +179,7 @@ interface HistoryListProps {
 Karta podsumowująca pojedynczy trening. Wyświetla datę, liczbę ćwiczeń, liczbę serii, skrócone notatki oraz przycisk edycji.
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `<Card>` z Shadcn/ui
 - `<CardHeader>`
   - `WorkoutDateBadge` - data treningu
@@ -174,15 +192,18 @@ Karta podsumowująca pojedynczy trening. Wyświetla datę, liczbę ćwiczeń, li
   - `Button` "Edytuj" (link do `/app/history/[id]`)
 
 **Obsługiwane zdarzenia**:
+
 - `onEdit()` - kliknięcie przycisku edycji (przekierowanie)
 
 **Warunki walidacji**:
 Brak - komponent prezentacyjny
 
 **Typy**:
+
 - `WorkoutListItemDTO` (API DTO)
 
 **Propsy**:
+
 ```typescript
 interface WorkoutSummaryCardProps {
   workout: WorkoutListItemDTO;
@@ -197,6 +218,7 @@ interface WorkoutSummaryCardProps {
 Provider React Context zarządzający stanem edytowanego treningu. Re-używa logikę `WorkoutLoggerProvider`, ale działa w trybie edycji (PUT zamiast POST). Pobiera szczegóły treningu z API przy inicjalizacji (`GET /api/workouts/:id`), umożliwia edycję i zapisuje zmiany (`PUT /api/workouts/:id`).
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `<div>` kontener główny
 - `EditWorkoutHeader` - nagłówek z datą i notatkami
 - `ExerciseCombobox` - dodawanie nowych ćwiczeń
@@ -204,11 +226,13 @@ Provider React Context zarządzający stanem edytowanego treningu. Re-używa log
 - `WorkoutEditorActions` - przyciski akcji (Zapisz, Usuń, Anuluj)
 
 **Obsługiwane zdarzenia**:
+
 - `onSave()` - zapisanie zmian (PUT)
 - `onDelete()` - usunięcie treningu (DELETE z potwierdzeniem)
 - `onCancel()` - anulowanie (powrót do listy)
 
 **Warunki walidacji**:
+
 - Data: format YYYY-MM-DD, nie może być w przyszłości
 - Notatki: max 1000 znaków
 - Minimum 1 ćwiczenie
@@ -217,11 +241,13 @@ Provider React Context zarządzający stanem edytowanego treningu. Re-używa log
   - Cardio: distance > 0, time > 0
 
 **Typy**:
+
 - `WorkoutEditorState` (ViewModel, rozszerzenie `WorkoutLoggerState`)
 - `WorkoutDetailsDTO` (API DTO)
 - `UpdateWorkoutCommand` (API Command)
 
 **Propsy**:
+
 ```typescript
 interface WorkoutEditorProviderProps {
   workoutId: string;
@@ -236,6 +262,7 @@ interface WorkoutEditorProviderProps {
 Nagłówek widoku edycji treningu. Wyświetla kontrolki do edycji daty i notatek. Dodatkowo pokazuje oryginalną datę utworzenia dla transparentności (read-only).
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `<div>` kontener nagłówka
 - `<h1>` "Edytuj Trening"
 - `<Label>` + `<Input type="date">` - edycja daty treningu
@@ -243,18 +270,22 @@ Nagłówek widoku edycji treningu. Wyświetla kontrolki do edycji daty i notatek
 - `<p>` muted text: "Utworzono: {created_at}" (read-only)
 
 **Obsługiwane zdarzenia**:
+
 - `onDateChange(date: string)` - zmiana daty
 - `onNotesChange(notes: string)` - zmiana notatek
 
 **Warunki walidacji**:
+
 - Data: nie może być w przyszłości (max: today)
 - Notatki: max 1000 znaków
 
 **Typy**:
+
 - `string` (date)
 - `string | null` (notes)
 
 **Propsy**:
+
 ```typescript
 interface EditWorkoutHeaderProps {
   date: string;
@@ -273,17 +304,20 @@ interface EditWorkoutHeaderProps {
 Panel z przyciskami akcji dla widoku edycji: Zapisz, Usuń, Anuluj. Odpowiada za walidację przed zapisem i potwierdzenie przed usunięciem.
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `<div>` kontener z flexbox
 - `Button` "Zapisz zmiany" (primary, disabled gdy invalid)
 - `AlertDialog` + `Button` "Usuń trening" (destructive)
 - `Button` "Anuluj" (ghost)
 
 **Obsługiwane zdarzenia**:
+
 - `onSave()` - zapis zmian (PUT)
 - `onDelete()` - usunięcie treningu (DELETE)
 - `onCancel()` - anulowanie (powrót)
 
 **Warunki walidacji**:
+
 - Zapisz: wyłączony gdy `!isValid` (brak ćwiczeń lub niepełne serie)
 - Usuń: wymaga potwierdzenia w `AlertDialog`
 
@@ -291,6 +325,7 @@ Panel z przyciskami akcji dla widoku edycji: Zapisz, Usuń, Anuluj. Odpowiada za
 Brak dodatkowych typów (używa callback functions)
 
 **Propsy**:
+
 ```typescript
 interface WorkoutEditorActionsProps {
   isValid: boolean;
@@ -310,19 +345,23 @@ interface WorkoutEditorActionsProps {
 Przycisk do ładowania kolejnej strony treningów (infinite scroll trigger). Wyświetla stan ładowania oraz informację o braku kolejnych wyników.
 
 **Główne elementy HTML i komponenty dzieci**:
+
 - `Button` "Pokaż więcej" z loaderem
 - Alternatywnie: `<p>` "Brak kolejnych treningów"
 
 **Obsługiwane zdarzenia**:
+
 - `onClick()` - ładowanie kolejnych wyników
 
 **Warunki walidacji**:
 Brak - komponent prezentacyjny
 
 **Typy**:
+
 - `boolean` (hasMore, isLoading)
 
 **Propsy**:
+
 ```typescript
 interface LoadMoreButtonProps {
   hasMore: boolean;
@@ -363,7 +402,7 @@ export interface HistoryListState {
 /**
  * Stan edytora treningu (rozszerzenie WorkoutLoggerState)
  */
-export interface WorkoutEditorState extends Omit<WorkoutLoggerState, 'isSaving'> {
+export interface WorkoutEditorState extends Omit<WorkoutLoggerState, "isSaving"> {
   workoutId: string;
   originalDate: string;
   createdAt: string;
@@ -376,18 +415,22 @@ export interface WorkoutEditorState extends Omit<WorkoutLoggerState, 'isSaving'>
 ### 5.2. Typy API (istniejące, używane w widoku)
 
 **Request/Response dla listy:**
+
 - Request: `GET /api/workouts?limit={limit}&offset={offset}&start_date={start_date}&end_date={end_date}&order=desc`
 - Response: `ListWorkoutsResponse` (zawiera `workouts: WorkoutListItemDTO[]`, `pagination: PaginationDTO`)
 
 **Request/Response dla szczegółów:**
+
 - Request: `GET /api/workouts/:id`
 - Response: `WorkoutDetailsDTO` (zawiera `sets: WorkoutSetDTO[]`)
 
 **Request/Response dla aktualizacji:**
+
 - Request: `PUT /api/workouts/:id` z body `UpdateWorkoutCommand`
 - Response: `WorkoutDetailsDTO`
 
 **Request/Response dla usunięcia:**
+
 - Request: `DELETE /api/workouts/:id`
 - Response: `MessageResponse`
 
@@ -398,6 +441,7 @@ export interface WorkoutEditorState extends Omit<WorkoutLoggerState, 'isSaving'>
 **Zarządzanie stanem**: React Context API + `useReducer` hook
 
 **Stan przechowuje**:
+
 - `workouts: WorkoutListItemDTO[]` - załadowane treningi
 - `pagination: PaginationDTO` - metadata paginacji
 - `filters: HistoryFilters` - aktualne filtry
@@ -407,6 +451,7 @@ export interface WorkoutEditorState extends Omit<WorkoutLoggerState, 'isSaving'>
 - `error: string | null` - błędy API
 
 **Akcje reducera**:
+
 - `LOAD_WORKOUTS_START` - rozpoczęcie ładowania
 - `LOAD_WORKOUTS_SUCCESS` - sukces (replace workouts)
 - `LOAD_MORE_START` - rozpoczęcie load more
@@ -417,12 +462,13 @@ export interface WorkoutEditorState extends Omit<WorkoutLoggerState, 'isSaving'>
 - `SET_AVAILABLE_EXERCISES` - załadowanie listy ćwiczeń
 
 **Custom hook**: `useHistoryList`
+
 - Inicjalizacja: pobiera listę ćwiczeń (`GET /api/exercises`) oraz pierwszą stronę treningów (`GET /api/workouts`)
 - `loadMore()` - zwiększa offset i doładowuje kolejne treningi
 - `applyFilters(filters)` - resetuje offset do 0 i pobiera odfiltrowane wyniki
 - `resetFilters()` - resetuje filtry i przeładowuje listę
 
-**Persistence**: 
+**Persistence**:
 Brak (nie ma potrzeby zapisywania stanu w localStorage - użytkownik tylko przegląda)
 
 ---
@@ -432,6 +478,7 @@ Brak (nie ma potrzeby zapisywania stanu w localStorage - użytkownik tylko przeg
 **Zarządzanie stanem**: Re-użycie logiki `WorkoutLoggerProvider` z rozszerzeniem
 
 **Stan przechowuje** (wszystko z `WorkoutLoggerState` plus):
+
 - `workoutId: string` - ID edytowanego treningu
 - `originalDate: string` - oryginalna data (do porównania)
 - `createdAt: string` - timestamp utworzenia (read-only display)
@@ -439,12 +486,14 @@ Brak (nie ma potrzeby zapisywania stanu w localStorage - użytkownik tylko przeg
 - `isDeleting: boolean` - stan usuwania
 
 **Akcje reducera** (wszystkie z `workoutLoggerReducer` plus):
+
 - `LOAD_WORKOUT_START` - rozpoczęcie ładowania szczegółów
 - `LOAD_WORKOUT_SUCCESS` - sukces (populate state)
 - `LOAD_WORKOUT_ERROR` - błąd
 - `SET_DELETING` - ustawienie stanu usuwania
 
 **Custom hook**: `useWorkoutEditor`
+
 - Inicjalizacja: pobiera szczegóły treningu (`GET /api/workouts/:id`) i populuje stan
 - `saveWorkout()` - wysyła `PUT /api/workouts/:id` z `UpdateWorkoutCommand`
 - `deleteWorkout()` - wysyła `DELETE /api/workouts/:id`, po sukcesie redirect do `/app/history`
@@ -460,6 +509,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 **Endpoint**: `GET /api/workouts`
 
 **Query Parameters**:
+
 - `limit` (optional): 1-100, default 20
 - `offset` (optional): >= 0, default 0
 - `start_date` (optional): YYYY-MM-DD
@@ -467,6 +517,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 - `order` (optional): `asc` | `desc`, default `desc`
 
 **Request Headers**:
+
 - `Authorization: Bearer {access_token}` (automatycznie z middleware)
 
 **Response Type**: `ListWorkoutsResponse`
@@ -479,6 +530,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 ```
 
 **Błędy**:
+
 - `401 Unauthorized` - brak sesji (redirect do `/login`)
 - `500 Internal Server Error` - błąd serwera (toast error)
 
@@ -489,9 +541,11 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 **Endpoint**: `GET /api/workouts/:id`
 
 **Path Parameter**:
+
 - `id` - UUID treningu
 
 **Request Headers**:
+
 - `Authorization: Bearer {access_token}`
 
 **Response Type**: `WorkoutDetailsDTO`
@@ -509,6 +563,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 ```
 
 **Błędy**:
+
 - `401 Unauthorized` - brak sesji
 - `404 Not Found` - trening nie istnieje lub nie należy do użytkownika (redirect do `/app/history`)
 - `500 Internal Server Error` - błąd serwera
@@ -520,9 +575,11 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 **Endpoint**: `PUT /api/workouts/:id`
 
 **Path Parameter**:
+
 - `id` - UUID treningu
 
 **Request Headers**:
+
 - `Content-Type: application/json`
 - `Authorization: Bearer {access_token}`
 
@@ -539,6 +596,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 **Response Type**: `WorkoutDetailsDTO`
 
 **Błędy**:
+
 - `400 Bad Request` - walidacja nie powiodła się (toast z komunikatem)
 - `404 Not Found` - trening nie istnieje
 - `500 Internal Server Error` - błąd serwera
@@ -550,9 +608,11 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 **Endpoint**: `DELETE /api/workouts/:id`
 
 **Path Parameter**:
+
 - `id` - UUID treningu
 
 **Request Headers**:
+
 - `Authorization: Bearer {access_token}`
 
 **Response Type**: `MessageResponse`
@@ -564,6 +624,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 ```
 
 **Błędy**:
+
 - `404 Not Found` - trening nie istnieje
 - `500 Internal Server Error` - błąd serwera
 
@@ -576,6 +637,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 **Endpoint**: `GET /api/exercises`
 
 **Query Parameters**:
+
 - `include_archived` (optional): `false` (domyślnie)
 
 **Response Type**: `ListExercisesResponse`
@@ -591,12 +653,14 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 ### 8.1. Widok listy treningów (`/app/history`)
 
 **1. Przeglądanie listy**
+
 - Użytkownik wchodzi na `/app/history`
 - System pobiera pierwszą stronę treningów (20 najnowszych)
 - Lista wyświetla karty treningów w kolejności malejącej (najnowsze na górze)
 - Każda karta pokazuje: datę, liczbę ćwiczeń, liczbę serii, notatki (skrócone)
 
 **2. Infinite scroll (Load More)**
+
 - Na dole listy widoczny przycisk "Pokaż więcej" (gdy `pagination.has_more === true`)
 - Kliknięcie: system zwiększa offset o limit i doładowuje kolejne treningi
 - Nowe treningi appendowane do istniejącej listy
@@ -604,27 +668,32 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 - Gdy brak kolejnych: przycisk znika, pojawia się tekst "To wszystkie treningi"
 
 **3. Filtrowanie po dacie**
+
 - Użytkownik klika przycisk "Filtry" w nagłówku
 - Otwiera się Popover z dwoma date-pickerami (start_date, end_date)
 - Wybór dat → zamknięcie Popover → reset offset → przeładowanie listy z filtrami
 - System waliduje: start_date <= end_date, pokazuje toast błędu jeśli nieprawidłowe
 
 **4. Filtrowanie po ćwiczeniu**
+
 - W Popover filtrów dostępny Select z listą ćwiczeń
 - Wybór ćwiczenia → przeładowanie listy (tylko treningi zawierające to ćwiczenie)
 - **Uwaga**: Backend nie ma natywnego wsparcia dla tego filtru w `GET /api/workouts`
   - **Rozwiązanie**: Filtrowanie po stronie klienta (w reducerze) lub rozszerzenie API
 
 **5. Reset filtrów**
+
 - Przycisk "Resetuj filtry"
 - Ustawia domyślne wartości: brak dat, brak exercise_id
 - Przeładowuje listę bez filtrów
 
 **6. Edycja treningu**
+
 - Użytkownik klika przycisk "Edytuj" na karcie treningu
 - Przekierowanie do `/app/history/[id]`
 
 **7. Pusty stan**
+
 - Jeśli użytkownik nie ma żadnych treningów: `EmptyState` z tekstem "Nie masz jeszcze żadnych treningów"
 - Link "Zaloguj pierwszy trening" → `/app/log`
 
@@ -633,45 +702,54 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 ### 8.2. Widok edycji treningu (`/app/history/[id]`)
 
 **1. Wczytywanie treningu**
+
 - Użytkownik wchodzi na `/app/history/[id]`
 - System pobiera szczegóły treningu (`GET /api/workouts/:id`)
 - Formularz wypełnia się danymi: data, notatki, ćwiczenia z seriami
 - Skeleton UI podczas ładowania
 
 **2. Edycja daty**
+
 - Użytkownik zmienia datę w date-pickerze
 - Walidacja: nie może być w przyszłości (max: today)
 - Toast błędu jeśli nieprawidłowa
 
 **3. Edycja notatek**
+
 - Użytkownik modyfikuje tekst w Textarea
 - Walidacja: max 1000 znaków (licznik znaków poniżej pola)
 
 **4. Edycja serii**
+
 - Użytkownik zmienia wartości w istniejących seriach (weight, reps, distance, time)
 - Walidacja w czasie rzeczywistym (zgodnie z typem ćwiczenia)
 - Pola invalid highlight (border-red) przy błędnych wartościach
 
 **5. Dodawanie serii**
+
 - Użytkownik klika "Dodaj serię" w ramach ćwiczenia
 - Nowy pusty wiersz pojawia się na końcu listy serii
 - Focus przenosi się do pierwszego pola
 
 **6. Usuwanie serii**
+
 - Użytkownik klika ikonę kosza przy serii
 - Seria usuwana bez potwierdzenia (można cofnąć przez Anuluj całej edycji)
 - Nie można usunąć ostatniej serii (minimalnie 1 seria w ćwiczeniu)
 
 **7. Dodawanie ćwiczenia**
+
 - Użytkownik wybiera ćwiczenie z ExerciseCombobox
 - Nowe ćwiczenie dodawane na koniec listy z 1 pustą serią
 
 **8. Usuwanie ćwiczenia**
+
 - Użytkownik klika przycisk "Usuń" w nagłówku ćwiczenia
 - Ćwiczenie usuwane bez potwierdzenia
 - Nie można usunąć ostatniego ćwiczenia (minimalnie 1 ćwiczenie w treningu)
 
 **9. Zapisywanie zmian**
+
 - Użytkownik klika "Zapisz zmiany"
 - Walidacja całego formularza (min 1 ćwiczenie, wszystkie serie wypełnione)
 - System wysyła `PUT /api/workouts/:id`
@@ -679,12 +757,14 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 - Po błędzie: Toast z komunikatem błędu (pozostaje w widoku edycji)
 
 **10. Usuwanie treningu**
+
 - Użytkownik klika "Usuń trening"
 - AlertDialog z potwierdzeniem: "Czy na pewno chcesz usunąć ten trening? Tej operacji nie można cofnąć."
 - Po potwierdzeniu: System wysyła `DELETE /api/workouts/:id`
 - Po sukcesie: Toast "Trening usunięty" + redirect do `/app/history`
 
 **11. Anulowanie edycji**
+
 - Użytkownik klika "Anuluj"
 - Jeśli wprowadzono zmiany: Potwierdzenie "Masz niezapisane zmiany. Czy na pewno chcesz wyjść?"
 - Po potwierdzeniu lub braku zmian: Redirect do `/app/history`
@@ -696,6 +776,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 **Komponent**: `FilterControls` w `HistoryListHeader`
 
 **Warunki**:
+
 1. **Zakres dat**:
    - `start_date` <= `end_date`
    - Jeśli naruszony: Toast "Data początkowa nie może być późniejsza niż data końcowa"
@@ -706,6 +787,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
    - Brak walidacji (select ogranicza wybór do prawidłowych wartości)
 
 **Wpływ na UI**:
+
 - Nieprawidłowe daty: przycisk "Zastosuj" wyłączony
 - Brak wybranego ćwiczenia: filtr ignorowany (pokazuje wszystkie)
 
@@ -750,6 +832,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
    - Przycisk "Usuń serię" wyłączony gdy tylko 1 seria
 
 **Wpływ na UI**:
+
 - Wszystkie warunki muszą być spełnione aby `isValid === true`
 - `isValid === false` → przycisk "Zapisz zmiany" wyłączony (disabled + tooltip)
 - Invalid pola: czerwony border + pomocniczy tekst pod polem
@@ -761,6 +844,7 @@ Brak (edycja istniejącego rekordu, nie ma potrzeby localStorage)
 API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szczegółami.
 
 **Obsługa błędów w UI**:
+
 - `400` → Toast z komunikatem błędu z API (np. "Invalid date format")
 - `404` → Toast "Trening nie został znaleziony" + redirect do `/app/history`
 - `500` → Toast "Wystąpił błąd serwera. Spróbuj ponownie później."
@@ -772,6 +856,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 **Scenariusz**: Błąd podczas `GET /api/workouts`
 
 **Obsługa**:
+
 - Stan: `error: string` w `HistoryListState`
 - UI: `ErrorState` komponent z komunikatem błędu + przycisk "Spróbuj ponownie"
 - Kliknięcie: Ponowne wywołanie `loadWorkouts()`
@@ -784,6 +869,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 **Scenariusz**: Błąd podczas ładowania kolejnej strony
 
 **Obsługa**:
+
 - Toast: "Nie udało się załadować kolejnych treningów"
 - Przycisk "Pokaż więcej" pozostaje aktywny (użytkownik może spróbować ponownie)
 - Offset nie jest zwiększany (kolejna próba pobierze te same dane)
@@ -795,6 +881,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 **Scenariusz**: Błąd podczas `GET /api/workouts/:id`
 
 **Obsługa**:
+
 - `404`: Toast "Trening nie został znaleziony" + redirect do `/app/history`
 - `401`: Redirect do `/login` (middleware powinien to obsłużyć wcześniej)
 - `500`: Wyświetlenie `ErrorState` z komunikatem + przycisk "Spróbuj ponownie"
@@ -806,6 +893,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 **Scenariusz**: Błąd podczas `PUT /api/workouts/:id`
 
 **Obsługa**:
+
 - `400`: Toast z komunikatem walidacji z API (np. "Date cannot be in the future")
 - `404`: Toast "Trening nie został znaleziony" + redirect do `/app/history`
 - `500`: Toast "Nie udało się zapisać zmian. Spróbuj ponownie."
@@ -818,6 +906,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 **Scenariusz**: Błąd podczas `DELETE /api/workouts/:id`
 
 **Obsługa**:
+
 - `404`: Toast "Trening został już usunięty" + redirect do `/app/history`
 - `500`: Toast "Nie udało się usunąć treningu. Spróbuj ponownie."
 - AlertDialog pozostaje otwarty (użytkownik może zamknąć lub spróbować ponownie)
@@ -829,6 +918,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 **Scenariusz**: Brak połączenia z internetem lub timeout
 
 **Obsługa**:
+
 - Catch w bloku `try/catch` dla wszystkich fetch calls
 - Toast: "Brak połączenia z internetem. Sprawdź połączenie i spróbuj ponownie."
 - Przycisk akcji pozostaje aktywny (możliwość retry)
@@ -840,6 +930,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 **Scenariusz**: Użytkownik edytuje trening w jednej zakładce, a w drugiej go usuwa
 
 **Obsługa**:
+
 - Podczas zapisu: API zwraca `404`
 - Toast: "Trening został już usunięty" + redirect do `/app/history`
 
@@ -881,6 +972,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 ### Krok 3: Implementacja listy treningów (Lista)
 
 1. Utworzyć strukturę katalogów:
+
    ```
    src/pages/app/history/
    ├── index.astro
@@ -917,7 +1009,8 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
    - Layout: `LayoutApp`
    - SSR: pobieranie exercises server-side (opcjonalnie)
 
-**Akceptacja**: 
+**Akceptacja**:
+
 - Widok `/app/history` renderuje listę treningów
 - Infinite scroll działa poprawnie
 - Filtry aplikują się i resetują bez błędów
@@ -928,6 +1021,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 ### Krok 4: Implementacja edytora treningu (Edycja)
 
 1. Utworzyć strukturę katalogów:
+
    ```
    src/pages/app/history/
    ├── [id].astro
@@ -964,6 +1058,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
    - Przekazanie `workoutId` z params do providera
 
 **Akceptacja**:
+
 - Widok `/app/history/[id]` ładuje szczegóły treningu
 - Edycja daty, notatek, serii działa poprawnie
 - Walidacja działa (invalid fields highlight, button disabled)
@@ -989,6 +1084,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
    - Breadcrumb: Dashboard > Historia > Edytuj trening
 
 **Akceptacja**:
+
 - Wszystkie linki działają poprawnie
 - Aktywny state w nawigacji jest prawidłowy
 - Breadcrumbs są widoczne i funkcjonalne
@@ -1009,6 +1105,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
    - Focus states na wszystkich interaktywnych elementach
 
 **Akceptacja**:
+
 - Widok wygląda spójnie z resztą aplikacji
 - RWD działa na urządzeniach 320px - 1920px
 - Dark mode poprawnie stosuje kolory
@@ -1046,6 +1143,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
    - Usunięcie treningu (weryfikacja w bazie)
 
 **Akceptacja**:
+
 - Wszystkie testy manualne przechodzą bez błędów
 - Brak błędów w konsoli przeglądarki
 - Brak błędów w logach serwera
@@ -1074,6 +1172,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
    - Opisać strukturę i usage dla przyszłych developerów
 
 **Akceptacja**:
+
 - Ładowanie listy < 500ms (dla 20 treningów)
 - Brak warnings w ESLint
 - Kod jest czytelny i dobrze udokumentowany
@@ -1092,6 +1191,7 @@ API waliduje wszystkie warunki ponownie i zwraca błędy `400 Bad Request` z szc
 6. Monitoring błędów (console errors, Sentry jeśli skonfigurowany)
 
 **Akceptacja**:
+
 - Widok działa poprawnie na produkcji
 - Brak błędów w production logs
 - User Stories US-011 i US-012 spełnione w 100%

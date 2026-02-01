@@ -1,6 +1,6 @@
 /**
  * Workout Header Component
- * 
+ *
  * Header section of the workout form containing date picker and notes field.
  */
 
@@ -16,12 +16,7 @@ import { Label } from "../ui/label";
 import type { WorkoutHeaderProps } from "./types";
 import { cn } from "../../lib/utils";
 
-export const WorkoutHeader = ({
-  date,
-  notes,
-  onDateChange,
-  onNotesChange,
-}: WorkoutHeaderProps) => {
+export const WorkoutHeader = ({ date, notes, onDateChange, onNotesChange }: WorkoutHeaderProps) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Parse date string to Date object
@@ -69,17 +64,10 @@ export const WorkoutHeader = ({
               <Button
                 id="workout-date"
                 variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
+                className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? (
-                  format(dateObj, "PPP", { locale: pl })
-                ) : (
-                  <span>Wybierz datę</span>
-                )}
+                {date ? format(dateObj, "PPP", { locale: pl }) : <span>Wybierz datę</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -103,12 +91,7 @@ export const WorkoutHeader = ({
         <div className="space-y-2 sm:col-span-2">
           <div className="flex justify-between items-center">
             <Label htmlFor="workout-notes">Notatki (opcjonalne)</Label>
-            <span
-              className={cn(
-                "text-sm",
-                isNotesOverLimit ? "text-destructive" : "text-muted-foreground"
-              )}
-            >
+            <span className={cn("text-sm", isNotesOverLimit ? "text-destructive" : "text-muted-foreground")}>
               {notesLength}/{maxNotesLength}
             </span>
           </div>

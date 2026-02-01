@@ -5,6 +5,7 @@
 Endpoint zwraca podsumowanie statystyk treningowych użytkownika za określony okres (domyślnie 3 miesiące). Zawiera agregaty (liczba treningów, serii, objętość, unikalne ćwiczenia) oraz listę ostatnich 5 treningów z metadanymi.
 
 **Główne funkcjonalności:**
+
 - Agregacja statystyk w okresie (months wstecz od dziś)
 - Obliczanie total_volume z calculated_volume
 - Lista ostatnich treningów z counts
@@ -15,14 +16,17 @@ Endpoint zwraca podsumowanie statystyk treningowych użytkownika za określony o
 ## 2. Szczegóły żądania
 
 ### HTTP Method & URL
+
 ```
 GET /api/analytics/dashboard?months=3
 ```
 
 ### Query Parameters
+
 - `months` (number, optional) - Liczba miesięcy wstecz (1-12, default: 3)
 
 ### Request Headers
+
 - `Cookie: sb-access-token, sb-refresh-token` (sesja Supabase Auth)
 
 ---
@@ -30,6 +34,7 @@ GET /api/analytics/dashboard?months=3
 ## 3. Wykorzystywane typy
 
 ### Response DTOs
+
 ```typescript
 export interface DashboardSummaryDTO {
   period: PeriodDTO;
@@ -39,26 +44,27 @@ export interface DashboardSummaryDTO {
 
 export interface PeriodDTO {
   start_date: string; // YYYY-MM-DD
-  end_date: string;   // YYYY-MM-DD
-  months: number;     // 1-12
+  end_date: string; // YYYY-MM-DD
+  months: number; // 1-12
 }
 
 export interface SummaryStatsDTO {
   total_workouts: number;
   total_sets: number;
-  total_volume: number;      // SUM(calculated_volume)
+  total_volume: number; // SUM(calculated_volume)
   unique_exercises: number;
 }
 
 export interface RecentWorkoutDTO {
   id: string;
-  date: string;              // YYYY-MM-DD
-  exercise_count: number;    // unique exercises
-  set_count: number;         // total sets
+  date: string; // YYYY-MM-DD
+  exercise_count: number; // unique exercises
+  set_count: number; // total sets
 }
 ```
 
 ### Zod Schema
+
 ```typescript
 const monthsParamSchema = z.coerce
   .number()
@@ -73,6 +79,7 @@ const monthsParamSchema = z.coerce
 ## 4. Szczegóły odpowiedzi
 
 ### Success Response (200 OK)
+
 ```json
 {
   "period": {
@@ -83,7 +90,7 @@ const monthsParamSchema = z.coerce
   "summary": {
     "total_workouts": 36,
     "total_sets": 540,
-    "total_volume": 125000.00,
+    "total_volume": 125000.0,
     "unique_exercises": 12
   },
   "recent_workouts": [
@@ -99,17 +106,18 @@ const monthsParamSchema = z.coerce
 
 ### Error Responses
 
-| Status | Body | Przypadek |
-|--------|------|-----------|
-| 400 | `{ "error": "Invalid input", "details": [...] }` | months < 1 lub > 12 |
-| 401 | `{ "error": "Unauthorized" }` | Brak sesji |
-| 500 | `{ "error": "Internal server error" }` | Błąd DB |
+| Status | Body                                             | Przypadek           |
+| ------ | ------------------------------------------------ | ------------------- |
+| 400    | `{ "error": "Invalid input", "details": [...] }` | months < 1 lub > 12 |
+| 401    | `{ "error": "Unauthorized" }`                    | Brak sesji          |
+| 500    | `{ "error": "Internal server error" }`           | Błąd DB             |
 
 ---
 
 ## 5. Przepływ danych
 
 ### High-Level Flow
+
 ```
 1. Request → Validate months param (default 3)
 2. Calculate period (start_date, end_date)
@@ -120,17 +128,20 @@ const monthsParamSchema = z.coerce
 ```
 
 ### Database Queries
+
 ```typescript
 // 1. Summary aggregates
 const { data: summary } = await supabase
   .from("workouts")
-  .select(`
+  .select(
+    `
     id,
     workout_sets!inner(
       exercise_id,
       calculated_volume
     )
-  `)
+  `
+  )
   .eq("user_id", userId)
   .gte("date", startDate)
   .lte("date", endDate);
@@ -138,11 +149,13 @@ const { data: summary } = await supabase
 // 2. Recent workouts
 const { data: recent } = await supabase
   .from("workouts")
-  .select(`
+  .select(
+    `
     id,
     date,
     workout_sets(id, exercise_id)
-  `)
+  `
+  )
   .eq("user_id", userId)
   .order("date", { ascending: false })
   .order("created_at", { ascending: false })
@@ -150,6 +163,7 @@ const { data: recent } = await supabase
 ```
 
 ### Logic
+
 ```typescript
 // Calculate period
 const endDate = new Date();
@@ -168,6 +182,7 @@ unique_exercises = Set(exercise_ids).size;
 ## 6. Względy bezpieczeństwa
 
 ### Checklist
+
 - ✅ **Auth** - Middleware sprawdza sesję
 - ✅ **Authorization** - Filter przez user_id
 - ✅ **Input validation** - Zod (months 1-12)
@@ -175,12 +190,14 @@ unique_exercises = Set(exercise_ids).size;
 - ✅ **Private data** - tylko dane użytkownika
 
 ### Cache Headers
+
 ```typescript
 headers: {
   "Content-Type": "application/json",
   "Cache-Control": "private, max-age=300, stale-while-revalidate=60"
 }
 ```
+
 Cache: 5 minut (dane rzadko się zmieniają w krótkim czasie).
 
 ---
@@ -195,18 +212,15 @@ try {
 } catch (error) {
   if (error instanceof z.ZodError) {
     return new Response(
-      JSON.stringify({ 
-        error: "Invalid input", 
-        details: error.errors.map(e => e.message) 
+      JSON.stringify({
+        error: "Invalid input",
+        details: error.errors.map((e) => e.message),
       }),
       { status: 400 }
     );
   }
   console.error("Error fetching dashboard summary:", error);
-  return new Response(
-    JSON.stringify({ error: "Internal server error" }),
-    { status: 500 }
-  );
+  return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
 }
 ```
 
@@ -215,12 +229,14 @@ try {
 ## 8. Rozważania dotyczące wydajności
 
 ### Optimization
+
 - **Single query** z nested select dla summary
 - **Separate query** dla recent workouts
 - **In-memory aggregation** (workouts count, sets count, volume sum)
 - **Indexes** na (user_id, date)
 
 ### Expected Latency
+
 - Auth: ~5-10ms
 - Queries: ~50-150ms (2 queries)
 - Aggregation: ~5-10ms
@@ -231,6 +247,7 @@ try {
 ## 9. Etapy wdrożenia
 
 ### Krok 1: Service Layer
+
 **Lokalizacja:** `src/lib/services/analytics.service.ts` (nowy plik)
 
 ```typescript
@@ -246,7 +263,7 @@ export async function getDashboardSummary(
   const endDate = new Date();
   const startDate = new Date();
   startDate.setMonth(startDate.getMonth() - months);
-  
+
   const period: PeriodDTO = {
     start_date: startDate.toISOString().split("T")[0],
     end_date: endDate.toISOString().split("T")[0],
@@ -256,14 +273,16 @@ export async function getDashboardSummary(
   // Query workouts with sets
   const { data: workouts, error: workoutsError } = await supabase
     .from("workouts")
-    .select(`
+    .select(
+      `
       id,
       workout_sets!inner(
         id,
         exercise_id,
         calculated_volume
       )
-    `)
+    `
+    )
     .eq("user_id", userId)
     .gte("date", period.start_date)
     .lte("date", period.end_date);
@@ -278,8 +297,8 @@ export async function getDashboardSummary(
   let total_volume = 0;
   const unique_exercises = new Set<string>();
 
-  (workouts || []).forEach(workout => {
-    (workout.workout_sets || []).forEach(set => {
+  (workouts || []).forEach((workout) => {
+    (workout.workout_sets || []).forEach((set) => {
       total_sets++;
       if (set.calculated_volume) {
         total_volume += Number(set.calculated_volume);
@@ -291,11 +310,13 @@ export async function getDashboardSummary(
   // Query recent workouts
   const { data: recentWorkouts, error: recentError } = await supabase
     .from("workouts")
-    .select(`
+    .select(
+      `
       id,
       date,
       workout_sets(id, exercise_id)
-    `)
+    `
+    )
     .eq("user_id", userId)
     .order("date", { ascending: false })
     .order("created_at", { ascending: false })
@@ -307,10 +328,10 @@ export async function getDashboardSummary(
   }
 
   // Map recent workouts
-  const recent_workouts = (recentWorkouts || []).map(workout => {
+  const recent_workouts = (recentWorkouts || []).map((workout) => {
     const sets = workout.workout_sets || [];
-    const exercise_ids = new Set(sets.map(s => s.exercise_id));
-    
+    const exercise_ids = new Set(sets.map((s) => s.exercise_id));
+
     return {
       id: workout.id,
       date: workout.date,
@@ -333,6 +354,7 @@ export async function getDashboardSummary(
 ```
 
 ### Krok 2: API Endpoint
+
 **Lokalizacja:** `src/pages/api/analytics/dashboard.ts`
 
 ```typescript
@@ -361,9 +383,7 @@ export const GET: APIRoute = async (context) => {
   }
 
   try {
-    const months = monthsParamSchema.parse(
-      context.url.searchParams.get("months")
-    );
+    const months = monthsParamSchema.parse(context.url.searchParams.get("months"));
 
     const summary = await getDashboardSummary(supabase, user.id, months);
 
@@ -386,15 +406,16 @@ export const GET: APIRoute = async (context) => {
     }
 
     console.error("Unexpected error in GET /api/analytics/dashboard:", error);
-    return new Response(
-      JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
 ```
 
 ### Krok 3: Testing
+
 ```bash
 # Happy path
 curl "http://localhost:4321/api/analytics/dashboard?months=3" \
@@ -413,6 +434,7 @@ curl "http://localhost:4321/api/analytics/dashboard"
 ```
 
 ### Krok 4: Checklist
+
 - [x] Service created in correct location
 - [x] Zod validation for months
 - [x] Auth check (401)
@@ -430,6 +452,7 @@ curl "http://localhost:4321/api/analytics/dashboard"
 Endpoint `GET /api/analytics/dashboard` agreguje dane treningowe użytkownika za okres N miesięcy. Oblicza statystyki (workouts, sets, volume, exercises) i zwraca 5 ostatnich treningów.
 
 **Kluczowe punkty:**
+
 - ✅ Query param validation (months 1-12)
 - ✅ Date range calculation
 - ✅ In-memory aggregation (performance)

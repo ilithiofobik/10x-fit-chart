@@ -1,13 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import type { ExerciseFiltersProps } from "@/types";
 
@@ -32,15 +26,12 @@ export default function ExerciseFilters({
   }, [localSearchQuery, onSearchChange]);
 
   // Walidacja długości tekstu wyszukiwania
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      if (value.length <= 100) {
-        setLocalSearchQuery(value);
-      }
-    },
-    []
-  );
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value.length <= 100) {
+      setLocalSearchQuery(value);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col sm:flex-row gap-4">

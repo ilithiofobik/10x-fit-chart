@@ -1,6 +1,6 @@
 /**
  * Set Row Component
- * 
+ *
  * Polymorphic row component that renders different fields based on exercise type
  */
 
@@ -30,7 +30,7 @@ export const SetRow = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, isLastField: boolean) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      
+
       if (isLastField && isLastSet) {
         // Check if current row is complete before adding new set
         const isCurrentRowComplete = isStrength
@@ -60,15 +60,10 @@ export const SetRow = ({
               max="999.99"
               step="0.5"
               value={setData.weight ?? ""}
-              onChange={(e) =>
-                onUpdate({ weight: e.target.value ? parseFloat(e.target.value) : null })
-              }
+              onChange={(e) => onUpdate({ weight: e.target.value ? parseFloat(e.target.value) : null })}
               onKeyDown={(e) => handleKeyDown(e, false)}
               placeholder="0"
-              className={cn(
-                "w-24",
-                !isWeightValid && "border-destructive focus-visible:ring-destructive"
-              )}
+              className={cn("w-24", !isWeightValid && "border-destructive focus-visible:ring-destructive")}
               aria-label={`Seria ${setIndex + 1}: Ciężar`}
               aria-invalid={!isWeightValid}
             />
@@ -81,15 +76,10 @@ export const SetRow = ({
               min="1"
               step="1"
               value={setData.reps ?? ""}
-              onChange={(e) =>
-                onUpdate({ reps: e.target.value ? parseInt(e.target.value) : null })
-              }
+              onChange={(e) => onUpdate({ reps: e.target.value ? parseInt(e.target.value) : null })}
               onKeyDown={(e) => handleKeyDown(e, true)}
               placeholder="0"
-              className={cn(
-                "w-24",
-                !isRepsValid && "border-destructive focus-visible:ring-destructive"
-              )}
+              className={cn("w-24", !isRepsValid && "border-destructive focus-visible:ring-destructive")}
               aria-label={`Seria ${setIndex + 1}: Powtórzenia`}
               aria-invalid={!isRepsValid}
             />
@@ -105,15 +95,10 @@ export const SetRow = ({
               max="999999.99"
               step="0.01"
               value={setData.distance ?? ""}
-              onChange={(e) =>
-                onUpdate({ distance: e.target.value ? parseFloat(e.target.value) : null })
-              }
+              onChange={(e) => onUpdate({ distance: e.target.value ? parseFloat(e.target.value) : null })}
               onKeyDown={(e) => handleKeyDown(e, false)}
               placeholder="0"
-              className={cn(
-                "w-24",
-                !isDistanceValid && "border-destructive focus-visible:ring-destructive"
-              )}
+              className={cn("w-24", !isDistanceValid && "border-destructive focus-visible:ring-destructive")}
               aria-label={`Seria ${setIndex + 1}: Dystans`}
               aria-invalid={!isDistanceValid}
             />
@@ -132,10 +117,7 @@ export const SetRow = ({
               }}
               onKeyDown={(e) => handleKeyDown(e, true)}
               placeholder="0"
-              className={cn(
-                "w-24",
-                !isTimeValid && "border-destructive focus-visible:ring-destructive"
-              )}
+              className={cn("w-24", !isTimeValid && "border-destructive focus-visible:ring-destructive")}
               aria-label={`Seria ${setIndex + 1}: Czas`}
               aria-invalid={!isTimeValid}
             />

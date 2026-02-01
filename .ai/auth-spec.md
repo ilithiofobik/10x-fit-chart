@@ -1,6 +1,7 @@
 # Specyfikacja Techniczna Systemu Autentykacji - 10xFitChart MVP
 
 ## Spis treści
+
 1. [Wstęp](#wstęp)
 2. [Architektura Interfejsu Użytkownika](#architektura-interfejsu-użytkownika)
 3. [Logika Backendowa](#logika-backendowa)
@@ -15,6 +16,7 @@
 Niniejsza specyfikacja opisuje architekturę i implementację systemu autentykacji dla aplikacji 10xFitChart MVP. System realizuje wymagania US-001 (Rejestracja) i US-002 (Logowanie) z dokumentu PRD, wykorzystując stos technologiczny: **Astro 5 (SSR)**, **React 19**, **TypeScript 5**, **Tailwind 4**, **Shadcn/ui** oraz **Supabase Auth**.
 
 ### Zakres funkcjonalny
+
 - **US-001**: Rejestracja nowego użytkownika (email + hasło, automatyczne logowanie po rejestracji)
 - **US-002**: Logowanie użytkownika (email + hasło, przekierowanie do dashboardu)
 - **US-003**: Trwałe usuwanie konta użytkownika (kaskadowe usunięcie danych, wylogowanie, przekierowanie na stronę główną)
@@ -22,7 +24,9 @@ Niniejsza specyfikacja opisuje architekturę i implementację systemu autentykac
 - **Ochrona tras**: Middleware zabezpieczające dostęp do strefy `/app/*`
 
 ### Struktura URL aplikacji
+
 Aplikacja dzieli się na dwie główne strefy URL:
+
 - **Strefa publiczna**: `/` (landing), `/login`, `/register`
 - **Strefa chroniona**: `/app/*` (wszystkie funkcjonalności wymagające logowania)
   - `/app/dashboard` - główny widok po zalogowaniu
@@ -32,6 +36,7 @@ Aplikacja dzieli się na dwie główne strefy URL:
   - `/app/profile` - profil użytkownika i ustawienia konta
 
 ### Ograniczenia MVP
+
 - Brak funkcji odzyskiwania hasła (out-of-scope)
 - Brak weryfikacji emaila (rejestracja bez potwierdzenia)
 - Brak logowania społecznościowego (OAuth)
@@ -46,12 +51,14 @@ Aplikacja dzieli się na dwie główne strefy URL:
 Aplikacja dzieli się na **dwie główne strefy**, różniące się wymaganiami autoryzacyjnymi i sposobem renderowania:
 
 #### Strefa Publiczna (Non-Auth)
+
 - **Ścieżki**: `/`, `/login`, `/register`
 - **Dostęp**: Publiczny (każdy użytkownik, niezależnie od stanu sesji)
 - **Rendering**: Astro SSR (Server-Side Rendering)
 - **Charakterystyka**: Strony statyczne z minimalnymi interakcjami React (wyspy)
 
 #### Strefa Chroniona (Authenticated)
+
 - **Ścieżki**: `/app/*` (np. `/app/dashboard`, `/app/log`, `/app/history`, `/app/exercises`, `/app/profile`)
 - **Dostęp**: Wymaga aktywnej sesji użytkownika
 - **Rendering**: Astro SSR + React Islands (dynamiczne komponenty)
@@ -64,16 +71,18 @@ Aplikacja dzieli się na **dwie główne strefy**, różniące się wymaganiami 
 **Stan obecny**: Strona sprawdza sesję użytkownika server-side i renderuje warunkowo przyciski CTA.
 
 **Zmiany do wprowadzenia**:
+
 - **Modyfikacja komponentu `HeroSection`**: Obecnie renderuje pojedynczy przycisk CTA, wymaga aktualizacji aby renderować:
   - Dla niezalogowanych: **dwa przyciski** - główny "Rozpocznij za darmo" (CTA do `/register`) i drugorzędny "Zaloguj się" (link do `/login`)
   - Dla zalogowanych: przycisk "Przejdź do aplikacji" (link do `/app/dashboard`)
 - Komponent już obsługuje prop `isAuthenticated`, wymaga tylko rozszerzenia logiki renderowania przycisków
 
 **Kluczowe komponenty**:
-- `HeroSection` (React Island, client:load): 
+
+- `HeroSection` (React Island, client:load):
   - Props: `isAuthenticated: boolean`
   - Renderuje warunkowo:
-    - Jeśli `isAuthenticated === false`: 
+    - Jeśli `isAuthenticated === false`:
       - Przycisk główny (CTA): "Rozpocznij za darmo" (link do `/register`)
       - Przycisk drugorzędny: "Zaloguj się" (link do `/login`)
     - Jeśli `isAuthenticated === true`: "Przejdź do aplikacji" (link do `/app/dashboard`)
@@ -81,10 +90,14 @@ Aplikacja dzieli się na **dwie główne strefy**, różniące się wymaganiami 
 - `Footer` (Astro statyczny): Stopka z linkami
 
 **Server-side logic (Astro frontmatter)**:
+
 ```typescript
 // Pobierz sesję z Supabase
 const supabase = supabaseServer(Astro);
-const { data: { session }, error } = await supabase.auth.getSession();
+const {
+  data: { session },
+  error,
+} = await supabase.auth.getSession();
 const isAuthenticated = !!session && !error;
 ```
 
@@ -95,6 +108,7 @@ const isAuthenticated = !!session && !error;
 **Cel**: Umożliwienie utworzenia nowego konta użytkownika.
 
 **Struktura strony** (Astro SSR):
+
 ```typescript
 // src/pages/register.astro
 ---
@@ -124,6 +138,7 @@ if (session) {
 **Komponent `RegisterForm` (React, nowy plik: `src/components/auth/RegisterForm.tsx`)**:
 
 **Struktura komponentu**:
+
 - **Biblioteka formularza**: React Hook Form + Zod
 - **UI**: Shadcn/ui (`Card`, `Input`, `Button`, `Label`)
 - **Stany**:
@@ -131,11 +146,11 @@ if (session) {
   - `error`: string | null (komunikat błędu globalnego)
 
 **Pola formularza**:
+
 1. **Email**:
    - Type: `email`
    - Walidacja: Format emaila (regex Zod), wymagane
    - Placeholder: "twoj@email.pl"
-   
 2. **Hasło**:
    - Type: `password`
    - Walidacja: Minimalna długość 8 znaków, wymagane
@@ -149,10 +164,12 @@ if (session) {
    - **Uwaga**: Pole nie jest wymienione w PRD, ale jest dodane jako dobra praktyka UX (zabezpieczenie przed literówkami)
 
 **Akcje**:
+
 - Przycisk "Zarejestruj się" (primary, disabled gdy `isLoading === true`)
 - Link "Masz już konto? Zaloguj się" (link do `/login`)
 
 **Logika submitu**:
+
 ```typescript
 async function handleSubmit(data: RegisterFormData) {
   setIsLoading(true);
@@ -160,20 +177,20 @@ async function handleSubmit(data: RegisterFormData) {
 
   try {
     // 1. Wywołaj endpoint rejestracji
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: data.email, password: data.password })
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: data.email, password: data.password }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Nieznany błąd');
+      throw new Error(errorData.error || "Nieznany błąd");
     }
 
     // 2. Po sukcesie (201) - automatyczne logowanie następuje po stronie serwera
     // 3. Przekieruj na dashboard
-    window.location.href = '/app/dashboard';
+    window.location.href = "/app/dashboard";
   } catch (err) {
     setError(err.message);
   } finally {
@@ -183,18 +200,22 @@ async function handleSubmit(data: RegisterFormData) {
 ```
 
 **Walidacja client-side (Zod schema)**:
+
 ```typescript
-const registerSchema = z.object({
-  email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków"),
-  confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Hasła muszą być identyczne",
-  path: ["confirmPassword"]
-});
+const registerSchema = z
+  .object({
+    email: z.string().email("Nieprawidłowy format adresu email"),
+    password: z.string().min(8, "Hasło musi mieć minimum 8 znaków"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Hasła muszą być identyczne",
+    path: ["confirmPassword"],
+  });
 ```
 
 **Scenariusze błędów**:
+
 - Email już istnieje (409): "Ten adres email jest już zarejestrowany"
 - Problem z siecią: "Problem z połączeniem. Spróbuj ponownie."
 - Błąd walidacji: Komunikaty pod konkretnymi polami
@@ -206,6 +227,7 @@ const registerSchema = z.object({
 **Cel**: Umożliwienie zalogowania się istniejącego użytkownika.
 
 **Struktura strony** (Astro SSR):
+
 ```typescript
 // src/pages/login.astro
 ---
@@ -235,6 +257,7 @@ if (session) {
 **Komponent `LoginForm` (React, nowy plik: `src/components/auth/LoginForm.tsx`)**:
 
 **Struktura komponentu**:
+
 - **Biblioteka formularza**: React Hook Form + Zod
 - **UI**: Shadcn/ui (`Card`, `Input`, `Button`, `Label`)
 - **Toast**: Dla komunikatów błędów (biblioteka `sonner` lub Shadcn Toast)
@@ -243,22 +266,24 @@ if (session) {
   - `error`: string | null
 
 **Pola formularza**:
+
 1. **Email**:
    - Type: `email`
    - Walidacja: Format emaila, wymagane
    - Placeholder: "twoj@email.pl"
-   
 2. **Hasło**:
    - Type: `password`
    - Walidacja: Wymagane
    - Placeholder: "Twoje hasło"
 
 **Akcje**:
+
 - Przycisk "Zaloguj się" (primary, disabled gdy `isLoading === true`)
 - Link "Nie masz konta? Zarejestruj się" (link do `/register`)
 - ~~Link "Zapomniałeś hasła?"~~ (out-of-scope dla MVP)
 
 **Logika submitu**:
+
 ```typescript
 async function handleSubmit(data: LoginFormData) {
   setIsLoading(true);
@@ -266,23 +291,23 @@ async function handleSubmit(data: LoginFormData) {
 
   try {
     // 1. Wywołaj endpoint logowania
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: data.email, password: data.password })
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: data.email, password: data.password }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Nieznany błąd');
+      throw new Error(errorData.error || "Nieznany błąd");
     }
 
     // 2. Po sukcesie (200) - sesja ustawiona w cookie przez serwer
     // 3. Wyświetl toast sukcesu (opcjonalny)
-    toast.success('Zalogowano pomyślnie');
-    
+    toast.success("Zalogowano pomyślnie");
+
     // 4. Przekieruj na dashboard
-    window.location.href = '/app/dashboard';
+    window.location.href = "/app/dashboard";
   } catch (err) {
     // 5. Wyświetl błąd w Toast
     toast.error(err.message);
@@ -294,14 +319,16 @@ async function handleSubmit(data: LoginFormData) {
 ```
 
 **Walidacja client-side (Zod schema)**:
+
 ```typescript
 const loginSchema = z.object({
   email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string().min(1, "Hasło jest wymagane")
+  password: z.string().min(1, "Hasło jest wymagane"),
 });
 ```
 
 **Scenariusze błędów**:
+
 - Nieprawidłowe dane logowania (401): "Nieprawidłowy email lub hasło"
 - Problem z siecią: "Problem z połączeniem. Spróbuj ponownie."
 - Konto nieaktywne: "Twoje konto zostało zdezaktywowane"
@@ -313,11 +340,13 @@ const loginSchema = z.object({
 **Cel**: Główny widok po zalogowaniu - podsumowanie treningów i statystyk.
 
 **Zmiany do wprowadzenia**:
+
 - **Dodanie nowego layoutu** `LayoutApp.astro` (szczegóły poniżej)
 - **Zastąpienie placeholder** aktualną zawartością dashboardu (zgodnie z ui-plan.md)
 - **Brak zmian** w logice server-side auth (middleware chroni trasę)
 
 **Struktura strony** (Astro SSR):
+
 ```typescript
 // src/pages/app/dashboard.astro
 ---
@@ -341,6 +370,7 @@ import LayoutApp from "@/layouts/LayoutApp.astro";
 **Realizuje**: US-003 (Usuwanie konta)
 
 **Struktura strony** (Astro SSR):
+
 ```typescript
 // src/pages/app/profile.astro
 ---
@@ -356,17 +386,17 @@ const { data: { user } } = await supabase.auth.getUser();
 <LayoutApp title="Profil - 10xFitChart">
   <div class="max-w-2xl mx-auto py-8 px-4">
     <h1 class="text-3xl font-bold mb-6">Profil użytkownika</h1>
-    
+
     <div class="space-y-6">
       <div>
         <label class="text-sm text-muted-foreground">Email</label>
         <p class="text-lg">{user?.email}</p>
       </div>
-      
+
       <div class="border-t pt-6">
         <SignOutButton client:load />
       </div>
-      
+
       <div class="border-t pt-6">
         <h2 class="text-xl font-semibold mb-3 text-destructive">Strefa niebezpieczna</h2>
         <p class="text-sm text-muted-foreground mb-4">
@@ -382,6 +412,7 @@ const { data: { user } } = await supabase.auth.getUser();
 **Komponent `SignOutButton` (React, nowy plik: `src/components/auth/SignOutButton.tsx`)**:
 
 **Struktura komponentu**:
+
 ```typescript
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -391,14 +422,14 @@ export function SignOutButton() {
 
   async function handleSignOut() {
     setIsLoading(true);
-    
+
     try {
       const response = await fetch('/api/auth/logout', { method: 'POST' });
-      
+
       if (!response.ok) {
         throw new Error('Nie udało się wylogować');
       }
-      
+
       // Przekieruj na stronę główną
       window.location.href = '/';
     } catch (err) {
@@ -408,9 +439,9 @@ export function SignOutButton() {
   }
 
   return (
-    <Button 
-      variant="outline" 
-      onClick={handleSignOut} 
+    <Button
+      variant="outline"
+      onClick={handleSignOut}
       disabled={isLoading}
     >
       {isLoading ? 'Wylogowywanie...' : 'Wyloguj się'}
@@ -424,6 +455,7 @@ export function SignOutButton() {
 **Cel**: Realizacja US-003 (Trwałe usuwanie konta użytkownika)
 
 **Struktura komponentu**:
+
 ```typescript
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -446,17 +478,17 @@ export function DeleteAccountButton() {
 
   async function handleDeleteAccount() {
     setIsLoading(true);
-    
+
     try {
-      const response = await fetch('/api/auth/delete-account', { 
-        method: 'DELETE' 
+      const response = await fetch('/api/auth/delete-account', {
+        method: 'DELETE'
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Nie udało się usunąć konta');
       }
-      
+
       // Przekieruj na stronę główną
       toast.success('Konto zostało usunięte');
       window.location.href = '/';
@@ -478,7 +510,7 @@ export function DeleteAccountButton() {
         <AlertDialogHeader>
           <AlertDialogTitle>Czy na pewno chcesz usunąć konto?</AlertDialogTitle>
           <AlertDialogDescription>
-            Ta akcja jest nieodwracalna. Wszystkie Twoje dane (treningi, ćwiczenia, statystyki) 
+            Ta akcja jest nieodwracalna. Wszystkie Twoje dane (treningi, ćwiczenia, statystyki)
             zostaną trwale usunięte z naszych serwerów.
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -501,6 +533,7 @@ export function DeleteAccountButton() {
 ```
 
 **Kryteria akceptacji (US-003)**:
+
 - Modal z potwierdzeniem (AlertDialog z Shadcn/ui)
 - Jasna informacja o konsekwencjach (nieodwracalność, usunięcie wszystkich danych)
 - Kaskadowe usunięcie danych z bazy (przez RLS i polityki Supabase)
@@ -515,9 +548,11 @@ export function DeleteAccountButton() {
 **Stan obecny**: Podstawowy layout dla wszystkich stron (publicznych i chronionych).
 
 **Zmiany do wprowadzenia**:
+
 - **Brak zmian** - obecny layout jest wystarczający dla stron publicznych
 
 **Struktura**:
+
 - Standardowy HTML skeleton (head, body)
 - Brak nawigacji (każda strona zarządza swoją strukturą)
 - Slot dla zawartości
@@ -529,6 +564,7 @@ export function DeleteAccountButton() {
 **Cel**: Wspólny layout dla wszystkich stron w strefie `/app/*` z nawigacją i user menu.
 
 **Struktura** (Astro SSR):
+
 ```typescript
 // src/layouts/LayoutApp.astro
 ---
@@ -551,11 +587,11 @@ const { data: { user } } = await supabase.auth.getUser();
 
 <Layout title={title} description={description}>
   <AppHeader user={user} client:load />
-  
+
   <main class="max-w-7xl mx-auto px-4 py-6">
     <slot />
   </main>
-  
+
   <Toaster position="top-right" />
 </Layout>
 ```
@@ -563,6 +599,7 @@ const { data: { user } } = await supabase.auth.getUser();
 **Komponent `AppHeader` (React, nowy plik: `src/components/layout/AppHeader.tsx`)**:
 
 **Struktura komponentu**:
+
 ```typescript
 interface AppHeaderProps {
   user: {
@@ -577,7 +614,7 @@ export function AppHeader({ user }: AppHeaderProps) {
       <div class="max-w-7xl mx-auto px-4 flex h-16 items-center justify-between">
         {/* Logo */}
         <a href="/app/dashboard" class="font-bold text-xl">10xFitChart</a>
-        
+
         {/* Desktop Navigation */}
         <nav class="hidden md:flex gap-6">
           <a href="/app/dashboard">Dashboard</a>
@@ -585,10 +622,10 @@ export function AppHeader({ user }: AppHeaderProps) {
           <a href="/app/history">Historia</a>
           <a href="/app/exercises">Ćwiczenia</a>
         </nav>
-        
+
         {/* User Menu (Dropdown) */}
         <UserMenu user={user} />
-        
+
         {/* Mobile Menu (Hamburger) */}
         <MobileMenu user={user} />
       </div>
@@ -598,6 +635,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 ```
 
 **Komponent `UserMenu` (React)**:
+
 - Dropdown z Shadcn/ui (`DropdownMenu`)
 - Avatar z inicjałem emaila
 - Opcje:
@@ -606,6 +644,7 @@ export function AppHeader({ user }: AppHeaderProps) {
   - "Wyloguj się" (wywołuje akcję wylogowania)
 
 **Komponent `MobileMenu` (React)**:
+
 - Hamburger button
 - Sheet/Drawer (Shadcn/ui) z linkami nawigacyjnymi
 - User info na górze drawer
@@ -615,6 +654,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 ### 1.4. Podsumowanie komponentów do stworzenia
 
 **Nowe pliki React**:
+
 1. `src/components/auth/RegisterForm.tsx`
 2. `src/components/auth/LoginForm.tsx`
 3. `src/components/auth/SignOutButton.tsx`
@@ -624,9 +664,11 @@ export function AppHeader({ user }: AppHeaderProps) {
 7. `src/components/layout/MobileMenu.tsx`
 
 **Nowe pliki Astro**:
+
 1. `src/layouts/LayoutApp.astro`
 
 **Modyfikacje istniejących plików**:
+
 1. `src/pages/login.astro` - zamiana placeholder na `LoginForm`
 2. `src/pages/register.astro` - zamiana placeholder na `RegisterForm`
 3. `src/pages/app/dashboard.astro` - zmiana layoutu na `LayoutApp`, rozwój zawartości
@@ -647,22 +689,25 @@ System autentykacji wymaga trzech nowych endpointów API:
 **Typ**: API Route (Astro)
 
 **Request Body**:
+
 ```typescript
 {
-  email: string;      // Wymagane, format email
-  password: string;   // Wymagane, min. 8 znaków
+  email: string; // Wymagane, format email
+  password: string; // Wymagane, min. 8 znaków
 }
 ```
 
 **Walidacja**:
+
 ```typescript
 const registerCommandSchema = z.object({
   email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków")
+  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków"),
 });
 ```
 
 **Logika**:
+
 1. Waliduj dane wejściowe za pomocą Zod
 2. Wywołaj `supabase.auth.signUp({ email, password })`
 3. Jeśli sukces:
@@ -675,6 +720,7 @@ const registerCommandSchema = z.object({
    - Inne błędy: 400 Bad Request `{ error: "Nie udało się utworzyć konta" }`
 
 **Kod (pseudo)**:
+
 ```typescript
 // src/pages/api/auth/register.ts
 import type { APIRoute } from "astro";
@@ -683,18 +729,18 @@ import { supabaseServer } from "@/db/supabase-server";
 
 const registerCommandSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(8),
 });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   // 1. Parse i waliduj body
   const body = await request.json();
   const validation = registerCommandSchema.safeParse(body);
-  
+
   if (!validation.success) {
     return new Response(JSON.stringify({ error: "Nieprawidłowe dane" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
@@ -708,30 +754,30 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     email,
     password,
     options: {
-      emailRedirectTo: undefined // Brak weryfikacji email w MVP
-    }
+      emailRedirectTo: undefined, // Brak weryfikacji email w MVP
+    },
   });
 
   if (error) {
     // Sprawdź typ błędu
     if (error.message.includes("already registered")) {
-      return new Response(
-        JSON.stringify({ error: "Ten adres email jest już zarejestrowany" }),
-        { status: 409, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Ten adres email jest już zarejestrowany" }), {
+        status: 409,
+        headers: { "Content-Type": "application/json" },
+      });
     }
-    
-    return new Response(
-      JSON.stringify({ error: "Nie udało się utworzyć konta" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+
+    return new Response(JSON.stringify({ error: "Nie udało się utworzyć konta" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // 4. Zwróć sukces (sesja już ustawiona w cookie przez supabaseServer)
   return new Response(
-    JSON.stringify({ 
+    JSON.stringify({
       message: "Konto utworzone pomyślnie",
-      user: { id: data.user?.id, email: data.user?.email }
+      user: { id: data.user?.id, email: data.user?.email },
     }),
     { status: 201, headers: { "Content-Type": "application/json" } }
   );
@@ -749,22 +795,25 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 **Typ**: API Route (Astro)
 
 **Request Body**:
+
 ```typescript
 {
-  email: string;      // Wymagane
-  password: string;   // Wymagane
+  email: string; // Wymagane
+  password: string; // Wymagane
 }
 ```
 
 **Walidacja**:
+
 ```typescript
 const loginCommandSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1)
+  password: z.string().min(1),
 });
 ```
 
 **Logika**:
+
 1. Waliduj dane wejściowe
 2. Wywołaj `supabase.auth.signInWithPassword({ email, password })`
 3. Jeśli sukces:
@@ -775,6 +824,7 @@ const loginCommandSchema = z.object({
    - Inne błędy: 400 Bad Request
 
 **Kod (pseudo)**:
+
 ```typescript
 // src/pages/api/auth/login.ts
 import type { APIRoute } from "astro";
@@ -783,17 +833,17 @@ import { supabaseServer } from "@/db/supabase-server";
 
 const loginCommandSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(1)
+  password: z.string().min(1),
 });
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const body = await request.json();
   const validation = loginCommandSchema.safeParse(body);
-  
+
   if (!validation.success) {
     return new Response(JSON.stringify({ error: "Nieprawidłowe dane" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
@@ -802,20 +852,20 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
-    password
+    password,
   });
 
   if (error) {
-    return new Response(
-      JSON.stringify({ error: "Nieprawidłowy email lub hasło" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Nieprawidłowy email lub hasło" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   return new Response(
-    JSON.stringify({ 
+    JSON.stringify({
       message: "Zalogowano pomyślnie",
-      user: { id: data.user?.id, email: data.user?.email }
+      user: { id: data.user?.id, email: data.user?.email },
     }),
     { status: 200, headers: { "Content-Type": "application/json" } }
   );
@@ -833,11 +883,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 **Request Body**: Brak (można wysłać pusty body)
 
 **Logika**:
+
 1. Wywołaj `supabase.auth.signOut()`
 2. Usuń cookie sesji
 3. Zwróć 200 OK z `{ message: "Wylogowano pomyślnie" }`
 
 **Kod (pseudo)**:
+
 ```typescript
 // src/pages/api/auth/logout.ts
 import type { APIRoute } from "astro";
@@ -849,16 +901,16 @@ export const POST: APIRoute = async ({ cookies }) => {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return new Response(
-      JSON.stringify({ error: "Nie udało się wylogować" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Nie udało się wylogować" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
-  return new Response(
-    JSON.stringify({ message: "Wylogowano pomyślnie" }),
-    { status: 200, headers: { "Content-Type": "application/json" } }
-  );
+  return new Response(JSON.stringify({ message: "Wylogowano pomyślnie" }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 };
 ```
 
@@ -875,6 +927,7 @@ export const POST: APIRoute = async ({ cookies }) => {
 **Request Body**: Brak (autentykacja przez sesję)
 
 **Logika**:
+
 1. Sprawdź czy użytkownik jest zalogowany (z `locals.user`)
 2. Pobierz `user_id` z sesji
 3. Wywołaj funkcję usuwającą dane użytkownika (kaskadowo):
@@ -885,6 +938,7 @@ export const POST: APIRoute = async ({ cookies }) => {
 5. Zwróć 200 OK z `{ message: "Konto zostało usunięte" }`
 
 **Kod (pseudo)**:
+
 ```typescript
 // src/pages/api/auth/delete-account.ts
 import type { APIRoute } from "astro";
@@ -895,10 +949,10 @@ export const DELETE: APIRoute = async ({ locals, cookies }) => {
 
   // 1. Sprawdź autentykację
   if (!user) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const supabase = supabaseServer({ cookies } as any);
@@ -906,13 +960,10 @@ export const DELETE: APIRoute = async ({ locals, cookies }) => {
   try {
     // 2. Usuń wszystkie dane użytkownika (RLS automatycznie filtruje)
     // Kolejność jest ważna ze względu na foreign keys
-    
+
     // 2a. Usuń workout_sets (przez cascade delete w workouts)
     // 2b. Usuń workouts
-    const { error: workoutsError } = await supabase
-      .from("workouts")
-      .delete()
-      .eq("user_id", user.id);
+    const { error: workoutsError } = await supabase.from("workouts").delete().eq("user_id", user.id);
 
     if (workoutsError) {
       console.error("Error deleting workouts:", workoutsError);
@@ -920,10 +971,7 @@ export const DELETE: APIRoute = async ({ locals, cookies }) => {
     }
 
     // 2c. Usuń niestandardowe ćwiczenia użytkownika
-    const { error: exercisesError } = await supabase
-      .from("exercises")
-      .delete()
-      .eq("user_id", user.id);
+    const { error: exercisesError } = await supabase.from("exercises").delete().eq("user_id", user.id);
 
     if (exercisesError) {
       console.error("Error deleting exercises:", exercisesError);
@@ -944,26 +992,26 @@ export const DELETE: APIRoute = async ({ locals, cookies }) => {
     await supabase.auth.signOut();
 
     // 5. Zwróć sukces
-    return new Response(
-      JSON.stringify({ message: "Konto zostało usunięte" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ message: "Konto zostało usunięte" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("Delete account error:", err);
-    return new Response(
-      JSON.stringify({ error: err.message || "Nie udało się usunąć konta" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: err.message || "Nie udało się usunąć konta" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
 ```
 
 **Uwaga o uprawnieniach**:
-Usunięcie użytkownika z Supabase Auth wymaga użycia `service_role` key, nie standardowego `anon` key. 
+Usunięcie użytkownika z Supabase Auth wymaga użycia `service_role` key, nie standardowego `anon` key.
 W Astro SSR, klient `supabaseServer` powinien być skonfigurowany z uprawnieniami wystarczającymi do tej operacji.
 
 **Alternatywne podejście (zalecane)**:
-Zamiast używać `supabase.auth.admin.deleteUser()` w aplikacji, można stworzyć **Database Function** w Supabase, 
+Zamiast używać `supabase.auth.admin.deleteUser()` w aplikacji, można stworzyć **Database Function** w Supabase,
 która wykona kaskadowe usunięcie i będzie wywołana przez RPC:
 
 ```sql
@@ -976,10 +1024,10 @@ AS $$
 BEGIN
   -- Usuń workout_sets (przez cascade)
   DELETE FROM workouts WHERE user_id = auth.uid();
-  
+
   -- Usuń exercises użytkownika
   DELETE FROM exercises WHERE user_id = auth.uid();
-  
+
   -- Usuń użytkownika z auth.users (wymaga SECURITY DEFINER)
   DELETE FROM auth.users WHERE id = auth.uid();
 END;
@@ -987,11 +1035,13 @@ $$;
 ```
 
 **Wywołanie z aplikacji**:
+
 ```typescript
-const { error } = await supabase.rpc('delete_user_account');
+const { error } = await supabase.rpc("delete_user_account");
 ```
 
 **Kryteria akceptacji (US-003)**:
+
 - Kaskadowe usunięcie wszystkich powiązanych danych (treningi, serie, ćwiczenia)
 - Usunięcie konta auth z Supabase
 - Automatyczne wylogowanie po usunięciu
@@ -1010,6 +1060,7 @@ const { error } = await supabase.rpc('delete_user_account');
 **Zmiany do wprowadzenia**: Dodanie logiki sprawdzania sesji i przekierowania.
 
 **Nowa logika**:
+
 ```typescript
 // src/middleware/index.ts
 import { defineMiddleware } from "astro:middleware";
@@ -1023,20 +1074,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.supabase = supabase;
 
   // 2. Pobierz sesję
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   // 3. Sprawdź czy ścieżka wymaga autentykacji
-  const isProtectedRoute = url.pathname.startsWith('/app');
-  const isAuthRoute = ['/login', '/register'].includes(url.pathname);
+  const isProtectedRoute = url.pathname.startsWith("/app");
+  const isAuthRoute = ["/login", "/register"].includes(url.pathname);
 
   // 4. Jeśli chroniona trasa i brak sesji - przekieruj na /login
   if (isProtectedRoute && !session) {
-    return redirect('/login');
+    return redirect("/login");
   }
 
   // 5. Jeśli strona auth i użytkownik zalogowany - przekieruj na /app/dashboard
   if (isAuthRoute && session) {
-    return redirect('/app/dashboard');
+    return redirect("/app/dashboard");
   }
 
   // 6. Kontynuuj renderowanie
@@ -1045,6 +1098,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 ```
 
 **Uwaga**: Ta logika zapewnia:
+
 - Niezalogowani użytkownicy nie mogą wejść na `/app/*`
 - Zalogowani użytkownicy są automatycznie przekierowywani z `/login` i `/register` na dashboard
 
@@ -1122,7 +1176,7 @@ export class AuthService {
   async register(command: RegisterCommand) {
     const { data, error } = await this.supabase.auth.signUp({
       email: command.email,
-      password: command.password
+      password: command.password,
     });
 
     if (error) {
@@ -1135,7 +1189,7 @@ export class AuthService {
   async login(command: LoginCommand) {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email: command.email,
-      password: command.password
+      password: command.password,
     });
 
     if (error) {
@@ -1154,18 +1208,25 @@ export class AuthService {
   }
 
   async getSession() {
-    const { data: { session }, error } = await this.supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await this.supabase.auth.getSession();
     return session;
   }
 
   async getUser() {
-    const { data: { user }, error } = await this.supabase.auth.getUser();
+    const {
+      data: { user },
+      error,
+    } = await this.supabase.auth.getUser();
     return user;
   }
 }
 ```
 
 **Użycie w API routes**:
+
 ```typescript
 const authService = new AuthService(supabase);
 const result = await authService.register({ email, password });
@@ -1194,6 +1255,7 @@ Supabase Auth dostarcza kompletne rozwiązanie do zarządzania użytkownikami, s
    - Custom storage adapter
 
 **Zmiany do wprowadzenia**:
+
 - **Brak zmian** w `supabase.client.ts`
 - **Brak zmian** w `supabase-server.ts` - obecna implementacja jest poprawna
 
@@ -1208,9 +1270,9 @@ setItem: (key: string, value: string) => {
     maxAge: 60 * 60 * 24 * 7, // 7 days
     sameSite: "lax",
     secure: import.meta.env.PROD, // Tylko w produkcji
-    httpOnly: false // Musi być false dla Supabase Auth
+    httpOnly: false, // Musi być false dla Supabase Auth
   });
-}
+};
 ```
 
 ---
@@ -1218,6 +1280,7 @@ setItem: (key: string, value: string) => {
 #### 3.1.2. Przepływ autoryzacji
 
 ##### Rejestracja (signUp):
+
 ```
 1. User wypełnia formularz rejestracji
    ↓
@@ -1239,6 +1302,7 @@ setItem: (key: string, value: string) => {
 ```
 
 ##### Logowanie (signInWithPassword):
+
 ```
 1. User wypełnia formularz logowania
    ↓
@@ -1260,6 +1324,7 @@ setItem: (key: string, value: string) => {
 ```
 
 ##### Wylogowanie (signOut):
+
 ```
 1. User klika "Wyloguj się"
    ↓
@@ -1279,6 +1344,7 @@ setItem: (key: string, value: string) => {
 ```
 
 ##### Ochrona tras (Middleware):
+
 ```
 1. User wchodzi na /app/dashboard
    ↓
@@ -1295,16 +1361,19 @@ setItem: (key: string, value: string) => {
 #### 3.1.3. Zarządzanie sesjami
 
 **Przechowywanie sesji**:
+
 - **Server-side**: Cookies (HttpOnly zalecane, ale nie wymagane dla Supabase)
 - **Czas życia**: 7 dni (konfigurowalny w `maxAge`)
 - **Odświeżanie tokenu**: Automatyczne przez Supabase Auth (refresh_token)
 
 **Strategia odświeżania**:
 Supabase Auth automatycznie odświeża `access_token` gdy:
+
 - Token wygaśnie (domyślnie 1 godzina)
 - Klient Supabase wykryje brak ważnego tokenu
 
 W Astro SSR, odświeżanie dzieje się:
+
 1. Przy każdym requestie server-side (w middleware lub page load)
 2. Supabase client automatycznie sprawdza ważność tokenu
 3. Jeśli access_token wygasł, używa refresh_token do uzyskania nowego
@@ -1312,6 +1381,7 @@ W Astro SSR, odświeżanie dzieje się:
 
 **Obsługa wygaśnięcia sesji**:
 Jeśli refresh_token również wygaśnie (po 7 dniach nieaktywności):
+
 1. `getSession()` zwróci `null`
 2. Middleware przekieruje na `/login`
 3. User musi zalogować się ponownie
@@ -1347,6 +1417,7 @@ Jeśli refresh_token również wygaśnie (po 7 dniach nieaktywności):
    - Automatyczne przekierowania dla niezalogowanych
 
 **Zabezpieczenia Supabase**:
+
 - Row Level Security (RLS) - polityki dostępu do danych
 - Automatyczna weryfikacja JWT w zapytaniach
 - Ochrona przed SQL Injection
@@ -1369,7 +1440,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.supabase = supabase;
 
   // Dodaj użytkownika do locals
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   context.locals.user = user;
 
   // ... reszta logiki middleware
@@ -1379,6 +1452,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 ```
 
 **Typ (rozszerzenie `src/env.d.ts`)**:
+
 ```typescript
 /// <reference types="astro/client" />
 
@@ -1395,6 +1469,7 @@ declare namespace App {
 ```
 
 **Użycie w Astro pages**:
+
 ```astro
 ---
 const user = Astro.locals.user;
@@ -1408,6 +1483,7 @@ const user = Astro.locals.user;
 #### 3.2.2. Props do komponentów React
 
 **Przekazywanie danych użytkownika**:
+
 ```astro
 ---
 import { UserProfile } from "@/components/UserProfile";
@@ -1418,9 +1494,12 @@ const user = Astro.locals.user;
 ```
 
 **Alternatywnie**: Komponent React może pobierać dane samodzielnie (client-side):
+
 ```typescript
 // W komponencie React
-const { data: { user } } = await supabaseClient.auth.getUser();
+const {
+  data: { user },
+} = await supabaseClient.auth.getUser();
 ```
 
 **Zalecenie**: Preferuj przekazywanie przez props (SSR) dla lepszej wydajności i SEO.
@@ -1529,15 +1608,12 @@ export const GET: APIRoute = async ({ locals }) => {
   if (!user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
   // Pobierz ćwiczenia użytkownika
-  const { data: exercises, error } = await supabase
-    .from("exercises")
-    .select("*")
-    .eq("user_id", user.id); // Filtruj po user_id
+  const { data: exercises, error } = await supabase.from("exercises").select("*").eq("user_id", user.id); // Filtruj po user_id
 
   // ... reszta logiki
 };
@@ -1551,7 +1627,7 @@ export function requireAuth(locals: App.Locals) {
   if (!locals.user) {
     throw new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
   return locals.user;
@@ -1570,6 +1646,7 @@ const user = requireAuth(locals);
 **Polityki RLS do ustawienia w Supabase** (SQL):
 
 #### Tabela `exercises`:
+
 ```sql
 -- Użytkownik może widzieć swoje ćwiczenia + systemowe
 CREATE POLICY "Users can view their exercises and system exercises"
@@ -1595,6 +1672,7 @@ USING (user_id = auth.uid());
 ```
 
 #### Tabela `workouts`:
+
 ```sql
 -- Użytkownik może widzieć tylko swoje treningi
 CREATE POLICY "Users can view their own workouts"
@@ -1618,6 +1696,7 @@ USING (user_id = auth.uid());
 ```
 
 #### Tabela `workout_sets`:
+
 ```sql
 -- Użytkownik może widzieć serie tylko ze swoich treningów
 CREATE POLICY "Users can view sets from their own workouts"
@@ -1657,6 +1736,7 @@ USING (
 ```
 
 **Włączenie RLS**:
+
 ```sql
 ALTER TABLE exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workouts ENABLE ROW LEVEL SECURITY;
@@ -1672,6 +1752,7 @@ ALTER TABLE workout_sets ENABLE ROW LEVEL SECURITY;
 ### 5.1. Walidacja po stronie klienta
 
 **Biblioteki**:
+
 - **Zod**: Schematy walidacji
 - **React Hook Form**: Zarządzanie formularzami
 - **Zod Resolver**: Integracja Zod z React Hook Form
@@ -1683,14 +1764,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-const registerSchema = z.object({
-  email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków"),
-  confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Hasła muszą być identyczne",
-  path: ["confirmPassword"]
-});
+const registerSchema = z
+  .object({
+    email: z.string().email("Nieprawidłowy format adresu email"),
+    password: z.string().min(8, "Hasło musi mieć minimum 8 znaków"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Hasła muszą być identyczne",
+    path: ["confirmPassword"],
+  });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
@@ -1698,9 +1781,9 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema)
+    resolver: zodResolver(registerSchema),
   });
 
   // ... reszta komponentu
@@ -1708,18 +1791,12 @@ export function RegisterForm() {
 ```
 
 **Wyświetlanie błędów**:
+
 ```tsx
 <div>
   <Label htmlFor="email">Email</Label>
-  <Input
-    id="email"
-    type="email"
-    {...register("email")}
-    aria-invalid={errors.email ? "true" : "false"}
-  />
-  {errors.email && (
-    <p class="text-sm text-destructive mt-1">{errors.email.message}</p>
-  )}
+  <Input id="email" type="email" {...register("email")} aria-invalid={errors.email ? "true" : "false"} />
+  {errors.email && <p class="text-sm text-destructive mt-1">{errors.email.message}</p>}
 </div>
 ```
 
@@ -1730,31 +1807,33 @@ export function RegisterForm() {
 **Cel**: Nigdy nie ufaj danym z klienta - zawsze waliduj na backendzie.
 
 **Podejście**:
+
 1. Definiuj schematy Zod dla każdego endpointa
 2. Użyj `safeParse()` do walidacji body
 3. Zwracaj 400 Bad Request dla błędnych danych
 
 **Przykład**:
+
 ```typescript
 // src/pages/api/auth/register.ts
 const registerCommandSchema = z.object({
   email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków")
+  password: z.string().min(8, "Hasło musi mieć minimum 8 znaków"),
 });
 
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json();
-  
+
   // Walidacja
   const validation = registerCommandSchema.safeParse(body);
-  
+
   if (!validation.success) {
     // Zwróć pierwsze błędy walidacji
     const firstError = validation.error.errors[0];
-    return new Response(
-      JSON.stringify({ error: firstError.message }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: firstError.message }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // Kontynuuj z zwalidowanymi danymi
@@ -1768,6 +1847,7 @@ export const POST: APIRoute = async ({ request }) => {
 ### 5.3. Obsługa błędów API
 
 **Standardowy format odpowiedzi błędu**:
+
 ```typescript
 {
   error: string; // Opis błędu dla użytkownika (po polsku)
@@ -1775,6 +1855,7 @@ export const POST: APIRoute = async ({ request }) => {
 ```
 
 **Kody statusu HTTP**:
+
 - **400 Bad Request**: Błąd walidacji, nieprawidłowe dane
 - **401 Unauthorized**: Brak sesji, nieprawidłowe credentials
 - **403 Forbidden**: Użytkownik nie ma uprawnień (rzadko w MVP)
@@ -1800,13 +1881,14 @@ export function getAuthErrorMessage(supabaseError: string): string {
 ```
 
 **Użycie**:
+
 ```typescript
 if (error) {
   const message = getAuthErrorMessage(error.message);
-  return new Response(
-    JSON.stringify({ error: message }),
-    { status: 401, headers: { "Content-Type": "application/json" } }
-  );
+  return new Response(JSON.stringify({ error: message }), {
+    status: 401,
+    headers: { "Content-Type": "application/json" },
+  });
 }
 ```
 
@@ -1817,11 +1899,13 @@ if (error) {
 **Toast notifications** (biblioteka `sonner`):
 
 **Instalacja**:
+
 ```bash
 npm install sonner
 ```
 
 **Setup w `LayoutApp.astro`**:
+
 ```astro
 ---
 import { Toaster } from "sonner";
@@ -1834,6 +1918,7 @@ import { Toaster } from "sonner";
 ```
 
 **Użycie w komponentach**:
+
 ```typescript
 import { toast } from "sonner";
 
@@ -1848,17 +1933,20 @@ toast.info("Sprawdź swoją skrzynkę email");
 ```
 
 **W FormularzeLoginForm**:
+
 ```typescript
 try {
-  const response = await fetch('/api/auth/login', { /* ... */ });
-  
+  const response = await fetch("/api/auth/login", {
+    /* ... */
+  });
+
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error);
   }
-  
+
   toast.success("Zalogowano pomyślnie");
-  window.location.href = '/app/dashboard';
+  window.location.href = "/app/dashboard";
 } catch (err) {
   toast.error(err.message);
 }
@@ -1871,22 +1959,23 @@ try {
 **Opcjonalnie dla MVP**: Implementacja automatycznego retry dla błędów 5xx.
 
 **Przykład**:
+
 ```typescript
 async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url, options);
-      
+
       if (response.status >= 500 && i < retries - 1) {
         // Czekaj przed kolejną próbą
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
         continue;
       }
-      
+
       return response;
     } catch (err) {
       if (i < retries - 1) {
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
         continue;
       }
       throw err;
@@ -1902,6 +1991,7 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
 ### Lista plików do utworzenia:
 
 **Nowe komponenty React**:
+
 1. `src/components/auth/RegisterForm.tsx`
 2. `src/components/auth/LoginForm.tsx`
 3. `src/components/auth/SignOutButton.tsx`
@@ -1911,16 +2001,19 @@ async function fetchWithRetry(url: string, options: RequestInit, retries = 3) {
 7. `src/components/layout/MobileMenu.tsx`
 
 **Nowe pliki Astro**:
+
 1. `src/layouts/LayoutApp.astro`
 2. `src/pages/app/profile.astro`
 
 **Nowe API routes**:
+
 1. `src/pages/api/auth/register.ts`
 2. `src/pages/api/auth/login.ts`
 3. `src/pages/api/auth/logout.ts`
 4. `src/pages/api/auth/delete-account.ts` (realizacja US-003)
 
 **Opcjonalne serwisy**:
+
 1. `src/lib/services/auth.service.ts`
 2. `src/lib/utils/auth-guards.ts`
 3. `src/lib/utils/error-messages.ts`
@@ -1959,10 +2052,10 @@ AS $$
 BEGIN
   -- Usuń workout_sets (przez cascade delete w workouts)
   DELETE FROM workouts WHERE user_id = auth.uid();
-  
+
   -- Usuń exercises użytkownika (nie systemowe)
   DELETE FROM exercises WHERE user_id = auth.uid();
-  
+
   -- Usuń użytkownika z auth.users
   DELETE FROM auth.users WHERE id = auth.uid();
 END;
@@ -1977,6 +2070,7 @@ GRANT EXECUTE ON FUNCTION delete_user_account() TO authenticated;
 ## Następne kroki (poza zakresem MVP autentykacji)
 
 Funkcjonalności do implementacji w przyszłości:
+
 1. **Odzyskiwanie hasła** (forgot password flow)
 2. **Weryfikacja emaila** (email confirmation)
 3. **Zmiana hasła** (w profilu użytkownika)

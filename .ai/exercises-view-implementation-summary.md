@@ -7,6 +7,7 @@ Widok Bazy Ćwiczeń został w pełni zaimplementowany zgodnie z planem implemen
 ## Zrealizowane funkcjonalności
 
 ### 1. Struktura komponentów ✅
+
 - `ExerciseManager.tsx` - główny kontener zarządzający stanem
 - `ExerciseHeader.tsx` - nagłówek z przyciskiem dodawania
 - `ExerciseFilters.tsx` - filtry (search + typ)
@@ -16,24 +17,29 @@ Widok Bazy Ćwiczeń został w pełni zaimplementowany zgodnie z planem implemen
 - `ConfirmArchiveDialog.tsx` - dialog potwierdzenia archiwizacji
 
 ### 2. Routing ✅
+
 - Strona: `/app/exercises`
 - Plik: `src/pages/app/exercises.astro`
 - Autoryzacja: Wymagane logowanie
 - Integracja z `LayoutApp`
 
 ### 3. Zarządzanie stanem ✅
+
 - Lokalny stan React (useState)
 - Computed values z useMemo (filtrowane ćwiczenia)
 - Side effects z useEffect (pobieranie danych)
 
 ### 4. Integracja API ✅
+
 Wszystkie endpointy zaimplementowane:
+
 - `GET /api/exercises` - pobieranie listy
 - `POST /api/exercises` - tworzenie ćwiczenia
 - `PUT /api/exercises/:id` - edycja nazwy
 - `DELETE /api/exercises/:id` - archiwizacja
 
 ### 5. Interakcje użytkownika ✅
+
 - Przeglądanie listy (systemowe + własne)
 - Wyszukiwanie z debounce (300ms)
 - Filtrowanie po typie (All/Siłowe/Cardio)
@@ -42,12 +48,15 @@ Wszystkie endpointy zaimplementowane:
 - Archiwizacja (tylko własne)
 
 ### 6. Walidacja ✅
+
 **Client-side:**
+
 - Pole nazwy: wymagane, max 100 znaków
 - Pole typu: wymagane przy tworzeniu, disabled przy edycji
 - Real-time walidacja z feedback
 
 **Server-side:**
+
 - Obsługa błędów 400 (Bad Request)
 - Obsługa błędów 401 (Unauthorized) → przekierowanie do login
 - Obsługa błędów 403 (Forbidden) → systemowe ćwiczenia
@@ -55,6 +64,7 @@ Wszystkie endpointy zaimplementowane:
 - Obsługa błędów 409 (Conflict) → duplikat nazwy
 
 ### 7. Obsługa błędów ✅
+
 - Błędy sieciowe (network errors)
 - Błędy autoryzacji (session expired)
 - Błędy walidacji (form validation)
@@ -64,6 +74,7 @@ Wszystkie endpointy zaimplementowane:
 - Toast notifications (sonner)
 
 ### 8. UI/UX ✅
+
 - Responsywny design (mobile-first)
 - Skeleton loaders podczas ładowania
 - Empty state z sugestiami
@@ -73,6 +84,7 @@ Wszystkie endpointy zaimplementowane:
 - ARIA labels dla dostępności
 
 ### 9. Styling ✅
+
 - Tailwind CSS 4
 - Shadcn/ui komponenty
 - Dark mode support
@@ -80,12 +92,14 @@ Wszystkie endpointy zaimplementowane:
 - Spójne kolory (primary, destructive, muted)
 
 ### 10. Nawigacja ✅
+
 - Link "Ćwiczenia" w AppHeader (desktop + mobile)
 - Aktywna strona oznaczona w nawigacji
 
 ## Typy TypeScript
 
 Wszystkie typy dodane do `src/types.ts`:
+
 - `ExercisesViewState`
 - `ExerciseTypeFilter`
 - `ExerciseFormData`
@@ -106,6 +120,7 @@ Wszystkie typy dodane do `src/types.ts`:
 ## Pliki utworzone/zmodyfikowane
 
 ### Nowe pliki (11):
+
 1. `src/pages/app/exercises.astro`
 2. `src/components/exercises/ExerciseManager.tsx`
 3. `src/components/exercises/ExerciseHeader.tsx`
@@ -118,11 +133,13 @@ Wszystkie typy dodane do `src/types.ts`:
 10. `src/components/exercises/README.md`
 
 ### Zmodyfikowane pliki (1):
+
 1. `src/types.ts` - dodane typy dla widoku Exercises
 
 ## Zgodność z planem
 
 Implementacja w 100% zgodna z:
+
 - `.ai/exercises-view-implementation-plan.md`
 - `.cursor/rules/shared.mdc`
 - `.cursor/rules/frontend.mdc`
@@ -132,6 +149,7 @@ Implementacja w 100% zgodna z:
 ## Testowanie
 
 ### Wymagane testy manualne:
+
 - [ ] US-004: Dodawanie własnego ćwiczenia
 - [ ] US-005: Archiwizacja ćwiczenia
 - [ ] Edycja nazwy ćwiczenia
@@ -140,6 +158,7 @@ Implementacja w 100% zgodna z:
 - [ ] Obsługa błędów (duplikat nazwy, offline, itp.)
 
 ### Scenariusze testowe:
+
 1. Otwórz `/app/exercises` (wymaga logowania)
 2. Sprawdź wyświetlanie listy (systemowe + własne)
 3. Użyj wyszukiwarki (debounce działa)
@@ -153,6 +172,7 @@ Implementacja w 100% zgodna z:
 ## Następne kroki
 
 Widok jest gotowy do:
+
 1. Code review
 2. Testów manualnych przez zespół QA
 3. Merge do main branch

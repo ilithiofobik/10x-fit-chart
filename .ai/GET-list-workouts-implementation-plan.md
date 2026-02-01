@@ -5,6 +5,7 @@
 **Cel:** Zwrócenie listy treningów użytkownika z paginacją, filtrowaniem po datach i agregowanymi statystykami.
 
 **Kluczowe cechy:**
+
 - Metoda: `GET /api/workouts`
 - Wymaga autoryzacji (Supabase Auth)
 - Paginacja (limit/offset)
@@ -18,6 +19,7 @@
 **Struktura URL:** `/api/workouts?limit=20&offset=0&start_date=2026-01-01&end_date=2026-01-31&order=desc`
 
 **Query Parameters (wszystkie opcjonalne):**
+
 - `limit`: liczba rekordów (1-100, default: 20)
 - `offset`: przesunięcie (≥0, default: 0)
 - `start_date`: początek zakresu dat (ISO 8601: YYYY-MM-DD)
@@ -25,29 +27,39 @@
 - `order`: sortowanie po dacie (`asc` | `desc`, default: `desc`)
 
 **Headers:**
+
 - `Authorization: Bearer {token}` (zarządzane przez Supabase)
 
 ## 3. Wykorzystywane typy
 
 Z `src/types.ts`:
+
 - `WorkoutListItemDTO` - Workout + `exercise_count: number` + `set_count: number`
 - `ListWorkoutsResponse` - `{ workouts: WorkoutListItemDTO[], pagination: PaginationDTO }`
 - `PaginationDTO` - `{ total: number, limit: number, offset: number, has_more: boolean }`
 
 **Walidacja Zod (query parameters):**
+
 ```typescript
 z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).default(0),
-  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  order: z.enum(['asc', 'desc']).default('desc')
-})
+  start_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  end_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  order: z.enum(["asc", "desc"]).default("desc"),
+});
 ```
 
 ## 4. Szczegóły odpowiedzi
 
 **Sukces (200):**
+
 ```json
 {
   "workouts": [
@@ -72,6 +84,7 @@ z.object({
 ```
 
 **Kody błędów:**
+
 - `401` - Brak autoryzacji
 - `400` - Nieprawidłowe parametry (limit > 100, offset < 0, invalid date)
 - `500` - Błąd serwera
@@ -106,31 +119,34 @@ z.object({
 
 ## 7. Obsługa błędów
 
-| Scenariusz | Kod | Odpowiedź | Logowanie |
-|------------|-----|-----------|-----------|
-| Sukces | 200 | ListWorkoutsResponse | Nie |
-| Brak autoryzacji | 401 | `{ message: "Unauthorized" }` | Nie |
-| limit > 100 | 400 | `{ message: "Invalid query parameters" }` | Nie |
-| offset < 0 | 400 | `{ message: "Invalid query parameters" }` | Nie |
-| Invalid date format | 400 | `{ message: "Invalid query parameters" }` | Nie |
-| Błąd DB (count) | 500 | `{ message: "Internal server error" }` | Tak |
-| Błąd DB (select) | 500 | `{ message: "Internal server error" }` | Tak |
+| Scenariusz          | Kod | Odpowiedź                                 | Logowanie |
+| ------------------- | --- | ----------------------------------------- | --------- |
+| Sukces              | 200 | ListWorkoutsResponse                      | Nie       |
+| Brak autoryzacji    | 401 | `{ message: "Unauthorized" }`             | Nie       |
+| limit > 100         | 400 | `{ message: "Invalid query parameters" }` | Nie       |
+| offset < 0          | 400 | `{ message: "Invalid query parameters" }` | Nie       |
+| Invalid date format | 400 | `{ message: "Invalid query parameters" }` | Nie       |
+| Błąd DB (count)     | 500 | `{ message: "Internal server error" }`    | Tak       |
+| Błąd DB (select)    | 500 | `{ message: "Internal server error" }`    | Tak       |
 
 ## 8. Rozważania dotyczące wydajności
 
 **Wąskie gardła:**
+
 - Agregacja exercise_count i set_count wymaga JOIN/subquery
-- COUNT(*) dla total może być wolny dla dużych zbiorów
+- COUNT(\*) dla total może być wolny dla dużych zbiorów
 
 **Optymalizacje:**
+
 1. **Index na (user_id, date):** Przyspiesza filtrowanie i sortowanie
 2. **Agregacja w jednym query:** Użyj LEFT JOIN do workout_sets z GROUP BY
 3. **Limit COUNT:** Rozważyć cache dla total lub approximate count dla bardzo dużych zbiorów
 4. **Order by date:** Index wspiera sortowanie
 
 **Implementacja agregacji:**
+
 ```sql
-SELECT 
+SELECT
   w.*,
   COUNT(DISTINCT ws.exercise_id) as exercise_count,
   COUNT(ws.id) as set_count
@@ -150,6 +166,7 @@ LIMIT ? OFFSET ?
 **Plik:** `src/lib/services/workout.service.ts`
 
 Funkcja: `listWorkouts(supabase, userId, filters)`
+
 - Parametry: `{ limit, offset, startDate?, endDate?, order }`
 - Query 1: COUNT total workouts z filtrami
 - Query 2: SELECT workouts z LEFT JOIN dla agregacji
@@ -179,15 +196,22 @@ export async function GET(context: APIContext) {
 const QueryParamsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(20),
   offset: z.coerce.number().int().min(0).default(0),
-  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  order: z.enum(['asc', 'desc']).default('desc')
+  start_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  end_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  order: z.enum(["asc", "desc"]).default("desc"),
 });
 ```
 
 ### Krok 4: Konfiguracja RLS
 
 **Policy SELECT dla workouts:**
+
 ```sql
 CREATE POLICY "Users can view own workouts"
 ON workouts FOR SELECT
@@ -195,13 +219,14 @@ USING (user_id = auth.uid());
 ```
 
 **Policy SELECT dla workout_sets (dla JOIN):**
+
 ```sql
 CREATE POLICY "Users can view own workout sets"
 ON workout_sets FOR SELECT
 USING (
   EXISTS (
-    SELECT 1 FROM workouts 
-    WHERE workouts.id = workout_sets.workout_id 
+    SELECT 1 FROM workouts
+    WHERE workouts.id = workout_sets.workout_id
     AND workouts.user_id = auth.uid()
   )
 );
@@ -210,7 +235,8 @@ USING (
 ### Krok 5: Implementacja agregacji w serwisie
 
 Użyj Supabase query builder z:
-- `.select('*, workout_sets(exercise_id)')` 
+
+- `.select('*, workout_sets(exercise_id)')`
 - Lub wykonaj COUNT w aplikacji po pobraniu danych
 - Lub użyj raw SQL przez `.rpc()` dla lepszej wydajności
 
@@ -235,12 +261,14 @@ CREATE INDEX idx_workout_sets_workout ON workout_sets(workout_id);
 ## 10. Uwagi implementacyjne
 
 **Best practices:**
+
 - Guard clause dla autoryzacji
 - Walidacja przed wywołaniem serwisu
 - Agregacja w jednym query (avoid N+1)
 - Index na (user_id, date) dla wydajności
 
 **Zależności:**
+
 - Wymaga middleware Astro
 - Wymaga aktywnej sesji Supabase
 - Typy z `src/types.ts`

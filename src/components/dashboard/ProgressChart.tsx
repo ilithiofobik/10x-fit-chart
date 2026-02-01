@@ -3,15 +3,7 @@
  * Displays workout progress over time
  */
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { formatChartValue, formatChartDate, formatWorkoutDate } from "@/lib/utils/formatters";
 import type { ProgressChartProps } from "@/types";
 

@@ -6,7 +6,9 @@ import { Toaster } from "@/components/ui/sonner";
 
 // Sprawdź czy użytkownik jest już zalogowany
 const supabase = supabaseServer(Astro);
-const { data: { session } } = await supabase.auth.getSession();
+const {
+  data: { session },
+} = await supabase.auth.getSession();
 
 // Przekieruj na dashboard jeśli zalogowany
 if (session) {

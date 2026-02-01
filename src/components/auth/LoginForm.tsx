@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 const loginSchema = z.object({
   email: z.string().email("Nieprawidłowy format adresu email"),
-  password: z.string().min(1, "Hasło jest wymagane")
+  password: z.string().min(1, "Hasło jest wymagane"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -22,30 +22,30 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
   });
 
   async function onSubmit(data: LoginFormData) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email, password: data.password })
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, password: data.password }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Nieznany błąd');
+        throw new Error(errorData.error || "Nieznany błąd");
       }
 
-      toast.success('Zalogowano pomyślnie');
-      window.location.href = '/app/dashboard';
+      toast.success("Zalogowano pomyślnie");
+      window.location.href = "/app/dashboard";
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Nie udało się zalogować');
+      toast.error(err instanceof Error ? err.message : "Nie udało się zalogować");
     } finally {
       setIsLoading(false);
     }
@@ -55,9 +55,7 @@ export function LoginForm() {
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-2xl">Logowanie</CardTitle>
-        <CardDescription>
-          Zaloguj się do swojego konta
-        </CardDescription>
+        <CardDescription>Zaloguj się do swojego konta</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
@@ -71,9 +69,7 @@ export function LoginForm() {
               aria-invalid={errors.email ? "true" : "false"}
               disabled={isLoading}
             />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -96,9 +92,7 @@ export function LoginForm() {
                 {showPassword ? "Ukryj" : "Pokaż"}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
           </div>
         </CardContent>
 

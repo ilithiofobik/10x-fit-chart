@@ -3,13 +3,7 @@
  * Shows title and period selector (1, 3, 6, 12 months)
  */
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { DashboardHeaderProps } from "@/types";
 
 const MONTHS_OPTIONS = [

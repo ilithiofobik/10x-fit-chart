@@ -11,6 +11,7 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ```
 
 **Zainstalowane pakiety:**
+
 - `vitest` - Framework testowy (v4.0.18)
 - `@vitest/ui` - Interfejs webowy do debugowania testów
 - `@vitest/coverage-v8` - Generowanie raportów coverage
@@ -22,6 +23,7 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ### 2. Konfiguracja Vitest
 
 **Utworzono `vitest.config.ts`:**
+
 - Plugin React dla obsługi JSX
 - Environment: jsdom
 - Globals: włączone (describe, it, expect bez importów)
@@ -32,6 +34,7 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ### 3. Setup File
 
 **Utworzono `src/test-utils/setup.ts`:**
+
 - Import `@testing-library/jest-dom` dla custom matcherów
 - Cleanup po każdym teście
 - Mock `global.fetch`
@@ -45,6 +48,7 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ### 4. Test Fixtures
 
 **Utworzono `src/test-utils/fixtures.ts`:**
+
 - Mock exercises (strength, cardio, user, archived)
 - Mock workout sets (strength, cardio)
 - Mock workouts (create command, details, list item)
@@ -58,16 +62,19 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ### 5. Test Utils
 
 **Utworzono `src/test-utils/test-utils.tsx`:**
+
 - `renderWithProviders()` - custom render z kontekstem
 - Re-export wszystkich funkcji Testing Library
 - Re-export `userEvent`
 
 **Utworzono `src/test-utils/index.ts`:**
+
 - Centralne miejsce do importowania utilities
 
 ### 6. Skrypty NPM
 
 **Zaktualizowano `package.json`:**
+
 ```json
 {
   "scripts": {
@@ -83,18 +90,21 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ### 7. Pre-commit Hook
 
 **Zaktualizowano `.husky/pre-commit`:**
+
 - Dodano uruchamianie testów przed commitem
 - Testy uruchamiają się automatycznie przy każdym git commit
 
 ### 8. Przykładowe Testy
 
 **Utworzono `src/test-utils/environment.test.ts`:**
+
 - Testy weryfikujące poprawność konfiguracji
 - Sprawdzenie podstawowej funkcjonalności Vitest
 - Weryfikacja globalnych mocków
 - Sprawdzenie path aliases
 
 **Utworzono `src/lib/utils/formatters.test.ts`:**
+
 - 28 testów dla funkcji formatujących
 - Przykłady testowania czystych funkcji
 - Coverage: edge cases, error handling
@@ -103,6 +113,7 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ### 9. Dokumentacja
 
 **Utworzono `src/test-utils/README.md`:**
+
 - Kompletny przewodnik po testowaniu
 - Przykłady różnych typów testów
 - Best practices
@@ -110,6 +121,7 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 - Linki do zasobów
 
 **Zaktualizowano `README.md`:**
+
 - Dodano sekcję "Testing"
 - Dodano skrypty testowe do tabeli
 - Dodano Vitest do tech stacku
@@ -117,6 +129,7 @@ npm install -D vitest @vitest/ui @vitest/coverage-v8 jsdom @testing-library/reac
 ### 10. .gitignore
 
 **Zaktualizowano `.gitignore`:**
+
 - Dodano `coverage/` - folder z raportami coverage
 - Dodano `*.lcov` - pliki coverage
 
@@ -151,6 +164,7 @@ npm run test:unit
 ```
 
 **Wynik:**
+
 - ✅ 26 testów przechodzi
 - ⚠️ 6 testów wymaga dostosowania (różnice w formatowaniu liczb/dat)
 - 📊 Coverage: Gotowe do generowania
@@ -158,6 +172,7 @@ npm run test:unit
 **Testy środowiska (6/6):** ✅ Wszystkie przechodzą
 
 **Testy formatters (26/32):** ⚠️ Wymaga drobnych poprawek:
+
 - formatNumber: różnice w separatorach (system używa spacji niełamliwej vs zwykła spacja)
 - formatWorkoutDate: test data może być rozpoznana jako "Dzisiaj"
 
@@ -184,9 +199,9 @@ npm run test:coverage
 1. Utwórz plik `*.test.ts` lub `*.test.tsx` obok testowanego modułu
 2. Importuj testowane funkcje i utilities:
    ```typescript
-   import { describe, it, expect } from 'vitest';
-   import { myFunction } from './myModule';
-   import { mockExerciseStrength } from '@/test-utils';
+   import { describe, it, expect } from "vitest";
+   import { myFunction } from "./myModule";
+   import { mockExerciseStrength } from "@/test-utils";
    ```
 3. Napisz testy używając AAA pattern (Arrange-Act-Assert)
 4. Uruchom `npm test` aby zobaczyć wyniki
@@ -195,17 +210,17 @@ npm run test:coverage
 
 ```typescript
 // src/lib/services/workout.service.test.ts
-import { describe, it, expect } from 'vitest';
-import { calculate1RM } from './workout.service';
+import { describe, it, expect } from "vitest";
+import { calculate1RM } from "./workout.service";
 
-describe('workout.service', () => {
-  describe('calculate1RM', () => {
-    it('zwraca weight gdy reps=1', () => {
+describe("workout.service", () => {
+  describe("calculate1RM", () => {
+    it("zwraca weight gdy reps=1", () => {
       const result = calculate1RM(100, 1);
       expect(result).toBe(100);
     });
 
-    it('oblicza 1RM wzorem Brzycki', () => {
+    it("oblicza 1RM wzorem Brzycki", () => {
       const result = calculate1RM(100, 8);
       expect(result).toBeCloseTo(125.0, 1);
     });

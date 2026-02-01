@@ -13,14 +13,17 @@ The Workout Editor feature allows users to edit existing workouts from their his
 Main provider component that manages state for the entire workout editor using React Context API.
 
 **Props:**
+
 - `workoutId`: UUID of the workout to edit
 
 **Usage:**
+
 ```tsx
 <WorkoutEditorProvider workoutId="uuid-here" client:load />
 ```
 
 **Features:**
+
 - Fetches workout details on mount
 - Manages editor state (extends WorkoutLoggerState)
 - Provides save (PUT) and delete (DELETE) actions
@@ -32,6 +35,7 @@ Main provider component that manages state for the entire workout editor using R
 Header section for the editor with date picker, notes textarea, and metadata.
 
 **Props:**
+
 - `date`: Current workout date
 - `notes`: Current notes
 - `createdAt`: Original creation timestamp (read-only)
@@ -39,6 +43,7 @@ Header section for the editor with date picker, notes textarea, and metadata.
 - `onNotesChange`: Callback for notes changes
 
 **Features:**
+
 - Date input with max=today validation
 - Notes textarea with character counter (max 1000)
 - Display of original creation timestamp
@@ -49,6 +54,7 @@ Header section for the editor with date picker, notes textarea, and metadata.
 Action buttons panel at the bottom of the form.
 
 **Props:**
+
 - `isValid`: Whether form is valid for saving
 - `isSaving`: Save operation in progress
 - `isDeleting`: Delete operation in progress
@@ -57,6 +63,7 @@ Action buttons panel at the bottom of the form.
 - `onCancel`: Callback to cancel and return
 
 **Features:**
+
 - Save button (disabled when invalid or saving)
 - Delete button with AlertDialog confirmation
 - Cancel button with unsaved changes warning
@@ -69,13 +76,16 @@ Action buttons panel at the bottom of the form.
 Custom hook managing all editor state and API calls.
 
 **Parameters:**
+
 - `workoutId`: UUID of workout to edit
 
 **Returns:**
+
 - `state`: Current editor state (WorkoutEditorState)
 - `actions`: Available actions
 
 **Actions:**
+
 - `setDate(date)`: Update workout date
 - `setNotes(notes)`: Update workout notes
 - `addExercise(exercise)`: Add exercise to workout
@@ -92,6 +102,7 @@ Custom hook managing all editor state and API calls.
 Reducer handling all state mutations. Extends `workoutLoggerReducer` with editor-specific actions.
 
 **Additional Actions:**
+
 - `LOAD_WORKOUT_START`: Start loading workout
 - `LOAD_WORKOUT_SUCCESS`: Workout loaded successfully
 - `LOAD_WORKOUT_ERROR`: Error loading workout
@@ -109,6 +120,7 @@ Reducer handling all state mutations. Extends `workoutLoggerReducer` with editor
 ### Request/Response Types
 
 **PUT Body (UpdateWorkoutCommand):**
+
 ```typescript
 {
   date?: string;
@@ -118,6 +130,7 @@ Reducer handling all state mutations. Extends `workoutLoggerReducer` with editor
 ```
 
 **DELETE Response:**
+
 ```typescript
 {
   message: string;
@@ -127,6 +140,7 @@ Reducer handling all state mutations. Extends `workoutLoggerReducer` with editor
 ## Re-used Components
 
 From `workout-logger`:
+
 - `ExerciseCombobox` - For adding new exercises
 - `ExerciseList` - For displaying and editing exercise sets
 - `ExerciseCard` - Individual exercise card
@@ -167,6 +181,7 @@ These components work seamlessly with the editor state.
 ## Unsaved Changes Protection
 
 When user tries to cancel:
+
 - If no changes: Navigate immediately
 - If changes exist: Show browser confirm dialog
 - User can choose to stay or leave
@@ -174,6 +189,7 @@ When user tries to cancel:
 ## Styling
 
 Consistent with the rest of the app:
+
 - Card-based layout with borders
 - Muted colors for metadata
 - Loading spinners for async operations
@@ -182,15 +198,15 @@ Consistent with the rest of the app:
 
 ## Differences from Workout Logger
 
-| Feature | Workout Logger | Workout Editor |
-|---------|---------------|----------------|
-| Mode | Create new workout | Edit existing |
-| API Call | POST /api/workouts | PUT /api/workouts/:id |
-| Delete | Not available | DELETE with confirmation |
-| Draft saving | localStorage | No (edits existing DB record) |
-| Created timestamp | Not shown | Shown in header |
-| Cancel behavior | Clear form | Navigate back with confirm |
-| "Copy last workout" | Available | Not available |
+| Feature             | Workout Logger     | Workout Editor                |
+| ------------------- | ------------------ | ----------------------------- |
+| Mode                | Create new workout | Edit existing                 |
+| API Call            | POST /api/workouts | PUT /api/workouts/:id         |
+| Delete              | Not available      | DELETE with confirmation      |
+| Draft saving        | localStorage       | No (edits existing DB record) |
+| Created timestamp   | Not shown          | Shown in header               |
+| Cancel behavior     | Clear form         | Navigate back with confirm    |
+| "Copy last workout" | Available          | Not available                 |
 
 ## Future Improvements
 
